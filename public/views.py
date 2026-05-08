@@ -119,57 +119,7 @@ def playground_detail(request, organization_slug, playground_slug):
     )
 
     preview_photo = playground.get_preview_photo()
-
     equipment_list = list(playground.equipment.all())
-
-    public_defects = (
-        Defect.objects
-        .select_related(
-            "equipment",
-            "surface",
-            "accessory",
-            "inspection",
-        )
-        .filter(
-            playground=playground,
-            public_visible=True,
-        )
-        .exclude(
-            status__in=[
-                Defect.STATUS_DONE,
-                Defect.STATUS_VERIFIED,
-            ]
-        )
-        .order_by(
-            "-has_safety_risk",
-            "planned_resolution_date",
-            "-created_at",
-        )
-    )
-
-    latest_completed_inspection = (
-        Inspection.objects
-        .filter(
-            playground=playground,
-            status=Inspection.STATUS_COMPLETED,
-        )
-        .select_related("inspector", "completed_by")
-        .order_by("-inspected_at", "-completed_at", "-created_at")
-        .first()
-    )
-
-    defects_by_equipment_id = {}
-
-    for defect in public_defects:
-        if defect.equipment_id:
-            defects_by_equipment_id.setdefault(defect.equipment_id, []).append(defect)
-
-    for equipment in equipment_list:
-        equipment.public_defects = defects_by_equipment_id.get(equipment.id, [])
-        equipment.has_public_defect = bool(equipment.public_defects)
-        equipment.has_public_safety_risk = any(
-            defect.has_safety_risk for defect in equipment.public_defects
-        )
 
     can_create_inspection = False
     can_create_defect = False
@@ -185,10 +135,61 @@ def playground_detail(request, organization_slug, playground_slug):
                 can_create_inspection = profile.may_inspect
                 can_create_defect = profile.may_maintain
 
+    visible_defects = (
+        Defect.objects
+        .select_related(
+            "equipment",
+            "surface",
+            "accessory",
+            "inspection",
+        )
+        .filter(playground=playground)
+        .exclude(
+            status__in=[
+                Defect.STATUS_DONE,
+                Defect.STATUS_VERIFIED,
+            ]
+        )
+    )
+
+    if not can_create_defect:
+        visible_defects = visible_defects.filter(public_visible=True)
+
+    visible_defects = visible_defects.order_by(
+        "public_visible",
+        "-has_safety_risk",
+        "planned_resolution_date",
+        "-created_at",
+    )
+
+    latest_completed_inspection = (
+        Inspection.objects
+        .filter(
+            playground=playground,
+            status=Inspection.STATUS_COMPLETED,
+        )
+        .select_related("inspector", "completed_by")
+        .order_by("-inspected_at", "-completed_at", "-created_at")
+        .first()
+    )
+
+    defects_by_equipment_id = {}
+
+    for defect in visible_defects:
+        if defect.equipment_id:
+            defects_by_equipment_id.setdefault(defect.equipment_id, []).append(defect)
+
+    for equipment in equipment_list:
+        equipment.public_defects = defects_by_equipment_id.get(equipment.id, [])
+        equipment.has_public_defect = bool(equipment.public_defects)
+        equipment.has_public_safety_risk = any(
+            defect.has_safety_risk for defect in equipment.public_defects
+        )
+
     context = {
         "playground": playground,
         "equipment_list": equipment_list,
-        "public_defects": public_defects,
+        "public_defects": visible_defects,
         "can_create_inspection": can_create_inspection,
         "can_create_defect": can_create_defect,
         "preview_photo": preview_photo,
