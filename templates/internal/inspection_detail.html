@@ -449,6 +449,32 @@
                                             >{{ answer.comment }}</textarea>
                                         </div>
                                     {% endif %}
+
+                                    {% if answer.defects.all %}
+                                        <div class="small mt-3 p-2 rounded-3 bg-light">
+                                            <strong>Erfasste Mängel:</strong>
+                                            {% for defect in answer.defects.all %}
+                                                <span class="badge text-bg-light border ms-1">
+                                                    #{{ defect.id }} · {{ defect.get_status_display }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if inspection.status != "completed" and answer.answer == "defect" and can_create_defects %}
+                                        <div class="mt-3">
+                                            <a
+                                                href="{% url 'internal:create_defect_from_inspection_answer' answer.id %}"
+                                                class="btn btn-sm btn-outline-danger"
+                                            >
+                                                Mangel erfassen
+                                            </a>
+                                        </div>
+                                    {% elif inspection.status != "completed" and answer.answer == "defect" and not can_create_defects %}
+                                        <div class="small text-secondary mt-3">
+                                            Für das Erfassen von Mängeln ist eine Unterhaltsberechtigung erforderlich.
+                                        </div>
+                                    {% endif %}
                                 </article>
                             </div>
                         {% empty %}
