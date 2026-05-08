@@ -7,6 +7,7 @@
 # unless expressly permitted in writing.
 
 from django import forms
+from django.utils import timezone
 
 from inspections.models import Defect
 from playgrounds.models import PlayEquipment, PlaygroundAccessory, PlaygroundSurface
@@ -121,3 +122,80 @@ class DefectCreateForm(forms.ModelForm):
             )
 
         return cleaned_data
+
+
+class DefectFromInspectionAnswerForm(forms.ModelForm):
+    class Meta:
+        model = Defect
+        fields = (
+            "reported_at",
+            "reported_by_text",
+            "internal_description",
+            "internal_note",
+            "has_safety_risk",
+            "status",
+            "planned_resolution_date",
+            "public_visible",
+            "public_note",
+        )
+        widgets = {
+            "reported_at": forms.DateTimeInput(
+                attrs={
+                    "type": "datetime-local",
+                    "class": "form-control",
+                },
+                format="%Y-%m-%dT%H:%M",
+            ),
+            "planned_resolution_date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "form-control",
+                }
+            ),
+            "internal_description": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "class": "form-control",
+                }
+            ),
+            "internal_note": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "class": "form-control",
+                }
+            ),
+            "public_note": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "class": "form-control",
+                }
+            ),
+        }
+
+    def __init__(self, *args, inspection_answer=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.inspection_answer = inspection_answer
+
+        if not self.is_bound:
+            self.initial.setdefault("reported_at", timezone.localtime().strftime("%Y-%m-%dT%H:%M"))
+            self.initial.setdefault("source_type", Defect.SOURCE_INSPECTION)
+
+            if inspection_answer and inspection_answer.comment:
+                self.initial.setdefault("internal_description", inspection_answer.comment)
+
+        for field in self.fields.values():
+            existing_classes = field.widget.attrs.get("class", "")
+
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs["class"] = "form-check-input"
+            elif "form-control" not in existing_classes and "form-select" not in existing_classes:
+                if isinstance(field.widget, forms.Select):
+                    field.widget.attrs["class"] = "form-select"
+                else:
+                    field.widget.attrs["class"] = "form-control"
+
+        self.fields["reported_by_text"].required = False
+        self.fields["internal_note"].required = False
+        self.fields["planned_resolution_date"].required = False
+        self.fields["public_note"].required = False
