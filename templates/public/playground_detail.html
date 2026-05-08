@@ -37,6 +37,18 @@
         }
         .empty-state { border: 1px dashed #CBD5E1; border-radius: 1rem; background: #F8FAFC; }
         .defect-card { border-radius: 1rem; }
+        .internal-defect-row {
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+        }
+        .internal-defect-description {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     </style>
 </head>
 
@@ -161,19 +173,29 @@
                                         {% if equipment.has_public_defect %}
                                             <div class="mb-3 p-2 rounded-3 {% if equipment.has_public_safety_risk %}bg-warning-subtle{% else %}bg-success-subtle{% endif %}">
                                                 <div class="small fw-semibold mb-1">Öffentlicher Pflegestand</div>
-                                                {% for defect in equipment.public_defects %}
-                                                    <div class="small mb-2">
-                                                        {{ defect.get_public_message }}
-                                                        {% if defect.planned_resolution_date %}
-                                                            <br><strong>Geplante Behebung:</strong> {{ defect.planned_resolution_date|date:"d.m.Y" }}
-                                                        {% endif %}
-                                                        {% if can_create_defect %}
-                                                            <div class="mt-2">
-                                                                <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary">Mangel bearbeiten</a>
-                                                            </div>
+
+                                                {% with first_defect=equipment.public_defects.0 %}
+                                                    <div class="small">
+                                                        {{ first_defect.get_public_message }}
+                                                        {% if first_defect.planned_resolution_date %}
+                                                            <br><strong>Geplante Behebung:</strong> {{ first_defect.planned_resolution_date|date:"d.m.Y" }}
                                                         {% endif %}
                                                     </div>
-                                                {% endfor %}
+                                                {% endwith %}
+
+                                                {% if can_create_defect %}
+                                                    <div class="small fw-semibold mt-3 mb-2">Interne Mängel</div>
+                                                    <div class="d-flex flex-column gap-2">
+                                                        {% for defect in equipment.public_defects %}
+                                                            <div class="internal-defect-row d-flex flex-column flex-lg-row justify-content-between gap-2 align-items-lg-center">
+                                                                <div class="internal-defect-description" title="{{ defect.internal_description }}">
+                                                                    #{{ defect.id }} · {{ defect.internal_description|truncatechars:45 }}
+                                                                </div>
+                                                                <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel bearbeiten</a>
+                                                            </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         {% endif %}
 
@@ -218,7 +240,9 @@
                                     <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
                                         <div>
                                             <div class="fw-bold">{% if defect.equipment %}{{ defect.equipment.name }}{% else %}Allgemeiner Spielplatzmangel{% endif %}</div>
-                                            <div class="small text-secondary">Status: {{ defect.get_status_display }}</div>
+                                            <div class="small text-secondary">
+                                                Status: {{ defect.get_status_display }}{% if can_create_defect and not defect.public_visible %} · intern{% endif %}
+                                            </div>
                                         </div>
                                         {% if defect.has_safety_risk %}
                                             <span class="badge text-bg-warning">Sicherheitsrisiko</span>
@@ -232,6 +256,9 @@
                                         <div class="small fw-semibold">Geplante Behebung: {{ defect.planned_resolution_date|date:"d.m.Y" }}</div>
                                     {% endif %}
                                     {% if can_create_defect %}
+                                        <div class="small text-secondary mt-2" title="{{ defect.internal_description }}">
+                                            {{ defect.internal_description|truncatechars:60 }}
+                                        </div>
                                         <div class="mt-3">
                                             <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary">Mangel bearbeiten</a>
                                         </div>
