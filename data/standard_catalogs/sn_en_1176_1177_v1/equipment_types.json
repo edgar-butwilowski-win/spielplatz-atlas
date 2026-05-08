@@ -1,0 +1,834 @@
+[
+  {
+    "name": "Anbaurutsche",
+    "code": "geraeteart-58",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Balancierbalken",
+    "code": "geraeteart-18",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Balanciergerät",
+    "is_active": true
+  },
+  {
+    "name": "Balancierbalken abhängend",
+    "code": "geraeteart-20",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Balanciergerät",
+    "is_active": true
+  },
+  {
+    "name": "Balancierbalken drehbar",
+    "code": "geraeteart-19",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Balanciergerät",
+    "is_active": true
+  },
+  {
+    "name": "Balancierseil",
+    "code": "geraeteart-21",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Balanciergerät",
+    "is_active": true
+  },
+  {
+    "name": "Ballkörbe",
+    "code": "geraeteart-100",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Ausstattungen, Zusatzeinrichtungen",
+    "is_active": true
+  },
+  {
+    "name": "Barren",
+    "code": "geraeteart-13",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Einzelgerät",
+    "is_active": true
+  },
+  {
+    "name": "Baumstamm",
+    "code": "geraeteart-84",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Naturnahe Spielelemente",
+    "is_active": true
+  },
+  {
+    "name": "Bodentrampolin",
+    "code": "geraeteart-30",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Trampolin",
+    "is_active": true
+  },
+  {
+    "name": "Breitrutsche",
+    "code": "geraeteart-65",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Brettschaukel",
+    "code": "geraeteart-44",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Drehkugel",
+    "code": "geraeteart-27",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rotationsgerät",
+    "is_active": false
+  },
+  {
+    "name": "Einpunkt Wippe (Typ 2a und Typ 2b) / Spiralfedern, Blattfedern, Zug- und Druckblöcke",
+    "code": "geraeteart-75",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wippgerät",
+    "is_active": true
+  },
+  {
+    "name": "Einpunktschaukeln",
+    "code": "geraeteart-53",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ 3",
+    "is_active": true
+  },
+  {
+    "name": "Einzelturm",
+    "code": "geraeteart-3",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Turmanlage",
+    "is_active": true
+  },
+  {
+    "name": "Ertasten, Barfussweg",
+    "code": "geraeteart-95",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Fachwerk-Raumnetz",
+    "code": "geraeteart-82",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Raumnetz",
+    "is_active": true
+  },
+  {
+    "name": "Fernrohr",
+    "code": "geraeteart-93",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Findlinge",
+    "code": "geraeteart-87",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Naturnahe Spielelemente",
+    "is_active": true
+  },
+  {
+    "name": "Fitnessgerät",
+    "code": "geraeteart-97",
+    "norm_reference": "EN 16630",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Fitnessgerät",
+    "is_active": true
+  },
+  {
+    "name": "Flächennetz",
+    "code": "geraeteart-80",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Raumnetz",
+    "is_active": true
+  },
+  {
+    "name": "Gerade Rutsche",
+    "code": "geraeteart-55",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Geschicklichkeitgerät",
+    "code": "geraeteart-88",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Gurtenschaukel",
+    "code": "geraeteart-46",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Gurtensteg",
+    "code": "geraeteart-23",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Balanciergerät",
+    "is_active": true
+  },
+  {
+    "name": "Handicapschaukel",
+    "code": "geraeteart-51",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Hangelsteg",
+    "code": "geraeteart-14",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Einzelgerät",
+    "is_active": true
+  },
+  {
+    "name": "Hangrutsche",
+    "code": "geraeteart-57",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Holzpoller, Holzrugel",
+    "code": "geraeteart-86",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Naturnahe Spielelemente",
+    "is_active": true
+  },
+  {
+    "name": "Hängematte",
+    "code": "geraeteart-16",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Einzelgerät",
+    "is_active": true
+  },
+  {
+    "name": "Innenlaufrolle",
+    "code": "geraeteart-28",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Laufrolle",
+    "is_active": true
+  },
+  {
+    "name": "Karussell Typ A / Drehkreuz",
+    "code": "geraeteart-68",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Karussell",
+    "is_active": true
+  },
+  {
+    "name": "Karussell Typ B / mit drehendem Boden, Bodenbündig",
+    "code": "geraeteart-69",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Karussell",
+    "is_active": true
+  },
+  {
+    "name": "Karussell Typ B / mit drehendem Boden, nicht Bodenbündig",
+    "code": "geraeteart-70",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Karussell",
+    "is_active": true
+  },
+  {
+    "name": "Karussell Typ C / Drehpilze, Rundläufe, Drehklettertürme",
+    "code": "geraeteart-71",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Karussell",
+    "is_active": true
+  },
+  {
+    "name": "Karussell Typ D / bahngeführtes Karussell",
+    "code": "geraeteart-72",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Karussell",
+    "is_active": true
+  },
+  {
+    "name": "Karussell Typ E / Drehscheiben, Drehkorb, Balancierteller",
+    "code": "geraeteart-73",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Karussell",
+    "is_active": true
+  },
+  {
+    "name": "Klangelement",
+    "code": "geraeteart-90",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Kleinkindersitzschaukel",
+    "code": "geraeteart-45",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Kletter",
+    "code": "geraeteart-10",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Labyrinth",
+    "is_active": true
+  },
+  {
+    "name": "Kletteranlage mit Holzstämme",
+    "code": "geraeteart-5",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Kletteranlage",
+    "is_active": true
+  },
+  {
+    "name": "Kletterbaumstamm",
+    "code": "geraeteart-85",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Naturnahe Spielelemente",
+    "is_active": true
+  },
+  {
+    "name": "Klettergerät ohne Turm",
+    "code": "geraeteart-6",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Kletteranlage",
+    "is_active": true
+  },
+  {
+    "name": "Kletternetze, Sprossenwand",
+    "code": "geraeteart-8",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Kletteranlage",
+    "is_active": true
+  },
+  {
+    "name": "Kletterpfahl",
+    "code": "geraeteart-15",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Einzelgerät",
+    "is_active": true
+  },
+  {
+    "name": "Kletterstange 5 Meter",
+    "code": "geraeteart-98",
+    "norm_reference": "EN 16899",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sportgerät",
+    "is_active": true
+  },
+  {
+    "name": "Kombianlage, 2 oder mehre Spieltürme",
+    "code": "geraeteart-4",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Turmanlage",
+    "is_active": true
+  },
+  {
+    "name": "Kontaktschaukeln",
+    "code": "geraeteart-54",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ4",
+    "is_active": true
+  },
+  {
+    "name": "Korbschaukel",
+    "code": "geraeteart-49",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Kreisel",
+    "code": "geraeteart-26",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rotationsgerät",
+    "is_active": false
+  },
+  {
+    "name": "Kurvenrutsche",
+    "code": "geraeteart-60",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Labyrinth",
+    "code": "geraeteart-11",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Labyrinth",
+    "is_active": true
+  },
+  {
+    "name": "Mahlwand",
+    "code": "geraeteart-94",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Mehrpunkt Wippe (Typ 3a und Typ 3b)",
+    "code": "geraeteart-76",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wippgerät",
+    "is_active": true
+  },
+  {
+    "name": "Mikadowippe",
+    "code": "geraeteart-22",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Balanciergerät",
+    "is_active": true
+  },
+  {
+    "name": "Mittelmast-Raumnetz",
+    "code": "geraeteart-81",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Raumnetz",
+    "is_active": true
+  },
+  {
+    "name": "Plattformschaukel",
+    "code": "geraeteart-50",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Pneuschaukel",
+    "code": "geraeteart-47",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Reckstange",
+    "code": "geraeteart-12",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Einzelgerät",
+    "is_active": true
+  },
+  {
+    "name": "Rotationsscheibe",
+    "code": "geraeteart-25",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rotationsgerät",
+    "is_active": false
+  },
+  {
+    "name": "Sandanlage",
+    "code": "geraeteart-31",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sandspielgerät",
+    "is_active": true
+  },
+  {
+    "name": "Sandbagger",
+    "code": "geraeteart-32",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sandspielgerät",
+    "is_active": true
+  },
+  {
+    "name": "Sandkasten",
+    "code": "geraeteart-33",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sandspielgerät",
+    "is_active": true
+  },
+  {
+    "name": "Sandkastenabdeckung",
+    "code": "geraeteart-35",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sandspielgerät",
+    "is_active": true
+  },
+  {
+    "name": "Sandkran",
+    "code": "geraeteart-34",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sandspielgerät",
+    "is_active": true
+  },
+  {
+    "name": "Sandtische",
+    "code": "geraeteart-36",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sandspielgerät",
+    "is_active": true
+  },
+  {
+    "name": "Schaufelrad",
+    "code": "geraeteart-40",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Schaukel",
+    "code": "schaukel",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "",
+    "is_active": true
+  },
+  {
+    "name": "Schaukel mit mehreren Drehachsen",
+    "code": "geraeteart-52",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ2",
+    "is_active": true
+  },
+  {
+    "name": "Schlittelhang",
+    "code": "geraeteart-101",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx",
+    "is_active": true
+  },
+  {
+    "name": "Schwebebalken",
+    "code": "geraeteart-102",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Einzelgerät",
+    "is_active": true
+  },
+  {
+    "name": "Schwenkwippe, oberhalb der Benutzerposition gelagert (Typ5)",
+    "code": "geraeteart-78",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wippgerät",
+    "is_active": true
+  },
+  {
+    "name": "Schwingwippe (Typ 4)",
+    "code": "geraeteart-77",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wippgerät",
+    "is_active": true
+  },
+  {
+    "name": "Seilanlage",
+    "code": "geraeteart-7",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Kletteranlage",
+    "is_active": true
+  },
+  {
+    "name": "Seilbahn für hängende Nutzung",
+    "code": "geraeteart-66",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Seilbahn",
+    "is_active": true
+  },
+  {
+    "name": "Seilbahn für sitzende Nutzung",
+    "code": "geraeteart-67",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Seilbahn",
+    "is_active": true
+  },
+  {
+    "name": "Spiegel",
+    "code": "geraeteart-92",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Spielcontainer",
+    "code": "geraeteart-96",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Vollständig umschlossene Spielgeräte im Aussenbereich",
+    "is_active": true
+  },
+  {
+    "name": "Spielhaus, Dach bekletterbar",
+    "code": "geraeteart-1",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Spielhaus",
+    "is_active": true
+  },
+  {
+    "name": "Spielhaus, Dach nicht bekletterbar",
+    "code": "geraeteart-2",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Spielhaus",
+    "is_active": true
+  },
+  {
+    "name": "Spiralrad",
+    "code": "geraeteart-91",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Sprachrohr",
+    "code": "geraeteart-89",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Sinnes-Elemente",
+    "is_active": false
+  },
+  {
+    "name": "Steh- Sitzseilschaukel",
+    "code": "geraeteart-48",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Schaukel Typ1",
+    "is_active": true
+  },
+  {
+    "name": "Street Workout",
+    "code": "geraeteart-9",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Kombianlage",
+    "is_active": true
+  },
+  {
+    "name": "Tischtennistisch",
+    "code": "geraeteart-103",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Ausstattungen, Zusatzeinrichtungen",
+    "is_active": true
+  },
+  {
+    "name": "Tore",
+    "code": "geraeteart-99",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Ausstattungen, Zusatzeinrichtungen",
+    "is_active": true
+  },
+  {
+    "name": "Tretrolle",
+    "code": "geraeteart-29",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Laufrolle",
+    "is_active": true
+  },
+  {
+    "name": "Tunnel- Röhrenrutsche",
+    "code": "geraeteart-62",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Tunnelröhre",
+    "code": "geraeteart-17",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Tunnel",
+    "is_active": true
+  },
+  {
+    "name": "Wasseranlage",
+    "code": "geraeteart-37",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Wasserrad",
+    "code": "geraeteart-39",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Wasserschnecke",
+    "code": "geraeteart-42",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Wasserschöpfrad",
+    "code": "geraeteart-43",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Wasserspender",
+    "code": "geraeteart-41",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Wassertisch",
+    "code": "geraeteart-38",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wasserspielgeräte",
+    "is_active": true
+  },
+  {
+    "name": "Weidenhaus",
+    "code": "geraeteart-83",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Naturnahe Spielelemente",
+    "is_active": true
+  },
+  {
+    "name": "Wellenrutsche",
+    "code": "geraeteart-56",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Wendel-, Spiralrutsche",
+    "code": "geraeteart-59",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "Zirkelscheibe",
+    "code": "geraeteart-24",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rotationsgerät",
+    "is_active": false
+  },
+  {
+    "name": "axiale Wippe (Typ1)  / nur vertikale Bewegung, Balkenwippe",
+    "code": "geraeteart-74",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wippgerät",
+    "is_active": true
+  },
+  {
+    "name": "einachsige Überkopfwippe (Typ6)",
+    "code": "geraeteart-79",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Wippgerät",
+    "is_active": true
+  },
+  {
+    "name": "freistehende Bockrutsche",
+    "code": "geraeteart-61",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "kombinierte Tunnelrutsche",
+    "code": "geraeteart-63",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  },
+  {
+    "name": "mehrbahnige Rutsche",
+    "code": "geraeteart-64",
+    "norm_reference": "SN EN 1176",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus Neu Spielgerätearten.xlsx | Typ: Rutschbahn",
+    "is_active": true
+  }
+]

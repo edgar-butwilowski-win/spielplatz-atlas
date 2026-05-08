@@ -1,0 +1,655 @@
+[
+  {
+    "area": "Allgemeine Metallteile",
+    "title": "Auf scharfe Kanten prüfen. Schweissnähte auf Brüche oder Abtrennungen prüfen.",
+    "inspection_text": "Auf scharfe Kanten prüfen. Schweissnähte auf Brüche oder Abtrennungen prüfen.",
+    "maintenance_text": "Gegebenenfalls reparieren oder austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Allgemeine Sichtprüfung",
+    "title": "Sichtbare Beschädigungen",
+    "inspection_text": "Sichtprüfung auf offensichtliche Schäden, lose Teile oder auffällige Veränderungen.",
+    "maintenance_text": "Auffälligkeiten dokumentieren und bei Bedarf Massnahme auslösen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "visual",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      },
+      {
+        "scope_type": "playground",
+        "applies_to_all_equipment": false,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Aluminium",
+    "title": "Auf Beschädigung und oder Abnutzung prüfen.",
+    "inspection_text": "Auf Beschädigung und oder Abnutzung prüfen.",
+    "maintenance_text": "Gegebenenfalls austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Beschädigte oder fehlende Teile",
+    "title": "Auf Risse an Rutschen, Rutschstangen, Dächern oder Geländern prüfen, an denen Kleidung hängen bleiben könnte.",
+    "inspection_text": "Auf Risse an Rutschen, Rutschstangen, Dächern oder Geländern prüfen, an denen Kleidung hängen bleiben könnte.",
+    "maintenance_text": "Gelockerte oder verstellte Teile festziehen. Falls dies nicht ausreicht, könnte eine Vorrichtung, die das Verfangen verhindert, das Problem lösen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Beschädigte oder fehlende Teile",
+    "title": "Auf beschädigte, lose oder fehlende Teile prüfen.",
+    "inspection_text": "Auf beschädigte, lose oder fehlende Teile prüfen.",
+    "maintenance_text": "Gegebenenfalls austauschen oder wieder befestigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Bewegliche Teile",
+    "title": "Aufhängungselemente",
+    "inspection_text": "Aufhängungselemente",
+    "maintenance_text": "Teile (z.B. Ketten, Seile, Lagerbüchsen, Federelemente) austauschen, die zu mehr als 50 % abgenutzt sind, die Risse oder andere Abnutzungsmerkmale aufweisen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Bewegliche Teile",
+    "title": "Drehende Ringe, z. B. Karussell",
+    "inspection_text": "Drehende Ringe, z. B. Karussell",
+    "maintenance_text": "Teile austauschen, deren Beweglichkeit teilweise oder vollständig behindert wird oder ungleichmässig sind.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Bewegliche Teile",
+    "title": "Drehende oder bewegliche Teile auf Funktion und Abnutzung prüfen.",
+    "inspection_text": "Drehende oder bewegliche Teile auf Funktion und Abnutzung prüfen.",
+    "maintenance_text": "Eventuell austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Bewegliche Teile",
+    "title": "Federn und Gummielemente",
+    "inspection_text": "Federn und Gummielemente",
+    "maintenance_text": "Verbindungen gegebenenfalls festziehen. Bei Korrosion, dieStelle vermerken für nächste Kontrolle und oder austauschen oder reparieren.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Bewegliche Teile",
+    "title": "Lager, drehende Teile und Schaukelaufhängungen.",
+    "inspection_text": "Lager, drehende Teile und Schaukelaufhängungen.",
+    "maintenance_text": "Teile austauschen, deren Beweglichkeit teilweise oder vollständig behindert wird oder ungleichmässig sind.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Bewegliche Teile",
+    "title": "Prüfen, ob die Schutzabdeckungen unbeschädigt und an der richtigen Stelle sind.",
+    "inspection_text": "Prüfen, ob die Schutzabdeckungen unbeschädigt und an der richtigen Stelle sind.",
+    "maintenance_text": "Eventuell austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Fangstellen",
+    "title": "Spielgerät auf Fangstellen prüfen.",
+    "inspection_text": "Spielgerät auf Fangstellen prüfen.",
+    "maintenance_text": "Gegebenenfalls Fangstelle beseitigen. Falls nicht möglich Stelle sichern. Falls nicht möglich absperren bis zur Beseitigung.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Fester Fallschutz \n(Rasen,Oberboden)",
+    "title": "Oberfläche auf Sand, Kies und Schmutz prüfen.",
+    "inspection_text": "Oberfläche auf Sand, Kies und Schmutz prüfen.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Fester Fallschutz \n(Rasen,Oberboden)",
+    "title": "Prüfen, ob Fallbereich eine ebene Oberfläche bildet und keine Stolpergefahr darstellt.",
+    "inspection_text": "Prüfen, ob Fallbereich eine ebene Oberfläche bildet und keine Stolpergefahr darstellt.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Fundamente",
+    "title": "Alle Fundamente auf Stabilität prüfen. Scharfe Kanten und Beton müssen durch einen Fallschutzbelag abgedeckt sein.",
+    "inspection_text": "Alle Fundamente auf Stabilität prüfen. Scharfe Kanten und Beton müssen durch einen Fallschutzbelag abgedeckt sein.",
+    "maintenance_text": "Fundament stabilisieren und Belag korrigieren.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Fundamente",
+    "title": "Fallschutzbelag beseitigen, um den Zustand des Fundaments auf Beschädigungen im Untergrundbereich prüfen. Besondere Vorsicht gilt bei Konstruktionen, die von nur einem Pfosten getragen werden.",
+    "inspection_text": "Fallschutzbelag beseitigen, um den Zustand des Fundaments auf Beschädigungen im Untergrundbereich prüfen. Besondere Vorsicht gilt bei Konstruktionen, die von nur einem Pfosten getragen werden.",
+    "maintenance_text": "Gegebenenfalls reparieren oder austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Gummibelag",
+    "title": "Auf Beschädigungen und Abnutzung prüfen.",
+    "inspection_text": "Auf Beschädigungen und Abnutzung prüfen.",
+    "maintenance_text": "Gegebenenfalls auswechseln.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Gummibelag",
+    "title": "Oberfläche auf Verunreinigungen prüfen.",
+    "inspection_text": "Oberfläche auf Verunreinigungen prüfen.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Gummibelag",
+    "title": "Prüfen, ob Gummibelagsteile eine ebene Oberfläche bilden und keine Stolpergefahr darstellen.",
+    "inspection_text": "Prüfen, ob Gummibelagsteile eine ebene Oberfläche bilden und keine Stolpergefahr darstellen.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Hinzugefügte Teile",
+    "title": "Auf Teile (Fremdkörper) prüfen, die an die Produkte gebunden wurden bzw. sich daran befinden (Springseile, Kleidung usw.)",
+    "inspection_text": "Auf Teile (Fremdkörper) prüfen, die an die Produkte gebunden wurden bzw. sich daran befinden (Springseile, Kleidung usw.)",
+    "maintenance_text": "Entfernen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Holz",
+    "title": "Auf Risse, Splitter oder Abnutzung prüfen. Sperrholzplatten auf übermässige Abnutzung und Verfall (Fäulniss) prüfen.",
+    "inspection_text": "Auf Risse, Splitter oder Abnutzung prüfen. Sperrholzplatten auf übermässige Abnutzung und Verfall (Fäulniss) prüfen.",
+    "maintenance_text": "Gegebenenfalls austauschen oder reparieren. Holz ist ein natürliches Material, bei dem sich nach einiger Zeit Risse bilden. Kleinere Risse beeinflussen die Qualität und Sicherheit nicht.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Ketten",
+    "title": "Ketten auf Beschädigung oder Abnutzung prüfen.",
+    "inspection_text": "Ketten auf Beschädigung oder Abnutzung prüfen.",
+    "maintenance_text": "Wenn sie zu mehr als 50 % abgenutzt sind, müssen sie ausgetauscht werden.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Kunststoff und Gummi",
+    "title": "Kunststoff- und Gummiteile auf Abnutzung, Beschädigung und Risse prüfen.",
+    "inspection_text": "Kunststoff- und Gummiteile auf Abnutzung, Beschädigung und Risse prüfen.",
+    "maintenance_text": "Gegebenenfalls austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Lackierter Stahl",
+    "title": "Auf Kratzer, Abnutzung und erste Korrosion prüfen.",
+    "inspection_text": "Auf Kratzer, Abnutzung und erste Korrosion prüfen.",
+    "maintenance_text": "Die Lackierung durch Beseitigung sämtlicher Korrosion und Auftrag eines geeigneten Lacks erneuern oder gegebenenfalls die Teile austauschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Loser Fallschutz",
+    "title": "Den losen Fallschutz auf Fremdkörper prüfen.",
+    "inspection_text": "Den losen Fallschutz auf Fremdkörper prüfen.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Loser Fallschutz",
+    "title": "Die Stärke des losen Fallschutzes im Hinblick auf EN1176-1 prüfen.",
+    "inspection_text": "Die Stärke des losen Fallschutzes im Hinblick auf EN1176-1 prüfen.",
+    "maintenance_text": "Gegebenenfalls auffüllen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Loser Fallschutz",
+    "title": "Lose Füllung auf genügend Einfüllhöhe, im Hinblick die Grundmarkierung auf den Produkten prüfen.",
+    "inspection_text": "Lose Füllung auf genügend Einfüllhöhe, im Hinblick die Grundmarkierung auf den Produkten prüfen.",
+    "maintenance_text": "Gegebenenfalls nachfüllen oder ausgleichen. Besondere Aufmerksamkeit gilt den stark bespielten Bereichen, z. B. unter Schaukeln und im Auslaufbereich von Rutschen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Rasengitter-Fallschutzplatten",
+    "title": "Auf Beschädigungen und Abnutzung prüfen.",
+    "inspection_text": "Auf Beschädigungen und Abnutzung prüfen.",
+    "maintenance_text": "Gegebenenfalls auswechseln.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Rasengitter-Fallschutzplatten",
+    "title": "Oberfläche auf Verunreinigungen prüfen.",
+    "inspection_text": "Oberfläche auf Verunreinigungen prüfen.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Rasengitter-Fallschutzplatten",
+    "title": "Prüfen, ob Gummibelagsteile eine ebene Oberfläche bilden und keine Stolpergefahr darstellen.",
+    "inspection_text": "Prüfen, ob Gummibelagsteile eine ebene Oberfläche bilden und keine Stolpergefahr darstellen.",
+    "maintenance_text": "Gegebenenfalls beseitigen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Sauberkeit",
+    "title": "Sauberkeit",
+    "inspection_text": "",
+    "maintenance_text": "Erde, Blätter und sonstigen Schmutz, sowie Fremdkörper auf und um das Spielgerät entfernen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Seile",
+    "title": "Seile auf Abnutzung prüfen.",
+    "inspection_text": "Seile auf Abnutzung prüfen.",
+    "maintenance_text": "Stahldraht darf zu sehen sein, aber wenn er beginnt auszufransen (gebrochene Drähte), muss das Seil ausgetauscht werden.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Stahlseile",
+    "title": "Spannung der Stahlseile prüfen.",
+    "inspection_text": "Spannung der Stahlseile prüfen.",
+    "maintenance_text": "Gegebenenfalls entsprechend der Montageanleitung anpassen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Stahlseile",
+    "title": "Stahlseile auf Abnutzung, Beschädigung und Korrosion prüfen.",
+    "inspection_text": "Stahlseile auf Abnutzung, Beschädigung und Korrosion prüfen.",
+    "maintenance_text": "Wenn Stahlseile beginnen, auszufransen oder andere Schäden aufweisen, müssen sie ausgetauscht werden.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Verbindungen",
+    "title": "Schraubenverbindungen auf Festigkeit prüfen. Nieten auf Festigkeit und Unversehrtheit prüfen.",
+    "inspection_text": "Schraubenverbindungen auf Festigkeit prüfen. Nieten auf Festigkeit und Unversehrtheit prüfen.",
+    "maintenance_text": "Die Verbindungen festziehen oder durch neue Produkt vorgegebene ersetzen. Für Produkte mit vorgeschriebenem Drehmoment gegebenenfalls Montageanleitung befolgen. Eventuell Mutterabdeckungen entfernen und oder bei Beschädigung durch Neue ersetzen.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  },
+  {
+    "area": "Verzinkung",
+    "title": "Auf Kratzer, Abnutzung und erste Korrosion prüfen.",
+    "inspection_text": "Auf Kratzer, Abnutzung und erste Korrosion prüfen.",
+    "maintenance_text": "Gegebenenfalls austauschen. Kleine Kratzer verschwinden von selbst – grössere Schäden können Korrosion verursachen und müssen repariert werden.",
+    "norm_reference": "Prüfkatalog auf Basis von SN EN 1176/1177",
+    "minimum_inspection_type": "operational",
+    "standard_version": "SN-EN-1176-1177-v1",
+    "source_note": "Import aus WGR_SP_INSP_KRITERIEN.xlsx",
+    "is_active": true,
+    "applicabilities": [
+      {
+        "scope_type": "equipment",
+        "applies_to_all_equipment": true,
+        "equipment_type_codes": []
+      }
+    ]
+  }
+]
