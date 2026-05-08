@@ -5,9 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ playground.name }} – SpielplatzAtlas</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         :root {
             --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }};
@@ -15,109 +13,46 @@
             --atlas-bg: #F8FAFC;
             --atlas-text: #0F172A;
         }
-
-        body {
-            background: var(--atlas-bg);
-            color: var(--atlas-text);
-        }
-
-        .navbar {
-            background: white;
-            border-bottom: 1px solid #E2E8F0;
-        }
-
+        body { background: var(--atlas-bg); color: var(--atlas-text); }
+        .navbar { background: white; border-bottom: 1px solid #E2E8F0; }
         .brand-mark {
-            width: 34px;
-            height: 34px;
-            border-radius: 12px;
+            width: 34px; height: 34px; border-radius: 12px;
             background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700;
         }
-
-        .btn-atlas-primary {
-            background: var(--atlas-primary);
-            border-color: var(--atlas-primary);
-            color: white;
-        }
-
-        .btn-atlas-primary:hover {
-            filter: brightness(0.92);
-            color: white;
-        }
-
-        .hero {
-            background: white;
-            border-bottom: 1px solid #E2E8F0;
-        }
-
-        .page-title {
-            font-size: clamp(2rem, 4vw, 3.5rem);
-            line-height: 1.05;
-            letter-spacing: -0.04em;
-        }
-
-        .content-card {
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1.25rem;
+        .btn-atlas-primary { background: var(--atlas-primary); border-color: var(--atlas-primary); color: white; }
+        .btn-atlas-primary:hover { filter: brightness(0.92); color: white; }
+        .hero { background: white; border-bottom: 1px solid #E2E8F0; }
+        .page-title { font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1.05; letter-spacing: -0.04em; }
+        .content-card, .equipment-card {
+            background: white; border: 1px solid #E2E8F0; border-radius: 1.25rem;
             box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
         }
-
-        .meta-label {
-            color: #64748B;
-            font-size: 0.875rem;
-        }
-
-        .equipment-card {
-            border: 1px solid #E2E8F0;
-            border-radius: 1rem;
-            background: white;
-        }
-
+        .equipment-card { border-radius: 1rem; box-shadow: none; }
+        .meta-label { color: #64748B; font-size: 0.875rem; }
         .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            border-radius: 999px;
-            padding: 0.25rem 0.65rem;
-            background: #ECFDF5;
-            color: #047857;
-            font-size: 0.85rem;
-            font-weight: 600;
-            white-space: nowrap;
+            display: inline-flex; border-radius: 999px; padding: 0.25rem 0.65rem;
+            background: #ECFDF5; color: #047857; font-size: 0.85rem; font-weight: 600;
         }
-
-        .empty-state {
-            border: 1px dashed #CBD5E1;
-            border-radius: 1rem;
-            background: #F8FAFC;
-        }
-
-        .defect-card {
-            border-radius: 1rem;
-        }
+        .empty-state { border: 1px dashed #CBD5E1; border-radius: 1rem; background: #F8FAFC; }
+        .defect-card { border-radius: 1rem; }
     </style>
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container-fluid px-3 px-lg-4">
             <a class="navbar-brand d-flex align-items-center gap-2" href="/">
                 <span class="brand-mark">A</span>
                 <span class="fw-bold">SpielplatzAtlas</span>
             </a>
-
             <div class="d-flex align-items-center gap-2">
                 <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
                 {% if request.user.is_authenticated %}
-                <a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>
+                    <a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>
                 {% else %}
-                <a href="/admin/" class="btn btn-sm btn-outline-secondary">Login</a>
+                    <a href="/admin/" class="btn btn-sm btn-outline-secondary">Login</a>
                 {% endif %}
             </div>
         </div>
@@ -130,36 +65,22 @@
                     <div class="text-uppercase fw-semibold small mb-2" style="color: var(--atlas-primary);">
                         {{ playground.organization.name }}
                     </div>
-
-                    <h1 class="page-title fw-bold mb-3">
-                        {{ playground.name }}
-                    </h1>
-
+                    <h1 class="page-title fw-bold mb-3">{{ playground.name }}</h1>
                     {% if playground.description %}
-                    <p class="fs-5 text-secondary mb-0">
-                        {{ playground.description }}
-                    </p>
+                        <p class="fs-5 text-secondary mb-0">{{ playground.description }}</p>
                     {% else %}
-                    <p class="fs-5 text-secondary mb-0">
-                        Dein Spielplatz. Deine Informationen.
-                    </p>
+                        <p class="fs-5 text-secondary mb-0">Dein Spielplatz. Deine Informationen.</p>
                     {% endif %}
+
                     {% if can_create_inspection or can_create_defect %}
                         <div class="mt-4 d-flex flex-wrap gap-2">
                             {% if can_create_inspection %}
-                                <a
-                                    href="{% url 'internal:create_inspection' playground.organization.slug playground.slug %}"
-                                    class="btn btn-atlas-primary"
-                                >
+                                <a href="{% url 'internal:create_inspection' playground.organization.slug playground.slug %}" class="btn btn-atlas-primary">
                                     Neue Kontrolle erfassen
                                 </a>
                             {% endif %}
-                            
                             {% if can_create_defect %}
-                                <a
-                                    href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}"
-                                    class="btn btn-outline-secondary"
-                                >
+                                <a href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
                                     Mangel erfassen
                                 </a>
                             {% endif %}
@@ -170,49 +91,28 @@
                 <div class="col-lg-4">
                     <div class="content-card p-3 p-lg-4">
                         {% if preview_photo %}
-                        <div class="mb-3">
-                            <img src="{% url 'media_assets:image_content' preview_photo.id %}"
-                                alt="Vorschaubild von {{ playground.name }}" class="img-fluid rounded-4 border"
-                                style="width: 100%; max-height: 260px; object-fit: cover;">
-                        </div>
+                            <div class="mb-3">
+                                <img src="{% url 'media_assets:image_content' preview_photo.id %}" alt="Vorschaubild von {{ playground.name }}" class="img-fluid rounded-4 border" style="width: 100%; max-height: 260px; object-fit: cover;">
+                            </div>
                         {% endif %}
                         <div class="row g-3">
                             <div class="col-12">
                                 <div class="meta-label">Adresse</div>
-                                <div class="fw-semibold">
-                                    {% if playground.address %}
-                                    {{ playground.address }}
-                                    {% else %}
-                                    Keine Adresse hinterlegt
-                                    {% endif %}
-                                </div>
+                                <div class="fw-semibold">{{ playground.address|default:"Keine Adresse hinterlegt" }}</div>
                             </div>
-
                             <div class="col-6">
                                 <div class="meta-label">Quartier</div>
-                                <div class="fw-semibold">
-                                    {% if playground.district %}
-                                    {{ playground.district }}
-                                    {% else %}
-                                    –
-                                    {% endif %}
-                                </div>
+                                <div class="fw-semibold">{{ playground.district|default:"–" }}</div>
                             </div>
-
                             <div class="col-6">
                                 <div class="meta-label">Status</div>
-                                <div>
-                                    <span class="status-pill">Öffentlich sichtbar</span>
-                                </div>
+                                <span class="status-pill">Öffentlich sichtbar</span>
                             </div>
-
                             {% if playground.latitude and playground.longitude %}
-                            <div class="col-12">
-                                <div class="meta-label">Koordinaten</div>
-                                <div class="fw-semibold">
-                                    {{ playground.latitude }}, {{ playground.longitude }}
+                                <div class="col-12">
+                                    <div class="meta-label">Koordinaten</div>
+                                    <div class="fw-semibold">{{ playground.latitude }}, {{ playground.longitude }}</div>
                                 </div>
-                            </div>
                             {% endif %}
                         </div>
                     </div>
@@ -228,117 +128,69 @@
                     <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
                         <div>
                             <h2 class="h4 fw-bold mb-1">Spielgeräte</h2>
-                            <div class="text-secondary">
-                                Ausstattung dieses Spielplatzes.
-                            </div>
+                            <div class="text-secondary">Ausstattung dieses Spielplatzes.</div>
                         </div>
-
-                        <div class="badge text-bg-light">
-                            {{ equipment_list|length }} Eintrag{% if equipment_list|length != 1 %}e{% endif %}
-                        </div>
+                        <div class="badge text-bg-light">{{ equipment_list|length }} Eintrag{% if equipment_list|length != 1 %}e{% endif %}</div>
                     </div>
 
                     {% if equipment_list %}
-                    <div class="row g-3">
-                        {% for equipment in equipment_list %}
-                        <div class="col-md-6">
-                            <article class="equipment-card p-3 h-100">
-                                {% if equipment.photo %}
-                                <div class="mb-3">
-                                    <img src="{% url 'media_assets:image_content' equipment.photo.id %}"
-                                        alt="Foto von {{ equipment.name }}" class="img-fluid rounded-4 border"
-                                        style="width: 100%; height: 180px; object-fit: cover;">
-                                </div>
-                                {% endif %}
-                                <div class="d-flex justify-content-between gap-3 align-items-start">
-                                    <div>
-                                        <h3 class="h6 fw-bold mb-1">
-                                            {{ equipment.name }}
-                                        </h3>
-                                        <div class="text-secondary small">
-                                            {{ equipment.equipment_type.name }}
-                                        </div>
-                                    </div>
-
-                                    {% if equipment.has_public_safety_risk %}
-                                    <span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>
-                                    {% elif equipment.has_public_defect %}
-                                    <span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>
-                                    {% else %}
-                                    <span class="status-pill">In Betrieb</span>
-                                    {% endif %}
-                                </div>
-
-                                <hr>
-
-                                {% if equipment.has_public_defect %}
-                                <div class="mb-3 p-2 rounded-3
-                                                {% if equipment.has_public_safety_risk %}
-                                                    bg-warning-subtle
-                                                {% else %}
-                                                    bg-success-subtle
-                                                {% endif %}
-                                            ">
-                                    <div class="small fw-semibold mb-1">Öffentlicher Pflegestand</div>
-
-                                    {% for defect in equipment.public_defects %}
-                                    <div class="small">
-                                        {{ defect.get_public_message }}
-                                        {% if defect.planned_resolution_date %}
-                                        <br>
-                                        <strong>Geplante Behebung:</strong>
-                                        {{ defect.planned_resolution_date|date:"d.m.Y" }}
+                        <div class="row g-3">
+                            {% for equipment in equipment_list %}
+                                <div class="col-md-6">
+                                    <article class="equipment-card p-3 h-100">
+                                        {% if equipment.photo %}
+                                            <div class="mb-3">
+                                                <img src="{% url 'media_assets:image_content' equipment.photo.id %}" alt="Foto von {{ equipment.name }}" class="img-fluid rounded-4 border" style="width: 100%; height: 180px; object-fit: cover;">
+                                            </div>
                                         {% endif %}
-                                    </div>
-                                    {% endfor %}
+                                        <div class="d-flex justify-content-between gap-3 align-items-start">
+                                            <div>
+                                                <h3 class="h6 fw-bold mb-1">{{ equipment.name }}</h3>
+                                                <div class="text-secondary small">{{ equipment.equipment_type.name }}</div>
+                                            </div>
+                                            {% if equipment.has_public_safety_risk %}
+                                                <span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>
+                                            {% elif equipment.has_public_defect %}
+                                                <span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>
+                                            {% else %}
+                                                <span class="status-pill">In Betrieb</span>
+                                            {% endif %}
+                                        </div>
+                                        <hr>
+
+                                        {% if equipment.has_public_defect %}
+                                            <div class="mb-3 p-2 rounded-3 {% if equipment.has_public_safety_risk %}bg-warning-subtle{% else %}bg-success-subtle{% endif %}">
+                                                <div class="small fw-semibold mb-1">Öffentlicher Pflegestand</div>
+                                                {% for defect in equipment.public_defects %}
+                                                    <div class="small mb-2">
+                                                        {{ defect.get_public_message }}
+                                                        {% if defect.planned_resolution_date %}
+                                                            <br><strong>Geplante Behebung:</strong> {{ defect.planned_resolution_date|date:"d.m.Y" }}
+                                                        {% endif %}
+                                                        {% if can_create_defect %}
+                                                            <div class="mt-2">
+                                                                <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary">Mangel bearbeiten</a>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+
+                                        <div class="row g-2 small">
+                                            <div class="col-6"><div class="meta-label">Inventar-Nr.</div><div class="fw-semibold">{{ equipment.inventory_number|default:"–" }}</div></div>
+                                            <div class="col-6"><div class="meta-label">Baujahr</div><div class="fw-semibold">{{ equipment.year_built|default:"–" }}</div></div>
+                                            <div class="col-12"><div class="meta-label">Hersteller</div><div class="fw-semibold">{{ equipment.manufacturer|default:"–" }}</div></div>
+                                        </div>
+                                    </article>
                                 </div>
-                                {% endif %}
-
-                                <div class="row g-2 small">
-                                    <div class="col-6">
-                                        <div class="meta-label">Inventar-Nr.</div>
-                                        <div class="fw-semibold">
-                                            {% if equipment.inventory_number %}
-                                            {{ equipment.inventory_number }}
-                                            {% else %}
-                                            –
-                                            {% endif %}
-                                        </div>
-                                    </div>
-
-                                    <div class="col-6">
-                                        <div class="meta-label">Baujahr</div>
-                                        <div class="fw-semibold">
-                                            {% if equipment.year_built %}
-                                            {{ equipment.year_built }}
-                                            {% else %}
-                                            –
-                                            {% endif %}
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <div class="meta-label">Hersteller</div>
-                                        <div class="fw-semibold">
-                                            {% if equipment.manufacturer %}
-                                            {{ equipment.manufacturer }}
-                                            {% else %}
-                                            –
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
                     {% else %}
-                    <div class="empty-state p-4 text-center">
-                        <div class="fw-semibold mb-1">Noch keine Spielgeräte erfasst</div>
-                        <div class="text-secondary">
-                            Sobald Spielgeräte öffentlich sichtbar erfasst sind, werden sie hier angezeigt.
+                        <div class="empty-state p-4 text-center">
+                            <div class="fw-semibold mb-1">Noch keine Spielgeräte erfasst</div>
+                            <div class="text-secondary">Sobald Spielgeräte öffentlich sichtbar erfasst sind, werden sie hier angezeigt.</div>
                         </div>
-                    </div>
                     {% endif %}
                 </section>
             </div>
@@ -346,92 +198,57 @@
             <div class="col-lg-4">
                 <section class="content-card p-3 p-lg-4">
                     <h2 class="h5 fw-bold mb-2">Pflegestand</h2>
-                    <p class="text-secondary mb-3">
-                        Bekannte Mängel und geplante Instandsetzungen.
-                    </p>
+                    <p class="text-secondary mb-3">Bekannte Mängel und geplante Instandsetzungen.</p>
 
                     <div class="p-3 rounded-4 border bg-light mb-3">
                         <div class="meta-label mb-1">Letzte Kontrolle</div>
-
                         {% if latest_completed_inspection %}
-                        <div class="fw-bold">
-                            {{ latest_completed_inspection.inspected_at|date:"d.m.Y" }}
-                        </div>
-                        <div class="text-secondary small">
-                            {{ latest_completed_inspection.get_inspection_type_display }}
-                        </div>
+                            <div class="fw-bold">{{ latest_completed_inspection.inspected_at|date:"d.m.Y" }}</div>
+                            <div class="text-secondary small">{{ latest_completed_inspection.get_inspection_type_display }}</div>
                         {% else %}
-                        <div class="fw-semibold">
-                            Noch keine abgeschlossene Kontrolle vorhanden
-                        </div>
-                        <div class="text-secondary small">
-                            Sobald eine Kontrolle abgeschlossen wurde, erscheint sie hier.
-                        </div>
+                            <div class="fw-semibold">Noch keine abgeschlossene Kontrolle vorhanden</div>
+                            <div class="text-secondary small">Sobald eine Kontrolle abgeschlossen wurde, erscheint sie hier.</div>
                         {% endif %}
                     </div>
 
                     {% if public_defects %}
-                    <div class="d-flex flex-column gap-3">
-                        {% for defect in public_defects %}
-                        <article class="defect-card p-3 border
-                                    {% if defect.has_safety_risk %}
-                                        bg-warning-subtle border-warning
-                                    {% else %}
-                                        bg-success-subtle border-success
-                                    {% endif %}
-                                ">
-                            <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
-                                <div>
-                                    <div class="fw-bold">
-                                        {% if defect.equipment %}
-                                        {{ defect.equipment.name }}
+                        <div class="d-flex flex-column gap-3">
+                            {% for defect in public_defects %}
+                                <article class="defect-card p-3 border {% if defect.has_safety_risk %}bg-warning-subtle border-warning{% else %}bg-success-subtle border-success{% endif %}">
+                                    <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
+                                        <div>
+                                            <div class="fw-bold">{% if defect.equipment %}{{ defect.equipment.name }}{% else %}Allgemeiner Spielplatzmangel{% endif %}</div>
+                                            <div class="small text-secondary">Status: {{ defect.get_status_display }}</div>
+                                        </div>
+                                        {% if defect.has_safety_risk %}
+                                            <span class="badge text-bg-warning">Sicherheitsrisiko</span>
                                         {% else %}
-                                        Allgemeiner Spielplatzmangel
+                                            <span class="badge text-bg-success">Kein Sicherheitsrisiko</span>
                                         {% endif %}
                                     </div>
-                                    <div class="small text-secondary">
-                                        Status: {{ defect.get_status_display }}
-                                    </div>
-                                </div>
-
-                                {% if defect.has_safety_risk %}
-                                <span class="badge text-bg-warning">Sicherheitsrisiko</span>
-                                {% else %}
-                                <span class="badge text-bg-success">Kein Sicherheitsrisiko</span>
-                                {% endif %}
-                            </div>
-
-                            <p class="mb-2">
-                                {{ defect.get_public_message }}
-                            </p>
-
-                            {% if defect.public_note %}
-                            <p class="small mb-2">
-                                {{ defect.public_note }}
-                            </p>
-                            {% endif %}
-
-                            {% if defect.planned_resolution_date %}
-                            <div class="small fw-semibold">
-                                Geplante Behebung: {{ defect.planned_resolution_date|date:"d.m.Y" }}
-                            </div>
-                            {% endif %}
-                        </article>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state p-3">
-                        <div class="fw-semibold">Keine Mängel bekannt</div>
-                        <div class="text-secondary small">
-                            Für diesen Spielplatz sind aktuell keine öffentlich freigegebenen Mängel hinterlegt.
+                                    <p class="mb-2">{{ defect.get_public_message }}</p>
+                                    {% if defect.public_note %}<p class="small mb-2">{{ defect.public_note }}</p>{% endif %}
+                                    {% if defect.planned_resolution_date %}
+                                        <div class="small fw-semibold">Geplante Behebung: {{ defect.planned_resolution_date|date:"d.m.Y" }}</div>
+                                    {% endif %}
+                                    {% if can_create_defect %}
+                                        <div class="mt-3">
+                                            <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary">Mangel bearbeiten</a>
+                                        </div>
+                                    {% endif %}
+                                </article>
+                            {% endfor %}
                         </div>
-                    </div>
+                    {% else %}
+                        <div class="empty-state p-3">
+                            <div class="fw-semibold">Keine Mängel bekannt</div>
+                            <div class="text-secondary small">Für diesen Spielplatz sind aktuell keine öffentlich freigegebenen Mängel hinterlegt.</div>
+                        </div>
                     {% endif %}
                 </section>
             </div>
         </div>
     </main>
-
 </body>
 
 </html>
