@@ -95,6 +95,59 @@ def public_playgrounds_api(request):
     })
 
 
+def get_defect_group_key(defect):
+    if defect.equipment_id:
+        return ("equipment", defect.equipment_id)
+
+    if defect.surface_id:
+        return ("surface", defect.surface_id)
+
+    if defect.accessory_id:
+        return ("accessory", defect.accessory_id)
+
+    return ("playground", defect.playground_id)
+
+
+def get_defect_group_label(defect):
+    if defect.equipment:
+        return defect.equipment.name
+
+    if defect.surface:
+        return defect.surface.name
+
+    if defect.accessory:
+        return defect.accessory.name
+
+    return "Allgemeiner Spielplatzmangel"
+
+
+def build_defect_groups(defects):
+    groups_by_key = {}
+    groups = []
+
+    for defect in defects:
+        key = get_defect_group_key(defect)
+        group = groups_by_key.get(key)
+
+        if group is None:
+            group = {
+                "key": key,
+                "label": get_defect_group_label(defect),
+                "representative": defect,
+                "defects": [],
+                "has_safety_risk": False,
+                "has_internal_defect": False,
+            }
+            groups_by_key[key] = group
+            groups.append(group)
+
+        group["defects"].append(defect)
+        group["has_safety_risk"] = group["has_safety_risk"] or defect.has_safety_risk
+        group["has_internal_defect"] = group["has_internal_defect"] or not defect.public_visible
+
+    return groups
+
+
 def playground_detail(request, organization_slug, playground_slug):
     playground = get_object_or_404(
         Playground.objects
@@ -155,12 +208,16 @@ def playground_detail(request, organization_slug, playground_slug):
     if not can_create_defect:
         visible_defects = visible_defects.filter(public_visible=True)
 
-    visible_defects = visible_defects.order_by(
-        "public_visible",
-        "-has_safety_risk",
-        "planned_resolution_date",
-        "-created_at",
+    visible_defects = list(
+        visible_defects.order_by(
+            "public_visible",
+            "-has_safety_risk",
+            "planned_resolution_date",
+            "-created_at",
+        )
     )
+
+    defect_groups = build_defect_groups(visible_defects)
 
     latest_completed_inspection = (
         Inspection.objects
@@ -185,11 +242,15 @@ def playground_detail(request, organization_slug, playground_slug):
         equipment.has_public_safety_risk = any(
             defect.has_safety_risk for defect in equipment.public_defects
         )
+        equipment.has_internal_defect = any(
+            not defect.public_visible for defect in equipment.public_defects
+        )
 
     context = {
         "playground": playground,
         "equipment_list": equipment_list,
         "public_defects": visible_defects,
+        "defect_groups": defect_groups,
         "can_create_inspection": can_create_inspection,
         "can_create_defect": can_create_defect,
         "preview_photo": preview_photo,
