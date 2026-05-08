@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="de-CH">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mangel bearbeiten – SpielplatzAtlas</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }};
+            --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }};
+            --atlas-bg: #F8FAFC;
+            --atlas-text: #0F172A;
+        }
+
+        body {
+            background: var(--atlas-bg);
+            color: var(--atlas-text);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .content-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+        }
+
+        .btn-atlas-primary {
+            background: var(--atlas-primary);
+            border-color: var(--atlas-primary);
+            color: white;
+        }
+
+        .btn-atlas-primary:hover {
+            filter: brightness(0.92);
+            color: white;
+        }
+
+        .context-label {
+            color: #64748B;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-3 px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span class="brand-mark">A</span>
+                <span class="fw-bold">SpielplatzAtlas</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-sm btn-outline-secondary">
+                    Zum Spielplatz
+                </a>
+
+                {% if defect.inspection %}
+                    <a href="{% url 'internal:inspection_detail' defect.inspection.id %}" class="btn btn-sm btn-outline-secondary">
+                        Zur Kontrolle
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} mb-2">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="content-card p-3 p-lg-4 mb-4">
+            <div class="context-label mb-2">Mangel bearbeiten</div>
+
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                <div>
+                    <h1 class="fw-bold h3 mb-2">
+                        Mangel #{{ defect.id }}
+                    </h1>
+
+                    <div class="text-secondary">
+                        {{ playground.name }} · {{ playground.organization.name }}
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2 align-self-start">
+                    <span class="badge text-bg-light border fs-6">
+                        {{ defect.get_status_display }}
+                    </span>
+
+                    {% if defect.has_safety_risk %}
+                        <span class="badge text-bg-danger fs-6">
+                            Sicherheitsrisiko
+                        </span>
+                    {% endif %}
+
+                    {% if defect.public_visible %}
+                        <span class="badge text-bg-success fs-6">
+                            Öffentlich sichtbar
+                        </span>
+                    {% else %}
+                        <span class="badge text-bg-secondary fs-6">
+                            Intern
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row g-3 mt-3">
+                <div class="col-lg-4">
+                    <div class="small text-secondary mb-1">Quelle</div>
+                    <div class="fw-semibold">{{ defect.get_source_type_display }}</div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="small text-secondary mb-1">Gemeldet am</div>
+                    <div class="fw-semibold">{{ defect.reported_at|date:"d.m.Y H:i" }}</div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="small text-secondary mb-1">Betroffenes Objekt</div>
+                    <div class="fw-semibold">
+                        {% if defect.equipment %}
+                            {{ defect.equipment.name }}
+                        {% elif defect.surface %}
+                            {{ defect.surface.name }}
+                        {% elif defect.accessory %}
+                            {{ defect.accessory.name }}
+                        {% else %}
+                            Allgemeiner Spielplatzmangel
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if defect.inspection_answer %}
+                    <div class="col-12">
+                        <div class="small text-secondary mb-1">Entstanden aus Prüfpunkt</div>
+                        <div class="p-3 rounded-3 bg-light">
+                            {% if defect.inspection_answer.scope %}
+                                <strong>{{ defect.inspection_answer.scope.label }}</strong><br>
+                            {% endif %}
+                            {{ defect.inspection_answer.criterion.title }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <form method="post" class="content-card p-3 p-lg-4">
+            {% csrf_token %}
+
+            <h2 class="h5 fw-bold mb-3">Angaben zum Mangel</h2>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="row g-3">
+                {% for field in form %}
+                    <div class="col-12 {% if field.name == 'has_safety_risk' or field.name == 'public_visible' %}col-lg-6{% elif field.name == 'equipment' or field.name == 'surface' or field.name == 'accessory' %}col-lg-4{% endif %}">
+                        {% if field.field.widget.input_type == "checkbox" %}
+                            <div class="form-check">
+                                {{ field }}
+                                <label class="form-check-label" for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                        {% else %}
+                            <label class="form-label fw-semibold" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                        {% endif %}
+
+                        {% if field.help_text %}
+                            <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% if field.errors %}
+                            <div class="text-danger small mt-1">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
+                <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
+                    Abbrechen
+                </a>
+
+                <button type="submit" class="btn btn-atlas-primary">
+                    Mangel speichern
+                </button>
+            </div>
+        </form>
+    </main>
+
+</body>
+
+</html>

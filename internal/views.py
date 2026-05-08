@@ -28,7 +28,11 @@ from playgrounds.models import (
     PlaygroundSurface,
 )
 
-from .forms import DefectCreateForm, DefectFromInspectionAnswerForm
+from .forms import (
+    DefectCreateForm,
+    DefectEditForm,
+    DefectFromInspectionAnswerForm,
+)
 from .permissions import require_inspection_permission, require_maintenance_permission
 
 
@@ -95,9 +99,8 @@ def create_defect(request, organization_slug, playground_slug):
 
             messages.success(request, "Der Mangel wurde erfasst.")
             return redirect(
-                "public:playground_detail",
-                organization_slug=playground.organization.slug,
-                playground_slug=playground.slug,
+                "internal:edit_defect",
+                defect_id=defect.id,
             )
     else:
         form = DefectCreateForm(playground=playground)
@@ -174,7 +177,7 @@ def create_defect_from_inspection_answer(request, answer_id):
             defect.save()
 
             messages.success(request, "Der Mangel wurde aus dem Prüfpunkt erfasst.")
-            return redirect("internal:inspection_detail", inspection_id=inspection.id)
+            return redirect("internal:edit_defect", defect_id=defect.id)
     else:
         form = DefectFromInspectionAnswerForm(inspection_answer=answer)
 
@@ -192,6 +195,59 @@ def create_defect_from_inspection_answer(request, answer_id):
             "existing_defects": existing_defects,
             "form": form,
             "inspection": inspection,
+            "playground": playground,
+        },
+    )
+
+
+@login_required
+def edit_defect(request, defect_id):
+    defect = get_object_or_404(
+        Defect.objects.select_related(
+            "inspection",
+            "inspection_answer",
+            "inspection_answer__criterion",
+            "inspection_answer__scope",
+            "playground",
+            "playground__organization",
+            "equipment",
+            "surface",
+            "accessory",
+        ),
+        id=defect_id,
+    )
+
+    playground = defect.playground
+
+    if not playground:
+        messages.error(request, "Dieser Mangel ist keinem Spielplatz zugeordnet.")
+        return redirect("public:index")
+
+    require_maintenance_permission(request.user, playground.organization)
+
+    if request.method == "POST":
+        form = DefectEditForm(
+            request.POST,
+            instance=defect,
+            playground=playground,
+        )
+
+        if form.is_valid():
+            defect = form.save(commit=False)
+            defect.playground = playground
+            defect.save()
+
+            messages.success(request, "Der Mangel wurde gespeichert.")
+            return redirect("internal:edit_defect", defect_id=defect.id)
+    else:
+        form = DefectEditForm(instance=defect, playground=playground)
+
+    return render(
+        request,
+        "internal/edit_defect.html",
+        {
+            "defect": defect,
+            "form": form,
             "playground": playground,
         },
     )

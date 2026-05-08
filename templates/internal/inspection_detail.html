@@ -454,9 +454,12 @@
                                         <div class="small mt-3 p-2 rounded-3 bg-light">
                                             <strong>Erfasste Mängel:</strong>
                                             {% for defect in answer.defects.all %}
-                                                <span class="badge text-bg-light border ms-1">
+                                                <a
+                                                    href="{% url 'internal:edit_defect' defect.id %}"
+                                                    class="badge text-bg-light border ms-1 text-decoration-none"
+                                                >
                                                     #{{ defect.id }} · {{ defect.get_status_display }}
-                                                </span>
+                                                </a>
                                             {% endfor %}
                                         </div>
                                     {% endif %}
