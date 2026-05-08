@@ -24,6 +24,11 @@ urlpatterns = [
         name="create_defect",
     ),
     path(
+        "inspection-answers/<int:answer_id>/defects/new/",
+        views.create_defect_from_inspection_answer,
+        name="create_defect_from_inspection_answer",
+    ),
+    path(
         "inspections/<int:inspection_id>/",
         views.inspection_detail,
         name="inspection_detail",

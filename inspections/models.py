@@ -472,6 +472,16 @@ class Defect(models.Model):
         help_text="Optional. Ein Mangel kann aus einer Kontrolle stammen, muss aber nicht.",
     )
 
+    inspection_answer = models.ForeignKey(
+        InspectionAnswer,
+        on_delete=models.SET_NULL,
+        related_name="defects",
+        null=True,
+        blank=True,
+        verbose_name="Prüfantwort",
+        help_text="Optionale Prüfantwort, aus der dieser Mangel entstanden ist.",
+    )
+
     playground = models.ForeignKey(
         "playgrounds.Playground",
         on_delete=models.CASCADE,
@@ -588,6 +598,13 @@ class Defect(models.Model):
         return f"Mangel #{self.id}"
 
     def save(self, *args, **kwargs):
+        if self.inspection_answer_id:
+            if not self.inspection_id:
+                self.inspection = self.inspection_answer.inspection
+
+            if not self.playground_id:
+                self.playground = self.inspection_answer.inspection.playground
+
         if self.inspection_id and not self.playground_id:
             self.playground = self.inspection.playground
 
