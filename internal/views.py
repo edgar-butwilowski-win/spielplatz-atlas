@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from inspections.models import (
+    Defect,
     Inspection,
     InspectionAnswer,
     InspectionCriterion,
@@ -27,7 +28,7 @@ from playgrounds.models import (
     PlaygroundSurface,
 )
 
-from .forms import DefectCreateForm
+from .forms import DefectCreateForm, DefectFromInspectionAnswerForm
 from .permissions import require_inspection_permission, require_maintenance_permission
 
 
@@ -110,6 +111,92 @@ def create_defect(request, organization_slug, playground_slug):
         },
     )
 
+
+@login_required
+def create_defect_from_inspection_answer(request, answer_id):
+    answer = get_object_or_404(
+        InspectionAnswer.objects.select_related(
+            "criterion",
+            "inspection",
+            "inspection__playground",
+            "inspection__playground__organization",
+            "scope",
+            "scope__equipment",
+            "scope__surface",
+            "scope__accessory",
+            "equipment",
+        ),
+        id=answer_id,
+    )
+
+    inspection = answer.inspection
+    playground = inspection.playground
+    organization = playground.organization
+
+    require_maintenance_permission(request.user, organization)
+
+    if inspection.status == Inspection.STATUS_COMPLETED:
+        messages.error(
+            request,
+            "Aus einer abgeschlossenen Kontrolle kann kein neuer Mangel erfasst werden.",
+        )
+        return redirect("internal:inspection_detail", inspection_id=inspection.id)
+
+    if answer.answer != InspectionAnswer.ANSWER_DEFECT:
+        messages.error(
+            request,
+            "Ein Mangel kann erst aus einem Prüfpunkt erfasst werden, wenn die Prüfantwort auf «Mangel» gesetzt wurde.",
+        )
+        return redirect("internal:inspection_detail", inspection_id=inspection.id)
+
+    if request.method == "POST":
+        form = DefectFromInspectionAnswerForm(
+            request.POST,
+            inspection_answer=answer,
+        )
+
+        if form.is_valid():
+            defect = form.save(commit=False)
+            defect.playground = playground
+            defect.inspection = inspection
+            defect.inspection_answer = answer
+            defect.source_type = Defect.SOURCE_INSPECTION
+
+            scope = answer.scope
+
+            if scope and scope.scope_type == InspectionScope.SCOPE_EQUIPMENT:
+                defect.equipment = answer.equipment or scope.equipment
+            elif scope and scope.scope_type == InspectionScope.SCOPE_SURFACE:
+                defect.surface = scope.surface
+            elif scope and scope.scope_type == InspectionScope.SCOPE_ACCESSORY:
+                defect.accessory = scope.accessory
+
+            defect.save()
+
+            messages.success(request, "Der Mangel wurde aus dem Prüfpunkt erfasst.")
+            return redirect("internal:inspection_detail", inspection_id=inspection.id)
+    else:
+        form = DefectFromInspectionAnswerForm(inspection_answer=answer)
+
+    existing_defects = answer.defects.all().order_by(
+        "-has_safety_risk",
+        "planned_resolution_date",
+        "-created_at",
+    )
+
+    return render(
+        request,
+        "internal/create_defect_from_inspection_answer.html",
+        {
+            "answer": answer,
+            "existing_defects": existing_defects,
+            "form": form,
+            "inspection": inspection,
+            "playground": playground,
+        },
+    )
+
+
 @login_required
 def inspection_detail(request, inspection_id):
     inspection = get_object_or_404(
@@ -130,6 +217,7 @@ def inspection_detail(request, inspection_id):
             "scope__surface",
             "scope__accessory",
         )
+        .prefetch_related("defects")
         .order_by("scope__sort_order", "criterion__area", "criterion__title")
     )
 
@@ -141,7 +229,7 @@ def inspection_detail(request, inspection_id):
             "surface",
             "accessory",
         )
-        .prefetch_related("answers", "answers__criterion")
+        .prefetch_related("answers", "answers__criterion", "answers__defects")
         .order_by("sort_order", "label")
     )
 
@@ -149,16 +237,23 @@ def inspection_detail(request, inspection_id):
         answer=InspectionAnswer.ANSWER_PENDING
     ).count()
 
+    can_create_defects = user_can_create_defects(
+        request.user,
+        inspection.playground.organization,
+    )
+
     return render(
         request,
         "internal/inspection_detail.html",
         {
             "inspection": inspection,
             "answers": answers,
+            "can_create_defects": can_create_defects,
             "scopes": scopes,
             "pending_answers_count": pending_answers_count,
         },
     )
+
 
 @login_required
 @require_POST
@@ -226,6 +321,7 @@ def save_inspection_answers(request, inspection_id):
 
     return redirect("internal:inspection_detail", inspection_id=inspection.id)
 
+
 @login_required
 @require_POST
 def complete_inspection(request, inspection_id):
@@ -283,6 +379,25 @@ def complete_inspection(request, inspection_id):
     messages.success(request, "Die Kontrolle wurde abgeschlossen.")
     return redirect("internal:inspection_detail", inspection_id=inspection.id)
 
+
+def user_can_create_defects(user, organization):
+    if user.is_superuser:
+        return True
+
+    profile = getattr(user, "profile", None)
+
+    if not profile:
+        return False
+
+    if not profile.is_active_for_organization:
+        return False
+
+    if profile.organization_id != organization.id:
+        return False
+
+    return profile.may_maintain
+
+
 def get_allowed_minimum_inspection_types(inspection_type):
     if inspection_type == Inspection.TYPE_VISUAL:
         return [
@@ -307,6 +422,7 @@ def get_allowed_minimum_inspection_types(inspection_type):
         InspectionCriterion.MINIMUM_OPERATIONAL,
         InspectionCriterion.MINIMUM_ANNUAL,
     ]
+
 
 def create_default_answers(inspection):
     organization = inspection.playground.organization
