@@ -33,6 +33,7 @@ from .forms import (
     DefectCreateForm,
     DefectEditForm,
     DefectFromInspectionAnswerForm,
+    EquipmentRenovationForm,
 )
 from .image_utils import (
     delete_selected_defect_images,
@@ -95,6 +96,34 @@ def save_defect_images_or_add_error(request, defect):
         return False
 
     return True
+
+
+@login_required
+@require_POST
+def update_equipment_renovation(request, equipment_id):
+    equipment = get_object_or_404(
+        PlayEquipment.objects.select_related("playground", "playground__organization"),
+        id=equipment_id,
+    )
+    playground = equipment.playground
+
+    require_maintenance_permission(request.user, playground.organization)
+
+    form = EquipmentRenovationForm(request.POST, instance=equipment)
+
+    if form.is_valid():
+        form.save()
+        messages.success(request, "Die Sanierungsangaben wurden gespeichert.")
+    else:
+        for errors in form.errors.values():
+            for error in errors:
+                messages.error(request, error)
+
+    return redirect(
+        "public:playground_detail",
+        organization_slug=playground.organization.slug,
+        playground_slug=playground.slug,
+    )
 
 
 @login_required
