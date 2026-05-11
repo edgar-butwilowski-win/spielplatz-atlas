@@ -12,14 +12,24 @@ from django.shortcuts import redirect
 from django.urls import reverse
 
 
+def user_should_enter_admin(user):
+    if user.is_superuser:
+        return True
+
+    profile = getattr(user, "profile", None)
+
+    return bool(
+        profile
+        and profile.may_manage_organization
+    )
+
+
 class SpielplatzAtlasLoginView(LoginView):
     template_name = "accounts/login.html"
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        user = self.request.user
-
-        if user.is_staff or user.is_superuser:
+        if user_should_enter_admin(self.request.user):
             return reverse("admin:index")
 
         return reverse("public:index")
