@@ -21,6 +21,10 @@ def index(request):
     return render(request, "public/index.html")
 
 
+def about(request):
+    return render(request, "public/about.html")
+
+
 def public_playgrounds_api(request):
     playgrounds = (
         Playground.objects
