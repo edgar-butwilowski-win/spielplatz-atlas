@@ -8,11 +8,16 @@
 
 from django.urls import path
 
-from . import views
+from . import dashboard, views
 
 app_name = "internal"
 
 urlpatterns = [
+    path(
+        "dashboard/",
+        dashboard.dashboard,
+        name="dashboard",
+    ),
     path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/inspections/new/",
         views.create_inspection,
