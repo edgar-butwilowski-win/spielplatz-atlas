@@ -88,21 +88,6 @@
                         {% else %}
                             <p class="fs-5 text-secondary mb-0">Dein Spielplatz. Deine Informationen.</p>
                         {% endif %}
-
-                        {% if can_create_inspection or can_create_defect %}
-                            <div class="mt-4 d-flex flex-wrap gap-2">
-                                {% if can_create_inspection %}
-                                    <a href="{% url 'internal:create_inspection' playground.organization.slug playground.slug %}" class="btn btn-atlas-primary">
-                                        Neue Kontrolle erfassen
-                                    </a>
-                                {% endif %}
-                                {% if can_create_defect %}
-                                    <a href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
-                                        Mangel erfassen
-                                    </a>
-                                {% endif %}
-                            </div>
-                        {% endif %}
                     </div>
                 </div>
 
@@ -140,6 +125,21 @@
                     <section class="content-card p-3 p-lg-4 h-100 care-panel">
                         <h2 class="h5 fw-bold mb-2">Pflegestand</h2>
                         <p class="text-secondary mb-3">Bekannte Mängel und geplante Instandsetzungen.</p>
+
+                        {% if can_create_inspection or can_create_defect %}
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                {% if can_create_inspection %}
+                                    <a href="{% url 'internal:create_inspection' playground.organization.slug playground.slug %}" class="btn btn-atlas-primary">
+                                        Neue Kontrolle erfassen
+                                    </a>
+                                {% endif %}
+                                {% if can_create_defect %}
+                                    <a href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
+                                        Mangel erfassen
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
 
                         <div class="p-3 rounded-4 border bg-light mb-3">
                             <div class="meta-label mb-1">Letzte Kontrolle</div>
