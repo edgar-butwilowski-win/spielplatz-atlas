@@ -14,6 +14,7 @@ from accounts.admin_utils import get_user_organization
 from media_assets.models import ImageAsset
 
 from .models import (
+    EquipmentSupplier,
     EquipmentType,
     PlayEquipment,
     Playground,
@@ -298,8 +299,6 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
             return False
 
         if obj.organization_id is None:
-            # Globale Standards dürfen geöffnet, aber nicht bearbeitet werden.
-            # Dafür geben wir formal Change-Permission, machen aber alle Felder readonly.
             return True
 
         return obj.organization_id == organization.id
@@ -335,22 +334,139 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+@admin.register(EquipmentSupplier)
+class EquipmentSupplierAdmin(admin.ModelAdmin):
+    list_display = ("name", "organization", "is_active", "created_at")
+    list_filter = ("organization", "is_active")
+    search_fields = ("name", "organization__name")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        if request.user.is_superuser:
+            return qs
+
+        organization = get_user_organization(request.user)
+
+        if organization:
+            return (
+                qs.filter(organization__isnull=True)
+                | qs.filter(organization=organization)
+            ).distinct()
+
+        return qs.filter(organization__isnull=True)
+
+    def get_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return ("organization", "name", "is_active")
+
+        return ("name", "is_active")
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return ()
+
+        if obj and obj.organization_id is None:
+            return ("name", "is_active")
+
+        return ()
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "organization" and not request.user.is_superuser:
+            organization = get_user_organization(request.user)
+
+            if organization:
+                kwargs["queryset"] = organization.__class__.objects.filter(id=organization.id)
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        if not request.user.is_superuser:
+            organization = get_user_organization(request.user)
+
+            if change and obj.organization_id is None:
+                return
+
+            if organization:
+                obj.organization = organization
+
+        super().save_model(request, obj, form, change)
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 @admin.register(PlayEquipment)
 class PlayEquipmentAdmin(admin.ModelAdmin):
 
     form = PlayEquipmentAdminForm
 
+    fieldsets = (
+        ("Grunddaten", {
+            "fields": (
+                "playground",
+                "equipment_type",
+                "name",
+                "sequence_number",
+                "inventory_number",
+            )
+        }),
+        ("Herstellung und Lieferung", {
+            "fields": (
+                "manufacturer",
+                "supplier",
+                "norm",
+                "year_built",
+                "build_date",
+            )
+        }),
+        ("Sanierung und Rückbau", {
+            "fields": (
+                "renovation_type",
+                "recommended_renovation_year",
+                "renovation_comment",
+                "demolition_date",
+            )
+        }),
+        ("Prüfbarkeit", {
+            "fields": (
+                "not_inspectable",
+                "not_inspectable_reason",
+            )
+        }),
+        ("Foto", {
+            "fields": (
+                "photo",
+                "photo_upload",
+            )
+        }),
+        ("Koordinaten und Sichtbarkeit", {
+            "fields": (
+                "latitude",
+                "longitude",
+                "public_visible",
+                "is_active",
+            )
+        }),
+    )
+
     list_display = (
         "name",
         "playground",
         "equipment_type",
+        "sequence_number",
         "inventory_number",
+        "recommended_renovation_year",
+        "demolition_date",
         "public_visible",
         "is_active",
     )
     list_filter = (
         "playground__organization",
         "equipment_type",
+        "supplier",
+        "renovation_type",
+        "not_inspectable",
         "public_visible",
         "is_active",
     )
@@ -358,9 +474,11 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
         "name",
         "inventory_number",
         "manufacturer",
+        "supplier__name",
+        "norm",
         "playground__name",
     )
-    autocomplete_fields = ("playground", "equipment_type", "photo")
+    autocomplete_fields = ("playground", "equipment_type", "supplier", "photo")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -374,20 +492,6 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
             return qs.filter(playground__organization=organization)
 
         return qs.none()
-
-    def get_fields(self, request, obj=None):
-        return (
-            "playground",
-            "equipment_type",
-            "name",
-            "inventory_number",
-            "manufacturer",
-            "year_built",
-            "photo",
-            "photo_upload",
-            "public_visible",
-            "is_active",
-        )
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         organization = get_user_organization(request.user)
@@ -403,6 +507,12 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
                     EquipmentType.objects.filter(organization__isnull=True)
                     | EquipmentType.objects.filter(organization=organization)
                 ).distinct()
+
+            if db_field.name == "supplier":
+                kwargs["queryset"] = (
+                    EquipmentSupplier.objects.filter(organization__isnull=True)
+                    | EquipmentSupplier.objects.filter(organization=organization)
+                ).filter(is_active=True).distinct()
 
             if db_field.name == "photo":
                 kwargs["queryset"] = db_field.remote_field.model.objects.filter(
