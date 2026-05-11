@@ -55,11 +55,6 @@
             filter: brightness(0.92);
             color: white;
         }
-
-        .help-text {
-            color: #64748B;
-            font-size: 0.875rem;
-        }
     </style>
 </head>
 
@@ -96,145 +91,20 @@
 
                         <p class="text-secondary mb-0">
                             Erfasse einen Mangel unabhängig von einer Kontrolle, zum Beispiel aufgrund einer
-                            Bürgermeldung,
-                            eines internen Hinweises oder einer Feststellung durch den Unterhalt.
+                            Bürgermeldung, eines internen Hinweises oder einer Feststellung durch den Unterhalt.
                         </p>
-                    </div>
 
-                    {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {{ form.non_field_errors }}
+                        {% if selected_equipment %}
+                            <div class="alert alert-info mt-3 mb-0">
+                                Betroffenes Spielgerät: <strong>{{ selected_equipment.name }}</strong>
+                            </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
 
                     <form method="post">
                         {% csrf_token %}
 
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold" for="{{ form.equipment.id_for_label }}">
-                                    Spielgerät
-                                </label>
-                                {{ form.equipment }}
-                                <div class="help-text mt-1">Optional.</div>
-                                {{ form.equipment.errors }}
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold" for="{{ form.surface.id_for_label }}">
-                                    Fallschutzfläche / Boden
-                                </label>
-                                {{ form.surface }}
-                                <div class="help-text mt-1">Optional.</div>
-                                {{ form.surface.errors }}
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold" for="{{ form.accessory.id_for_label }}">
-                                    Zusatzausstattung
-                                </label>
-                                {{ form.accessory }}
-                                <div class="help-text mt-1">Optional.</div>
-                                {{ form.accessory.errors }}
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="{{ form.source_type.id_for_label }}">
-                                    Quelle
-                                </label>
-                                {{ form.source_type }}
-                                {{ form.source_type.errors }}
-                            </div>
-
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold" for="{{ form.reported_at.id_for_label }}">
-                                    Gemeldet am
-                                </label>
-                                {{ form.reported_at }}
-                                {{ form.reported_at.errors }}
-                            </div>
-
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold" for="{{ form.reported_by_text.id_for_label }}">
-                                    Gemeldet durch
-                                </label>
-                                {{ form.reported_by_text }}
-                                <div class="help-text mt-1">
-                                    Optionaler Freitext, z. B. Bürgertelefon, Werkhof, Hauswartung.
-                                </div>
-                                {{ form.reported_by_text.errors }}
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold"
-                                    for="{{ form.internal_description.id_for_label }}">
-                                    Interne Beschreibung
-                                </label>
-                                {{ form.internal_description }}
-                                {{ form.internal_description.errors }}
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold" for="{{ form.internal_note.id_for_label }}">
-                                    Interne Notiz
-                                </label>
-                                {{ form.internal_note }}
-                                {{ form.internal_note.errors }}
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-check mt-4">
-                                    {{ form.has_safety_risk }}
-                                    <label class="form-check-label fw-semibold"
-                                        for="{{ form.has_safety_risk.id_for_label }}">
-                                        Sicherheitsrisiko
-                                    </label>
-                                </div>
-                                {{ form.has_safety_risk.errors }}
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold" for="{{ form.status.id_for_label }}">
-                                    Status
-                                </label>
-                                {{ form.status }}
-                                {{ form.status.errors }}
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold"
-                                    for="{{ form.planned_resolution_date.id_for_label }}">
-                                    Geplante Behebung
-                                </label>
-                                {{ form.planned_resolution_date }}
-                                {{ form.planned_resolution_date.errors }}
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-check">
-                                    {{ form.public_visible }}
-                                    <label class="form-check-label fw-semibold"
-                                        for="{{ form.public_visible.id_for_label }}">
-                                        Öffentlich sichtbar
-                                    </label>
-                                </div>
-                                <div class="help-text mt-1">
-                                    Nur aktivieren, wenn der Hinweis im öffentlichen Pflegestand erscheinen soll.
-                                </div>
-                                {{ form.public_visible.errors }}
-                            </div>
-
-                            <div class="col-12">
-                                <label class="form-label fw-semibold" for="{{ form.public_note.id_for_label }}">
-                                    Öffentlicher Hinweis
-                                </label>
-                                {{ form.public_note }}
-                                <div class="help-text mt-1">
-                                    Dieser Text kann öffentlich sichtbar sein. Keine internen Details eintragen.
-                                </div>
-                                {{ form.public_note.errors }}
-                            </div>
-                        </div>
+                        {% include "internal/partials/defect_form_fields.html" %}
 
                         <div class="d-flex justify-content-between gap-2 mt-4">
                             <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}"
