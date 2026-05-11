@@ -15,6 +15,7 @@ app_name = "public"
 urlpatterns = [
     path("", views.index, name="index"),
     path("about/", views.about, name="about"),
+    path("impressum/", views.imprint, name="imprint"),
     path("api/playgrounds/", views.public_playgrounds_api, name="playgrounds_api"),
     path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/",
