@@ -8,6 +8,7 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -32,6 +33,11 @@ from .forms import (
     DefectCreateForm,
     DefectEditForm,
     DefectFromInspectionAnswerForm,
+)
+from .image_utils import (
+    delete_selected_defect_images,
+    handle_defect_image_uploads,
+    sync_defect_image_visibility,
 )
 from .permissions import require_inspection_permission, require_maintenance_permission
 
@@ -75,6 +81,18 @@ def create_inspection(request, organization_slug, playground_slug):
     )
 
 
+def save_defect_images_or_add_error(request, defect):
+    try:
+        delete_selected_defect_images(defect, request.POST)
+        handle_defect_image_uploads(defect, request.FILES)
+        sync_defect_image_visibility(defect)
+    except ValidationError as error:
+        messages.error(request, error.messages[0] if error.messages else str(error))
+        return False
+
+    return True
+
+
 @login_required
 def create_defect(request, organization_slug, playground_slug):
     playground = get_object_or_404(
@@ -108,11 +126,14 @@ def create_defect(request, organization_slug, playground_slug):
             defect.inspection = None
             defect.save()
 
-            messages.success(request, "Der Mangel wurde erfasst.")
-            return redirect(
-                "internal:edit_defect",
-                defect_id=defect.id,
-            )
+            if not save_defect_images_or_add_error(request, defect):
+                defect.delete()
+            else:
+                messages.success(request, "Der Mangel wurde erfasst.")
+                return redirect(
+                    "internal:edit_defect",
+                    defect_id=defect.id,
+                )
     else:
         initial = {}
 
@@ -128,6 +149,7 @@ def create_defect(request, organization_slug, playground_slug):
             "playground": playground,
             "form": form,
             "selected_equipment": selected_equipment,
+            "defect_images": [],
         },
     )
 
@@ -193,8 +215,11 @@ def create_defect_from_inspection_answer(request, answer_id):
 
             defect.save()
 
-            messages.success(request, "Der Mangel wurde aus dem Prüfpunkt erfasst.")
-            return redirect("internal:edit_defect", defect_id=defect.id)
+            if not save_defect_images_or_add_error(request, defect):
+                defect.delete()
+            else:
+                messages.success(request, "Der Mangel wurde aus dem Prüfpunkt erfasst.")
+                return redirect("internal:edit_defect", defect_id=defect.id)
     else:
         form = DefectFromInspectionAnswerForm(inspection_answer=answer)
 
@@ -213,6 +238,7 @@ def create_defect_from_inspection_answer(request, answer_id):
             "form": form,
             "inspection": inspection,
             "playground": playground,
+            "defect_images": [],
         },
     )
 
@@ -230,7 +256,7 @@ def edit_defect(request, defect_id):
             "equipment",
             "surface",
             "accessory",
-        ),
+        ).prefetch_related("images", "images__image"),
         id=defect_id,
     )
 
@@ -254,8 +280,9 @@ def edit_defect(request, defect_id):
             defect.playground = playground
             defect.save()
 
-            messages.success(request, "Der Mangel wurde gespeichert.")
-            return redirect("internal:edit_defect", defect_id=defect.id)
+            if save_defect_images_or_add_error(request, defect):
+                messages.success(request, "Der Mangel wurde gespeichert.")
+                return redirect("internal:edit_defect", defect_id=defect.id)
     else:
         form = DefectEditForm(instance=defect, playground=playground)
 
@@ -266,6 +293,7 @@ def edit_defect(request, defect_id):
             "defect": defect,
             "form": form,
             "playground": playground,
+            "defect_images": defect.images.select_related("image").all(),
         },
     )
 
