@@ -143,6 +143,18 @@
                                     <div class="meta-label">Koordinaten</div>
                                     <div class="fw-semibold">{{ playground.latitude }}, {{ playground.longitude }}</div>
                                 </div>
+                                {% if request.user.is_authenticated %}
+                                    <div class="col-12">
+                                        <a
+                                            href="https://stadtplan.winterthur.ch/mini?gbapp=portal&amp;topic=Spielplatzkarte&amp;infoactive=1&amp;maponly=1&amp;onlymap=1&amp;scale=200&amp;x={{ playground.longitude }}&amp;y={{ playground.latitude }}&amp;back=Hintergrundkarte_LK_AV_Situationsplan"
+                                            class="btn btn-atlas-primary w-100"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            Fachkarte anzeigen
+                                        </a>
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
