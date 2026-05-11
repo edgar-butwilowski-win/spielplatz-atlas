@@ -35,7 +35,18 @@
             color: var(--atlas-primary); font-size: 0.82rem; font-weight: 700;
             letter-spacing: 0.08em; text-transform: uppercase;
         }
-        .chart-box { min-height: 260px; }
+        .chart-box { min-height: 0; }
+        .chart-container {
+            position: relative;
+            height: 280px;
+            max-height: 280px;
+            width: 100%;
+        }
+        .chart-container canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
         .table td, .table th { vertical-align: middle; }
     </style>
 </head>
@@ -88,13 +99,17 @@
         <div class="col-xl-6">
             <div class="content-card p-3 p-lg-4 chart-box">
                 <h2 class="h5 fw-bold mb-3">Mängel nach Status</h2>
-                <canvas id="defectsByStatusChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="defectsByStatusChart"></canvas>
+                </div>
             </div>
         </div>
         <div class="col-xl-6">
             <div class="content-card p-3 p-lg-4 chart-box">
                 <h2 class="h5 fw-bold mb-3">Mängel nach Quelle</h2>
-                <canvas id="defectsBySourceChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="defectsBySourceChart"></canvas>
+                </div>
             </div>
         </div>
     </section>
@@ -104,13 +119,17 @@
             <div class="col-xl-6">
                 <div class="content-card p-3 p-lg-4 chart-box">
                     <h2 class="h5 fw-bold mb-3">Kontrollen nach Art</h2>
-                    <canvas id="inspectionsByTypeChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="inspectionsByTypeChart"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="col-xl-6">
                 <div class="content-card p-3 p-lg-4 chart-box">
                     <h2 class="h5 fw-bold mb-3">Kontrollen nach Status</h2>
-                    <canvas id="inspectionsByStatusChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="inspectionsByStatusChart"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
@@ -121,7 +140,9 @@
             <div class="col-xl-6">
                 <div class="content-card p-3 p-lg-4 chart-box">
                     <h2 class="h5 fw-bold mb-3">Instandhaltung nach Status</h2>
-                    <canvas id="maintenanceByStatusChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="maintenanceByStatusChart"></canvas>
+                    </div>
                 </div>
             </div>
             <div class="col-xl-6">
@@ -274,6 +295,7 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                resizeDelay: 100,
                 plugins: { legend: { display: false } },
                 scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
             }
