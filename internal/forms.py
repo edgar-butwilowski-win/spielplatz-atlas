@@ -13,11 +13,26 @@ from inspections.models import Defect
 from playgrounds.models import PlayEquipment, PlaygroundAccessory, PlaygroundSurface
 
 
+TARGET_TYPE_NONE = "none"
+TARGET_TYPE_EQUIPMENT = "equipment"
+TARGET_TYPE_SURFACE = "surface"
+TARGET_TYPE_ACCESSORY = "accessory"
+
+TARGET_TYPE_CHOICES = [
+    (TARGET_TYPE_NONE, "Allgemeiner Spielplatzmangel"),
+    (TARGET_TYPE_EQUIPMENT, "Spielgerät"),
+    (TARGET_TYPE_SURFACE, "Fallschutzfläche / Boden"),
+    (TARGET_TYPE_ACCESSORY, "Zusatzausstattung"),
+]
+
+
 def apply_bootstrap_classes(form):
     for field in form.fields.values():
         existing_classes = field.widget.attrs.get("class", "")
 
         if isinstance(field.widget, forms.CheckboxInput):
+            field.widget.attrs["class"] = "form-check-input"
+        elif isinstance(field.widget, forms.RadioSelect):
             field.widget.attrs["class"] = "form-check-input"
         elif "form-control" not in existing_classes and "form-select" not in existing_classes:
             if isinstance(field.widget, forms.Select):
@@ -46,6 +61,22 @@ def restrict_target_fields_to_playground(form, playground):
     ).order_by("name")
 
 
+def get_initial_target_type(instance):
+    if not instance:
+        return TARGET_TYPE_NONE
+
+    if getattr(instance, "equipment_id", None):
+        return TARGET_TYPE_EQUIPMENT
+
+    if getattr(instance, "surface_id", None):
+        return TARGET_TYPE_SURFACE
+
+    if getattr(instance, "accessory_id", None):
+        return TARGET_TYPE_ACCESSORY
+
+    return TARGET_TYPE_NONE
+
+
 def clean_single_target(cleaned_data):
     equipment = cleaned_data.get("equipment")
     surface = cleaned_data.get("surface")
@@ -61,6 +92,49 @@ def clean_single_target(cleaned_data):
         )
 
     return cleaned_data
+
+
+def clean_target_by_type(cleaned_data):
+    target_type = cleaned_data.get("target_type") or TARGET_TYPE_NONE
+
+    equipment = cleaned_data.get("equipment")
+    surface = cleaned_data.get("surface")
+    accessory = cleaned_data.get("accessory")
+
+    if target_type == TARGET_TYPE_NONE:
+        cleaned_data["equipment"] = None
+        cleaned_data["surface"] = None
+        cleaned_data["accessory"] = None
+        return cleaned_data
+
+    if target_type == TARGET_TYPE_EQUIPMENT:
+        cleaned_data["surface"] = None
+        cleaned_data["accessory"] = None
+
+        if not equipment:
+            raise forms.ValidationError("Bitte das betroffene Spielgerät auswählen.")
+
+        return cleaned_data
+
+    if target_type == TARGET_TYPE_SURFACE:
+        cleaned_data["equipment"] = None
+        cleaned_data["accessory"] = None
+
+        if not surface:
+            raise forms.ValidationError("Bitte die betroffene Fallschutzfläche oder den betroffenen Boden auswählen.")
+
+        return cleaned_data
+
+    if target_type == TARGET_TYPE_ACCESSORY:
+        cleaned_data["equipment"] = None
+        cleaned_data["surface"] = None
+
+        if not accessory:
+            raise forms.ValidationError("Bitte die betroffene Zusatzausstattung auswählen.")
+
+        return cleaned_data
+
+    raise forms.ValidationError("Bitte eine gültige Objektart auswählen.")
 
 
 class DefectCreateForm(forms.ModelForm):
@@ -205,9 +279,18 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
 
 
 class DefectEditForm(forms.ModelForm):
+    target_type = forms.ChoiceField(
+        label="Betroffenes Objekt",
+        choices=TARGET_TYPE_CHOICES,
+        widget=forms.RadioSelect,
+        required=True,
+        help_text="Wählen Sie zuerst die Objektart aus. Danach wird das passende Auswahlfeld aktiv.",
+    )
+
     class Meta:
         model = Defect
         fields = (
+            "target_type",
             "equipment",
             "surface",
             "accessory",
@@ -232,6 +315,9 @@ class DefectEditForm(forms.ModelForm):
         restrict_target_fields_to_playground(self, playground)
         apply_bootstrap_classes(self)
 
+        if not self.is_bound:
+            self.initial["target_type"] = get_initial_target_type(self.instance)
+
         self.fields["equipment"].required = False
         self.fields["surface"].required = False
         self.fields["accessory"].required = False
@@ -242,4 +328,5 @@ class DefectEditForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        cleaned_data = clean_target_by_type(cleaned_data)
         return clean_single_target(cleaned_data)
