@@ -10,17 +10,22 @@ import re
 
 
 class PublicAuthNavigationMiddleware:
-    """Vereinheitlicht die Login-/Logout-/Admin-Navigation in öffentlichen Seiten.
+    """Vereinheitlicht die öffentliche Navigation.
 
     Die öffentlichen Templates sind aktuell noch nicht auf ein gemeinsames
-    Basistemplate umgestellt. Diese Middleware verhindert deshalb, dass
-    angemeldete interne Nicht-Admins über den Navigationsbutton in den
-    Django-Admin gelangen, und zeigt den Admin-Button nur echten Admin-Usern.
+    Basistemplate umgestellt. Diese Middleware reduziert die sichtbare
+    Navigationsleiste auf die wichtigsten öffentlichen Links und ergänzt ein
+    Burger-Menü für weitere Ziele wie Karte, Dashboard, Admin, Login und Logout.
     """
 
-    ADMIN_LINK_PATTERN = re.compile(
-        r'<a href="/admin/" class="btn btn-sm btn-outline-secondary">\s*(Admin|Login)\s*</a>'
+    NAV_ACTIONS_PATTERN = re.compile(
+        r'(<nav class="navbar[\s\S]*?</a>\s*)'
+        r'<div class="d-flex align-items-center gap-2">[\s\S]*?</div>'
+        r'(\s*</div>\s*</nav>)',
+        re.MULTILINE,
     )
+
+    BODY_END_PATTERN = re.compile(r"</body>", re.IGNORECASE)
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -41,18 +46,14 @@ class PublicAuthNavigationMiddleware:
         except UnicodeDecodeError:
             return response
 
-        if request.user.is_authenticated:
-            if self.user_should_see_admin_button(request.user):
-                replacement = (
-                    '<a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>'
-                    '<a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>'
-                )
-            else:
-                replacement = '<a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>'
-        else:
-            replacement = '<a href="/login/" class="btn btn-sm btn-outline-secondary">Login</a>'
+        updated_html = self.NAV_ACTIONS_PATTERN.sub(
+            lambda match: f"{match.group(1)}{self.build_navigation_actions(request)}{match.group(2)}",
+            html,
+            count=1,
+        )
 
-        updated_html = self.ADMIN_LINK_PATTERN.sub(replacement, html)
+        if updated_html != html and "atlas-menu-panel" in updated_html:
+            updated_html = self.inject_menu_script(updated_html)
 
         if updated_html == html:
             return response
@@ -60,6 +61,89 @@ class PublicAuthNavigationMiddleware:
         response.content = updated_html.encode(response.charset or "utf-8")
         response["Content-Length"] = str(len(response.content))
         return response
+
+    def build_navigation_actions(self, request):
+        menu_links = [
+            ("/", "Karte"),
+        ]
+
+        if request.user.is_authenticated:
+            menu_links.append(("/internal/dashboard/", "Dashboard"))
+
+            if self.user_should_see_admin_button(request.user):
+                menu_links.append(("/admin/", "Admin"))
+
+            menu_links.append(("/logout/", "Logout"))
+        else:
+            menu_links.append(("/login/", "Login"))
+
+        menu_items = "".join(
+            f'<a class="dropdown-item" href="{href}">{label}</a>'
+            for href, label in menu_links
+        )
+
+        return f'''
+            <div class="d-flex align-items-center gap-2 position-relative">
+                <a href="/about/" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex">Über</a>
+                <a href="/impressum/" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex">Impressum</a>
+                <a href="/register-organization/" class="btn btn-sm btn-atlas-primary d-none d-md-inline-flex">Organisation registrieren</a>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary atlas-menu-toggle"
+                    aria-label="Menü öffnen"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
+                <div class="atlas-menu-panel dropdown-menu dropdown-menu-end shadow">
+                    <a class="dropdown-item d-md-none" href="/about/">Über</a>
+                    <a class="dropdown-item d-md-none" href="/impressum/">Impressum</a>
+                    <a class="dropdown-item d-md-none" href="/register-organization/">Organisation registrieren</a>
+                    <div class="dropdown-divider d-md-none"></div>
+                    {menu_items}
+                </div>
+            </div>
+        '''
+
+    def inject_menu_script(self, html):
+        script = """
+<script>
+(function () {
+    function closeAllMenus(exceptPanel) {
+        document.querySelectorAll('.atlas-menu-panel.show').forEach(function (panel) {
+            if (panel !== exceptPanel) {
+                panel.classList.remove('show');
+            }
+        });
+        document.querySelectorAll('.atlas-menu-toggle[aria-expanded="true"]').forEach(function (button) {
+            if (!exceptPanel || button.nextElementSibling !== exceptPanel) {
+                button.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('.atlas-menu-toggle');
+
+        if (button) {
+            var panel = button.nextElementSibling;
+            var isOpen = panel.classList.contains('show');
+            closeAllMenus(panel);
+            panel.classList.toggle('show', !isOpen);
+            button.setAttribute('aria-expanded', String(!isOpen));
+            event.preventDefault();
+            return;
+        }
+
+        if (!event.target.closest('.atlas-menu-panel')) {
+            closeAllMenus(null);
+        }
+    });
+}());
+</script>
+"""
+
+        return self.BODY_END_PATTERN.sub(script + "\n</body>", html, count=1)
 
     @staticmethod
     def user_should_see_admin_button(user):
