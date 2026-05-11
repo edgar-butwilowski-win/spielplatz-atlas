@@ -46,6 +46,12 @@
         .lifecycle-pill-warning { background: #FEF3C7; color: #92400E; }
         .lifecycle-pill-info { background: #EFF6FF; color: #1D4ED8; }
         .lifecycle-pill-danger { background: #FEE2E2; color: #B91C1C; }
+        .renovation-panel {
+            border: 1px solid #E2E8F0;
+            border-radius: 0.9rem;
+            background: #F8FAFC;
+            padding: 0.75rem;
+        }
         .empty-state { border: 1px dashed #CBD5E1; border-radius: 1rem; background: #F8FAFC; }
         .defect-card { border-radius: 1rem; }
         .internal-defect-row {
@@ -84,6 +90,16 @@
             </div>
         </div>
     </nav>
+
+    {% if messages %}
+        <div class="container-fluid px-3 px-lg-4 pt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} mb-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <header class="hero py-4 py-lg-5">
         <div class="container-fluid px-3 px-lg-4">
@@ -270,12 +286,14 @@
                                 </div>
 
                                 <div class="d-flex flex-wrap gap-2 mt-3">
-                                    {% if equipment.has_pending_renovation %}
-                                        <span class="lifecycle-pill lifecycle-pill-warning">
-                                            Sanierung ausstehend{% if equipment.recommended_renovation_year %} {{ equipment.recommended_renovation_year }}{% endif %}
-                                        </span>
-                                    {% else %}
-                                        <span class="lifecycle-pill lifecycle-pill-success">Keine Sanierung geplant</span>
+                                    {% if can_view_equipment_renovation %}
+                                        {% if equipment.has_pending_renovation %}
+                                            <span class="lifecycle-pill lifecycle-pill-warning">
+                                                Sanierung ausstehend{% if equipment.recommended_renovation_year %} {{ equipment.recommended_renovation_year }}{% endif %}
+                                            </span>
+                                        {% else %}
+                                            <span class="lifecycle-pill lifecycle-pill-success">Keine Sanierung geplant</span>
+                                        {% endif %}
                                     {% endif %}
 
                                     {% if equipment.has_future_demolition %}
@@ -284,6 +302,71 @@
                                         </span>
                                     {% endif %}
                                 </div>
+
+                                {% if can_view_equipment_renovation %}
+                                    <div class="renovation-panel mt-3">
+                                        <div class="small fw-semibold mb-2">Sanierungsangaben</div>
+
+                                        {% if can_edit_equipment_renovation %}
+                                            <form method="post" action="{% url 'internal:update_equipment_renovation' equipment.id %}">
+                                                {% csrf_token %}
+                                                <div class="row g-2">
+                                                    <div class="col-6">
+                                                        <label class="form-label small mb-1" for="renovation_year_{{ equipment.id }}">Empfohlenes Sanierungsjahr</label>
+                                                        <input
+                                                            type="number"
+                                                            min="{% now 'Y' %}"
+                                                            max="9999"
+                                                            name="recommended_renovation_year"
+                                                            id="renovation_year_{{ equipment.id }}"
+                                                            value="{{ equipment.recommended_renovation_year|default_if_none:'' }}"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="z. B. {% now 'Y' %}"
+                                                        >
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <label class="form-label small mb-1" for="renovation_type_{{ equipment.id }}">Sanierungsart</label>
+                                                        <select name="renovation_type" id="renovation_type_{{ equipment.id }}" class="form-select form-select-sm">
+                                                            <option value="">Keine Angabe</option>
+                                                            {% for value, label in renovation_type_choices %}
+                                                                <option value="{{ value }}" {% if equipment.renovation_type == value %}selected{% endif %}>{{ label }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-12">
+                                                        <label class="form-label small mb-1" for="renovation_comment_{{ equipment.id }}">Kommentar zur Sanierung</label>
+                                                        <input
+                                                            type="text"
+                                                            name="renovation_comment"
+                                                            id="renovation_comment_{{ equipment.id }}"
+                                                            value="{{ equipment.renovation_comment }}"
+                                                            class="form-control form-control-sm"
+                                                            placeholder="Optionaler Kommentar"
+                                                        >
+                                                    </div>
+                                                    <div class="col-12 d-flex justify-content-end">
+                                                        <button type="submit" class="btn btn-sm btn-atlas-primary">Sanierung speichern</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        {% else %}
+                                            <div class="row g-2 small">
+                                                <div class="col-6">
+                                                    <div class="meta-label">Empfohlenes Sanierungsjahr</div>
+                                                    <div class="fw-semibold">{{ equipment.recommended_renovation_year|default:"–" }}</div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="meta-label">Sanierungsart</div>
+                                                    <div class="fw-semibold">{{ equipment.get_renovation_type_display|default:"–" }}</div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="meta-label">Kommentar zur Sanierung</div>
+                                                    <div class="fw-semibold">{{ equipment.renovation_comment|default:"–" }}</div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
                                 <hr>
 
                                 {% if equipment.has_public_defect %}
