@@ -6,6 +6,7 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
+import json
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
@@ -52,13 +53,6 @@ def get_dashboard_scope(user):
         "can_maintain": profile.may_maintain,
         "can_view_internal": profile.may_view_internal,
     }
-
-
-def apply_organization_filter(queryset, organization, field_path="playground__organization"):
-    if organization is None:
-        return queryset
-
-    return queryset.filter(**{field_path: organization})
 
 
 def choice_count_map(queryset, field_name, choices):
@@ -138,6 +132,23 @@ def build_dashboard_context(scope):
     completed_inspections = inspections.filter(status=Inspection.STATUS_COMPLETED)
     draft_inspections = inspections.filter(status=Inspection.STATUS_DRAFT)
 
+    defects_by_status = choice_count_map(defects, "status", Defect.STATUS_CHOICES)
+    defects_by_source = choice_count_map(defects, "source_type", Defect.SOURCE_CHOICES)
+    maintenance_by_status = choice_count_map(
+        maintenance_actions,
+        "status",
+        MaintenanceAction.STATUS_CHOICES,
+    )
+    inspections_by_type = choice_count_map(
+        inspections,
+        "inspection_type",
+        Inspection.TYPE_CHOICES,
+    )
+    inspections_by_status = choice_count_map(
+        inspections,
+        "status",
+        Inspection.STATUS_CHOICES,
+    )
     organizations_count = Organization.objects.count() if organization is None else 1
 
     return {
@@ -151,24 +162,17 @@ def build_dashboard_context(scope):
         "planned_maintenance_actions_count": planned_maintenance_actions.count(),
         "completed_inspections_count": completed_inspections.count(),
         "draft_inspections_count": draft_inspections.count(),
-        "defects_by_status": choice_count_map(defects, "status", Defect.STATUS_CHOICES),
-        "defects_by_source": choice_count_map(defects, "source_type", Defect.SOURCE_CHOICES),
+        "defects_by_status": defects_by_status,
+        "defects_by_source": defects_by_source,
         "defects_by_playground": top_playground_defect_counts(open_defects),
-        "maintenance_by_status": choice_count_map(
-            maintenance_actions,
-            "status",
-            MaintenanceAction.STATUS_CHOICES,
-        ),
-        "inspections_by_type": choice_count_map(
-            inspections,
-            "inspection_type",
-            Inspection.TYPE_CHOICES,
-        ),
-        "inspections_by_status": choice_count_map(
-            inspections,
-            "status",
-            Inspection.STATUS_CHOICES,
-        ),
+        "maintenance_by_status": maintenance_by_status,
+        "inspections_by_type": inspections_by_type,
+        "inspections_by_status": inspections_by_status,
+        "defects_by_status_json": json.dumps(defects_by_status),
+        "defects_by_source_json": json.dumps(defects_by_source),
+        "maintenance_by_status_json": json.dumps(maintenance_by_status),
+        "inspections_by_type_json": json.dumps(inspections_by_type),
+        "inspections_by_status_json": json.dumps(inspections_by_status),
         "latest_inspections": list(
             completed_inspections
             .select_related("playground", "playground__organization", "inspector")
