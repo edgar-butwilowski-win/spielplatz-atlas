@@ -17,5 +17,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("internal/", include("internal.urls")),
     path("media-assets/", include("media_assets.urls")),
+    path("", include("accounts.urls")),
     path("", include("public.urls")),
 ]
