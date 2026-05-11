@@ -25,6 +25,10 @@ def about(request):
     return render(request, "public/about.html")
 
 
+def imprint(request):
+    return render(request, "public/imprint.html")
+
+
 def public_playgrounds_api(request):
     playgrounds = (
         Playground.objects
@@ -288,4 +292,4 @@ def register_organization(request):
 
 
 def register_organization_done(request):
-    return render(request, "public/register_organization_done.html")
+    return render(request, "public/register_organization_done")
