@@ -39,7 +39,11 @@ from .image_utils import (
     handle_defect_image_uploads,
     sync_defect_image_visibility,
 )
-from .permissions import require_inspection_permission, require_maintenance_permission
+from .permissions import (
+    require_inspection_permission,
+    require_internal_view_permission,
+    require_maintenance_permission,
+)
 
 
 @login_required
@@ -266,9 +270,12 @@ def edit_defect(request, defect_id):
         messages.error(request, "Dieser Mangel ist keinem Spielplatz zugeordnet.")
         return redirect("public:index")
 
-    require_maintenance_permission(request.user, playground.organization)
+    require_internal_view_permission(request.user, playground.organization)
+    can_edit_defect = user_can_create_defects(request.user, playground.organization)
 
     if request.method == "POST":
+        require_maintenance_permission(request.user, playground.organization)
+
         form = DefectEditForm(
             request.POST,
             instance=defect,
@@ -286,6 +293,10 @@ def edit_defect(request, defect_id):
     else:
         form = DefectEditForm(instance=defect, playground=playground)
 
+    if not can_edit_defect:
+        for field in form.fields.values():
+            field.disabled = True
+
     return render(
         request,
         "internal/edit_defect.html",
@@ -294,6 +305,7 @@ def edit_defect(request, defect_id):
             "form": form,
             "playground": playground,
             "defect_images": defect.images.select_related("image").all(),
+            "can_edit_defect": can_edit_defect,
         },
     )
 
