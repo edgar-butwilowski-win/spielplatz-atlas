@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mangel bearbeiten – SpielplatzAtlas</title>
+    <title>{% if can_edit_defect %}Mangel bearbeiten{% else %}Mangel öffnen{% endif %} – SpielplatzAtlas</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -101,7 +101,7 @@
         {% endif %}
 
         <div class="content-card p-3 p-lg-4 mb-4">
-            <div class="context-label mb-2">Mangel bearbeiten</div>
+            <div class="context-label mb-2">{% if can_edit_defect %}Mangel bearbeiten{% else %}Mangel öffnen{% endif %}</div>
 
             <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
                 <div>
@@ -136,6 +136,12 @@
                     {% endif %}
                 </div>
             </div>
+
+            {% if not can_edit_defect %}
+                <div class="alert alert-info mt-3 mb-0">
+                    Sie haben lesenden Zugriff auf diesen Mangel. Änderungen sind mit Ihrer Rolle nicht möglich.
+                </div>
+            {% endif %}
 
             <div class="row g-3 mt-3">
                 <div class="col-lg-4">
@@ -186,12 +192,14 @@
 
             <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
                 <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
-                    Abbrechen
+                    Zurück zum Spielplatz
                 </a>
 
-                <button type="submit" class="btn btn-atlas-primary">
-                    Mangel speichern
-                </button>
+                {% if can_edit_defect %}
+                    <button type="submit" class="btn btn-atlas-primary">
+                        Mangel speichern
+                    </button>
+                {% endif %}
             </div>
         </form>
     </main>
