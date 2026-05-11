@@ -66,7 +66,7 @@ def profile_values_for_role(role):
             "is_org_admin": False,
             "can_view_internal": True,
             "can_inspect": True,
-            "can_maintain": False,
+            "can_maintain": True,
         }
 
     return {
