@@ -160,13 +160,24 @@
                                                 <h3 class="h6 fw-bold mb-1">{{ equipment.name }}</h3>
                                                 <div class="text-secondary small">{{ equipment.equipment_type.name }}</div>
                                             </div>
-                                            {% if equipment.has_public_safety_risk %}
-                                                <span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>
-                                            {% elif equipment.has_public_defect %}
-                                                <span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>
-                                            {% else %}
-                                                <span class="status-pill">In Betrieb</span>
-                                            {% endif %}
+                                            <div class="d-flex flex-column align-items-end gap-2">
+                                                {% if equipment.has_public_safety_risk %}
+                                                    <span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>
+                                                {% elif equipment.has_public_defect %}
+                                                    <span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>
+                                                {% else %}
+                                                    <span class="status-pill">In Betrieb</span>
+                                                {% endif %}
+
+                                                {% if can_create_defect %}
+                                                    <a
+                                                        href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}?equipment={{ equipment.id }}"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                    >
+                                                        Mangel erfassen
+                                                    </a>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <hr>
 
