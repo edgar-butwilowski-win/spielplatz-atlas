@@ -184,12 +184,16 @@ def playground_detail(request, organization_slug, playground_slug):
     can_create_inspection = False
     can_create_defect = False
     can_open_defect = False
+    can_view_equipment_renovation = False
+    can_edit_equipment_renovation = False
 
     if request.user.is_authenticated:
         if request.user.is_superuser:
             can_create_inspection = True
             can_create_defect = True
             can_open_defect = True
+            can_view_equipment_renovation = True
+            can_edit_equipment_renovation = True
         else:
             profile = getattr(request.user, "profile", None)
 
@@ -197,6 +201,8 @@ def playground_detail(request, organization_slug, playground_slug):
                 can_create_inspection = profile.may_inspect
                 can_create_defect = profile.may_maintain
                 can_open_defect = profile.may_view_internal
+                can_view_equipment_renovation = profile.may_view_internal
+                can_edit_equipment_renovation = profile.may_maintain
 
     visible_defects = (
         Defect.objects
@@ -264,6 +270,9 @@ def playground_detail(request, organization_slug, playground_slug):
         "can_create_inspection": can_create_inspection,
         "can_create_defect": can_create_defect,
         "can_open_defect": can_open_defect,
+        "can_view_equipment_renovation": can_view_equipment_renovation,
+        "can_edit_equipment_renovation": can_edit_equipment_renovation,
+        "renovation_type_choices": PlayEquipment.RENOVATION_TYPE_CHOICES,
         "preview_photo": preview_photo,
         "latest_completed_inspection": latest_completed_inspection,
     }
