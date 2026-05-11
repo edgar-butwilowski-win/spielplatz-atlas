@@ -159,7 +159,7 @@
                                         <div class="d-flex justify-content-between gap-2 align-items-start mb-2">
                                             <div>
                                                 <div class="fw-bold">{{ group.label }}</div>
-                                                {% if can_create_defect %}
+                                                {% if can_open_defect %}
                                                     <div class="small text-secondary">
                                                         {{ group.defects|length }} Mangel{% if group.defects|length != 1 %}e{% endif %}{% if group.has_internal_defect %} · enthält interne Mängel{% endif %}
                                                     </div>
@@ -178,7 +178,7 @@
                                             <div class="small fw-semibold">Geplante Behebung: {{ group.representative.planned_resolution_date|date:"d.m.Y" }}</div>
                                         {% endif %}
 
-                                        {% if can_create_defect %}
+                                        {% if can_open_defect %}
                                             <div class="small fw-semibold mt-3 mb-2">Interne Mängel</div>
                                             <div class="d-flex flex-column gap-2">
                                                 {% for defect in group.defects %}
@@ -191,7 +191,7 @@
                                                                 <span class="badge text-bg-secondary ms-1">intern</span>
                                                             {% endif %}
                                                         </div>
-                                                        <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel bearbeiten</a>
+                                                        <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel öffnen</a>
                                                     </div>
                                                 {% endfor %}
                                             </div>
@@ -270,7 +270,7 @@
                                             </div>
                                         {% endwith %}
 
-                                        {% if can_create_defect %}
+                                        {% if can_open_defect %}
                                             <div class="small fw-semibold mt-3 mb-2">Interne Mängel</div>
                                             <div class="d-flex flex-column gap-2">
                                                 {% for defect in equipment.public_defects %}
@@ -283,7 +283,7 @@
                                                                 <span class="badge text-bg-secondary ms-1">intern</span>
                                                             {% endif %}
                                                         </div>
-                                                        <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel bearbeiten</a>
+                                                        <a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel öffnen</a>
                                                     </div>
                                                 {% endfor %}
                                             </div>
