@@ -138,9 +138,18 @@ def clean_target_by_type(cleaned_data):
 
 
 class DefectCreateForm(forms.ModelForm):
+    target_type = forms.ChoiceField(
+        label="Betroffenes Objekt",
+        choices=TARGET_TYPE_CHOICES,
+        widget=forms.RadioSelect,
+        required=True,
+        help_text="Wählen Sie zuerst die Objektart aus. Danach wird das passende Auswahlfeld aktiv.",
+    )
+
     class Meta:
         model = Defect
         fields = (
+            "target_type",
             "equipment",
             "surface",
             "accessory",
@@ -197,6 +206,16 @@ class DefectCreateForm(forms.ModelForm):
         restrict_target_fields_to_playground(self, playground)
         apply_bootstrap_classes(self)
 
+        if not self.is_bound:
+            if self.initial.get("equipment"):
+                self.initial["target_type"] = TARGET_TYPE_EQUIPMENT
+            elif self.initial.get("surface"):
+                self.initial["target_type"] = TARGET_TYPE_SURFACE
+            elif self.initial.get("accessory"):
+                self.initial["target_type"] = TARGET_TYPE_ACCESSORY
+            else:
+                self.initial["target_type"] = TARGET_TYPE_NONE
+
         self.fields["equipment"].required = False
         self.fields["surface"].required = False
         self.fields["accessory"].required = False
@@ -207,6 +226,7 @@ class DefectCreateForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        cleaned_data = clean_target_by_type(cleaned_data)
         return clean_single_target(cleaned_data)
 
 
