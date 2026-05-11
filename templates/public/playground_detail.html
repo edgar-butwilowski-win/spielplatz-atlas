@@ -35,6 +35,17 @@
             display: inline-flex; border-radius: 999px; padding: 0.25rem 0.65rem;
             background: #ECFDF5; color: #047857; font-size: 0.85rem; font-weight: 600;
         }
+        .lifecycle-pill {
+            display: inline-flex;
+            border-radius: 999px;
+            padding: 0.25rem 0.65rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .lifecycle-pill-success { background: #ECFDF5; color: #047857; }
+        .lifecycle-pill-warning { background: #FEF3C7; color: #92400E; }
+        .lifecycle-pill-info { background: #EFF6FF; color: #1D4ED8; }
+        .lifecycle-pill-danger { background: #FEE2E2; color: #B91C1C; }
         .empty-state { border: 1px dashed #CBD5E1; border-radius: 1rem; background: #F8FAFC; }
         .defect-card { border-radius: 1rem; }
         .internal-defect-row {
@@ -237,7 +248,9 @@
                                         <div class="text-secondary small">{{ equipment.equipment_type.name }}</div>
                                     </div>
                                     <div class="d-flex flex-column align-items-end gap-2">
-                                        {% if equipment.has_public_safety_risk %}
+                                        {% if equipment.is_planned %}
+                                            <span class="lifecycle-pill lifecycle-pill-info">In Planung</span>
+                                        {% elif equipment.has_public_safety_risk %}
                                             <span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>
                                         {% elif equipment.has_public_defect %}
                                             <span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>
@@ -254,6 +267,22 @@
                                             </a>
                                         {% endif %}
                                     </div>
+                                </div>
+
+                                <div class="d-flex flex-wrap gap-2 mt-3">
+                                    {% if equipment.has_pending_renovation %}
+                                        <span class="lifecycle-pill lifecycle-pill-warning">
+                                            Sanierung ausstehend{% if equipment.recommended_renovation_year %} {{ equipment.recommended_renovation_year }}{% endif %}
+                                        </span>
+                                    {% else %}
+                                        <span class="lifecycle-pill lifecycle-pill-success">Keine Sanierung geplant</span>
+                                    {% endif %}
+
+                                    {% if equipment.has_future_demolition %}
+                                        <span class="lifecycle-pill lifecycle-pill-danger">
+                                            Wird am {{ equipment.demolition_date|date:"d.m.Y" }} abgebrochen
+                                        </span>
+                                    {% endif %}
                                 </div>
                                 <hr>
 
@@ -295,6 +324,8 @@
                                     <div class="col-6"><div class="meta-label">Inventar-Nr.</div><div class="fw-semibold">{{ equipment.inventory_number|default:"–" }}</div></div>
                                     <div class="col-6"><div class="meta-label">Baujahr</div><div class="fw-semibold">{{ equipment.year_built|default:"–" }}</div></div>
                                     <div class="col-12"><div class="meta-label">Hersteller</div><div class="fw-semibold">{{ equipment.manufacturer|default:"–" }}</div></div>
+                                    {% if equipment.supplier %}<div class="col-12"><div class="meta-label">Lieferant</div><div class="fw-semibold">{{ equipment.supplier.name }}</div></div>{% endif %}
+                                    {% if equipment.norm %}<div class="col-12"><div class="meta-label">Norm</div><div class="fw-semibold">{{ equipment.norm }}</div></div>{% endif %}
                                 </div>
                             </article>
                         </div>
