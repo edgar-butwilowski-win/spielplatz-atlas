@@ -280,11 +280,11 @@
         });
     }
 
-    renderBarChart("defectsByStatusChart", {{ defects_by_status|safe }});
-    renderBarChart("defectsBySourceChart", {{ defects_by_source|safe }});
-    renderBarChart("inspectionsByTypeChart", {{ inspections_by_type|safe }});
-    renderBarChart("inspectionsByStatusChart", {{ inspections_by_status|safe }});
-    renderBarChart("maintenanceByStatusChart", {{ maintenance_by_status|safe }});
+    renderBarChart("defectsByStatusChart", {{ defects_by_status_json|safe }});
+    renderBarChart("defectsBySourceChart", {{ defects_by_source_json|safe }});
+    renderBarChart("inspectionsByTypeChart", {{ inspections_by_type_json|safe }});
+    renderBarChart("inspectionsByStatusChart", {{ inspections_by_status_json|safe }});
+    renderBarChart("maintenanceByStatusChart", {{ maintenance_by_status_json|safe }});
 </script>
 </body>
 </html>
