@@ -10,12 +10,12 @@ import re
 
 
 class PublicAuthNavigationMiddleware:
-    """Vereinheitlicht den Login-/Logout-Button in öffentlichen Seiten.
+    """Vereinheitlicht die Login-/Logout-/Admin-Navigation in öffentlichen Seiten.
 
     Die öffentlichen Templates sind aktuell noch nicht auf ein gemeinsames
     Basistemplate umgestellt. Diese Middleware verhindert deshalb, dass
-    angemeldete interne Nicht-Admins über den Navigationsbutton wieder im
-    Django-Admin landen.
+    angemeldete interne Nicht-Admins über den Navigationsbutton in den
+    Django-Admin gelangen, und zeigt den Admin-Button nur echten Admin-Usern.
     """
 
     ADMIN_LINK_PATTERN = re.compile(
@@ -42,7 +42,13 @@ class PublicAuthNavigationMiddleware:
             return response
 
         if request.user.is_authenticated:
-            replacement = '<a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>'
+            if self.user_should_see_admin_button(request.user):
+                replacement = (
+                    '<a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>'
+                    '<a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>'
+                )
+            else:
+                replacement = '<a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>'
         else:
             replacement = '<a href="/login/" class="btn btn-sm btn-outline-secondary">Login</a>'
 
@@ -54,3 +60,15 @@ class PublicAuthNavigationMiddleware:
         response.content = updated_html.encode(response.charset or "utf-8")
         response["Content-Length"] = str(len(response.content))
         return response
+
+    @staticmethod
+    def user_should_see_admin_button(user):
+        if user.is_superuser:
+            return True
+
+        profile = getattr(user, "profile", None)
+
+        return bool(
+            profile
+            and profile.may_manage_organization
+        )
