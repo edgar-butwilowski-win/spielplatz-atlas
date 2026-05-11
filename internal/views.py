@@ -88,6 +88,17 @@ def create_defect(request, organization_slug, playground_slug):
 
     require_maintenance_permission(request.user, playground.organization)
 
+    selected_equipment = None
+    selected_equipment_id = request.GET.get("equipment")
+
+    if selected_equipment_id:
+        selected_equipment = get_object_or_404(
+            PlayEquipment.objects.select_related("equipment_type"),
+            id=selected_equipment_id,
+            playground=playground,
+            is_active=True,
+        )
+
     if request.method == "POST":
         form = DefectCreateForm(request.POST, playground=playground)
 
@@ -103,7 +114,12 @@ def create_defect(request, organization_slug, playground_slug):
                 defect_id=defect.id,
             )
     else:
-        form = DefectCreateForm(playground=playground)
+        initial = {}
+
+        if selected_equipment:
+            initial["equipment"] = selected_equipment
+
+        form = DefectCreateForm(initial=initial, playground=playground)
 
     return render(
         request,
@@ -111,6 +127,7 @@ def create_defect(request, organization_slug, playground_slug):
         {
             "playground": playground,
             "form": form,
+            "selected_equipment": selected_equipment,
         },
     )
 
