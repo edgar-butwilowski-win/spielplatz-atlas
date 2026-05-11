@@ -137,6 +137,59 @@ def clean_target_by_type(cleaned_data):
     raise forms.ValidationError("Bitte eine gültige Objektart auswählen.")
 
 
+class EquipmentRenovationForm(forms.ModelForm):
+    class Meta:
+        model = PlayEquipment
+        fields = (
+            "recommended_renovation_year",
+            "renovation_type",
+            "renovation_comment",
+        )
+        widgets = {
+            "recommended_renovation_year": forms.NumberInput(
+                attrs={
+                    "class": "form-control form-control-sm",
+                    "placeholder": "z. B. 2028",
+                    "min": timezone.localdate().year,
+                    "max": 9999,
+                }
+            ),
+            "renovation_type": forms.Select(
+                attrs={
+                    "class": "form-select form-select-sm",
+                }
+            ),
+            "renovation_comment": forms.TextInput(
+                attrs={
+                    "class": "form-control form-control-sm",
+                    "placeholder": "Optionaler Kommentar",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["recommended_renovation_year"].required = False
+        self.fields["renovation_type"].required = False
+        self.fields["renovation_comment"].required = False
+
+    def clean_recommended_renovation_year(self):
+        year = self.cleaned_data.get("recommended_renovation_year")
+
+        if year is None:
+            return year
+
+        current_year = timezone.localdate().year
+
+        if year < current_year:
+            raise forms.ValidationError("Das empfohlene Sanierungsjahr darf nicht in der Vergangenheit liegen.")
+
+        if year < 1000 or year > 9999:
+            raise forms.ValidationError("Bitte eine vierstellige Jahreszahl eingeben.")
+
+        return year
+
+
 class DefectCreateForm(forms.ModelForm):
     target_type = forms.ChoiceField(
         label="Betroffenes Objekt",
