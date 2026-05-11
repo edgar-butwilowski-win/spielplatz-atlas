@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="de-CH">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Impressum und Datenschutz – SpielplatzAtlas</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --atlas-primary: #0F766E;
+            --atlas-secondary: #F59E0B;
+            --atlas-bg: #F8FAFC;
+            --atlas-text: #0F172A;
+        }
+
+        body {
+            background: var(--atlas-bg);
+            color: var(--atlas-text);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .hero {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .page-title {
+            font-size: clamp(2.1rem, 5vw, 4.2rem);
+            line-height: 1.04;
+            letter-spacing: -0.045em;
+        }
+
+        .content-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+        }
+
+        .section-label {
+            color: var(--atlas-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .btn-atlas-primary {
+            background: var(--atlas-primary);
+            border-color: var(--atlas-primary);
+            color: white;
+        }
+
+        .btn-atlas-primary:hover {
+            background: #0B5F59;
+            border-color: #0B5F59;
+            color: white;
+        }
+
+        .toc-card {
+            position: sticky;
+            top: 82px;
+        }
+
+        .data-list li {
+            margin-bottom: 0.35rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-3 px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span class="brand-mark">A</span>
+                <span class="fw-bold">SpielplatzAtlas</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2">
+                <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
+                <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary">Über</a>
+                {% if request.user.is_authenticated %}
+                    <a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>
+                {% else %}
+                    <a href="/admin/" class="btn btn-sm btn-outline-secondary">Login</a>
+                {% endif %}
+                <a href="{% url 'public:register_organization' %}" class="btn btn-sm btn-atlas-primary d-none d-md-inline-flex">
+                    Organisation registrieren
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero py-5">
+        <div class="container-fluid px-3 px-lg-4">
+            <div class="section-label mb-2">Rechtliche Hinweise</div>
+            <h1 class="page-title fw-bold mb-3">Impressum und Datenschutz</h1>
+            <p class="fs-5 text-secondary mb-0" style="max-width: 880px;">
+                Diese Seite enthält Angaben zur verantwortlichen Stelle, zur Nutzung des SpielplatzAtlas
+                und zur Bearbeitung personenbezogener Daten im Rahmen dieser WebApp.
+            </p>
+        </div>
+    </header>
+
+    <main class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
+        <div class="row g-4">
+            <aside class="col-lg-3">
+                <div class="content-card toc-card p-3 p-lg-4">
+                    <div class="fw-bold mb-2">Inhalt</div>
+                    <div class="d-grid gap-2 small">
+                        <a href="#impressum" class="text-decoration-none">Impressum</a>
+                        <a href="#nutzung" class="text-decoration-none">Nutzungshinweise</a>
+                        <a href="#datenschutz" class="text-decoration-none">Datenschutz</a>
+                        <a href="#betroffenenrechte" class="text-decoration-none">Rechte betroffener Personen</a>
+                        <a href="#opensource" class="text-decoration-none">Open Source</a>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="col-lg-9">
+                <section id="impressum" class="content-card p-4 p-lg-5 mb-4">
+                    <div class="section-label mb-2">Impressum</div>
+                    <h2 class="fw-bold mb-3">Verantwortliche Stelle</h2>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h3 class="h5 fw-bold">Herausgeberin</h3>
+                            <p class="mb-0">
+                                Stadt Winterthur<br>
+                                Geomatik- und Vermessungsamt<br>
+                                Fachstelle Geoinformation<br>
+                                Pionierstrasse 7<br>
+                                8403 Winterthur<br>
+                                Schweiz
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="h5 fw-bold">Kontakt</h3>
+                            <p class="mb-0">
+                                Telefon: +41 52 267 54 82<br>
+                                E-Mail: <a href="mailto:geov@win.ch">geov@win.ch</a><br>
+                                Website: <a href="https://stadt.winterthur.ch" rel="noopener">stadt.winterthur.ch</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h3 class="h5 fw-bold">Inhaltliche Verantwortung</h3>
+                    <p class="text-secondary mb-0">
+                        Verantwortlich für die fachlichen Inhalte dieser WebApp ist die Fachstelle Geoinformation
+                        der Stadt Winterthur. Die Inhalte werden mit Sorgfalt erstellt und gepflegt. Dennoch kann
+                        keine Gewähr für Vollständigkeit, Aktualität und jederzeitige Verfügbarkeit übernommen werden.
+                    </p>
+                </section>
+
+                <section id="nutzung" class="content-card p-4 p-lg-5 mb-4">
+                    <div class="section-label mb-2">Nutzungshinweise</div>
+                    <h2 class="fw-bold mb-3">Informationen auf der Karte und Detailseiten</h2>
+                    <p class="text-secondary">
+                        Die öffentliche Karte zeigt aktive und öffentlich freigegebene Spielplätze mit Koordinaten.
+                        Detailseiten können Informationen zu Standort, Ausstattung, Fotos, letzter abgeschlossener
+                        Kontrolle und öffentlich freigegebenen Mängeln anzeigen.
+                    </p>
+                    <p class="text-secondary mb-0">
+                        Öffentliche Hinweise zu Mängeln dienen der Information. Interne Notizen, interne Beschreibungen,
+                        nicht freigegebene Mängel und laufende Kontrollen werden nicht öffentlich angezeigt.
+                    </p>
+                </section>
+
+                <section id="datenschutz" class="content-card p-4 p-lg-5 mb-4">
+                    <div class="section-label mb-2">Datenschutz</div>
+                    <h2 class="fw-bold mb-3">Bearbeitung personenbezogener Daten</h2>
+                    <p class="text-secondary">
+                        Der SpielplatzAtlas verarbeitet Daten, soweit dies für Betrieb, Sicherheit, öffentliche Information,
+                        interne Verwaltung, Kontrolle, Mängelbearbeitung und Unterhalt erforderlich ist. Die Datenschutzhinweise
+                        sind an den Anforderungen des Schweizer Datenschutzrechts und an den Informationspflichten der DSGVO
+                        ausgerichtet.
+                    </p>
+
+                    <h3 class="h5 fw-bold mt-4">Kategorien bearbeiteter Daten</h3>
+                    <ul class="data-list text-secondary">
+                        <li><strong>Öffentliche Spielplatzdaten:</strong> Name, Adresse, Quartier, Koordinaten, Beschreibung, öffentliche Sichtbarkeit und Fotos.</li>
+                        <li><strong>Organisationsdaten:</strong> Name, Kurzbezeichnung, Status, öffentliche Sichtbarkeit, Farbwerte und optionale Logos von Organisationen.</li>
+                        <li><strong>Registrierungsanfragen:</strong> Organisationsname, gewünschte Kurzbezeichnung, Vorname, Nachname, E-Mail-Adresse und Nachricht der anfragenden Person.</li>
+                        <li><strong>Benutzer- und Berechtigungsdaten:</strong> Benutzerkonto, zugehörige Organisation, interne Berechtigungen und Aktivstatus.</li>
+                        <li><strong>Kontrolldaten:</strong> Kontrollart, Datum, Prüfpunkte, Prüfantworten, Kommentare, Kontrollperson, Abschlusszeitpunkt und abschliessende Person.</li>
+                        <li><strong>Mängel- und Unterhaltsdaten:</strong> Quelle, Meldedatum, gemeldet durch, interne Beschreibung, interne Notizen, Status, Sicherheitsrisiko, geplante Behebung, öffentliche Sichtbarkeit und öffentliche Hinweise.</li>
+                        <li><strong>Bilddaten:</strong> Spielplatzfotos, Spielgerätefotos und Mangelfotos einschliesslich Dateiname, Dateityp, Dateigrösse, Bildabmessungen, Prüfsumme, Bilddaten und Vorschaubilder.</li>
+                        <li><strong>Technische Daten:</strong> technisch erforderliche Session- und CSRF-Cookies sowie übliche Server- und Zugriffsinformationen, die beim Betrieb einer WebApp anfallen können.</li>
+                    </ul>
+
+                    <h3 class="h5 fw-bold mt-4">Zwecke der Bearbeitung</h3>
+                    <p class="text-secondary">
+                        Die Daten werden verwendet, um Spielplätze öffentlich auffindbar zu machen, interne Kontroll- und
+                        Unterhaltsprozesse zu unterstützen, Mängel zu dokumentieren, berechtigte Benutzer zu authentifizieren,
+                        Organisationen mandantenfähig voneinander zu trennen, Anfragen zu bearbeiten und die Sicherheit und
+                        Stabilität der Anwendung sicherzustellen.
+                    </p>
+
+                    <h3 class="h5 fw-bold mt-4">Rechtsgrundlagen</h3>
+                    <p class="text-secondary">
+                        Die Bearbeitung erfolgt im Rahmen der öffentlichen Aufgabenerfüllung der Stadt Winterthur, zur
+                        Wahrnehmung berechtigter öffentlicher und organisatorischer Interessen, zur Erfüllung gesetzlicher
+                        oder fachlicher Dokumentationspflichten sowie – soweit anwendbar – auf Grundlage einer Einwilligung
+                        oder freiwilligen Eingabe der betroffenen Person, zum Beispiel bei Organisationsanfragen.
+                    </p>
+
+                    <h3 class="h5 fw-bold mt-4">Cookies und externe Dienste</h3>
+                    <p class="text-secondary">
+                        Die WebApp verwendet technisch notwendige Cookies für Anmeldung, Sitzung und Schutz vor missbräuchlichen
+                        Formularanfragen. Für die Kartendarstellung wird OpenStreetMap-Kartenmaterial über öffentliche Tile-Server
+                        eingebunden. Für Gestaltung und Kartenfunktionen können externe Bibliotheken wie Bootstrap und Leaflet
+                        über Content Delivery Networks geladen werden. Dabei können technische Zugriffsdaten an die jeweiligen
+                        Anbieter übertragen werden.
+                    </p>
+
+                    <h3 class="h5 fw-bold mt-4">Empfänger und Zugriff</h3>
+                    <p class="text-secondary">
+                        Öffentliche Daten sind für Besucherinnen und Besucher der WebApp sichtbar. Interne Daten sind nur für
+                        angemeldete und berechtigte Benutzer zugänglich. Innerhalb der Anwendung werden fachliche Daten
+                        mandantenfähig nach Organisation getrennt. Eine Weitergabe an Dritte erfolgt nur, soweit dies für Betrieb,
+                        Wartung, gesetzliche Pflichten oder berechtigte öffentliche Aufgaben erforderlich ist.
+                    </p>
+
+                    <h3 class="h5 fw-bold mt-4">Speicherung und Löschung</h3>
+                    <p class="text-secondary mb-0">
+                        Daten werden nur so lange gespeichert, wie sie für die genannten Zwecke, für Nachvollziehbarkeit,
+                        Qualitätssicherung, Betrieb, Sicherheit oder gesetzliche Aufbewahrungspflichten erforderlich sind.
+                        Mangelfotos werden vor der Speicherung automatisch verkleinert und in der Datenbank abgelegt.
+                    </p>
+                </section>
+
+                <section id="betroffenenrechte" class="content-card p-4 p-lg-5 mb-4">
+                    <div class="section-label mb-2">Rechte betroffener Personen</div>
+                    <h2 class="fw-bold mb-3">Auskunft, Berichtigung und weitere Rechte</h2>
+                    <p class="text-secondary">
+                        Betroffene Personen können im Rahmen des anwendbaren Datenschutzrechts Auskunft über die sie betreffenden
+                        Daten verlangen sowie Berichtigung, Löschung, Einschränkung der Bearbeitung oder Widerspruch gegen eine
+                        Bearbeitung geltend machen. Soweit die DSGVO anwendbar ist, können zusätzlich Rechte wie Datenübertragbarkeit
+                        und Beschwerde bei einer zuständigen Aufsichtsbehörde bestehen.
+                    </p>
+                    <p class="text-secondary mb-0">
+                        Anfragen zum Datenschutz können an die oben genannte verantwortliche Stelle gerichtet werden. Für die Stadt
+                        Winterthur besteht zudem die städtische Datenaufsicht beziehungsweise Datenschutzstelle als zuständige
+                        Anlaufstelle nach kommunalem und kantonalem Recht.
+                    </p>
+                </section>
+
+                <section id="opensource" class="content-card p-4 p-lg-5">
+                    <div class="section-label mb-2">Open Source</div>
+                    <h2 class="fw-bold mb-3">Quellcode</h2>
+                    <p class="text-secondary mb-4">
+                        SpielplatzAtlas ist als Open-Source-Lösung angelegt. Der Quellcode ist öffentlich auf GitHub verfügbar.
+                    </p>
+                    <a href="https://github.com/edgar-butwilowski-win/spielplatz-atlas" class="btn btn-atlas-primary" rel="noopener">
+                        Repository auf GitHub öffnen
+                    </a>
+                </section>
+            </div>
+        </div>
+    </main>
+
+</body>
+
+</html>
