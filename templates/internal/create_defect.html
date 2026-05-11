@@ -101,7 +101,7 @@
                         {% endif %}
                     </div>
 
-                    <form method="post">
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
 
                         {% include "internal/partials/defect_form_fields.html" %}
