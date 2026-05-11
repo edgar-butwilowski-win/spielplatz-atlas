@@ -184,17 +184,20 @@ def playground_detail(request, organization_slug, playground_slug):
 
     can_create_inspection = False
     can_create_defect = False
+    can_open_defect = False
 
     if request.user.is_authenticated:
         if request.user.is_superuser:
             can_create_inspection = True
             can_create_defect = True
+            can_open_defect = True
         else:
             profile = getattr(request.user, "profile", None)
 
             if profile and profile.organization_id == playground.organization_id:
                 can_create_inspection = profile.may_inspect
                 can_create_defect = profile.may_maintain
+                can_open_defect = profile.may_view_internal
 
     visible_defects = (
         Defect.objects
@@ -213,7 +216,7 @@ def playground_detail(request, organization_slug, playground_slug):
         )
     )
 
-    if not can_create_defect:
+    if not can_open_defect:
         visible_defects = visible_defects.filter(public_visible=True)
 
     visible_defects = list(
@@ -261,6 +264,7 @@ def playground_detail(request, organization_slug, playground_slug):
         "defect_groups": defect_groups,
         "can_create_inspection": can_create_inspection,
         "can_create_defect": can_create_defect,
+        "can_open_defect": can_open_defect,
         "preview_photo": preview_photo,
         "latest_completed_inspection": latest_completed_inspection,
     }
