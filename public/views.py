@@ -7,14 +7,27 @@
 # unless expressly permitted in writing.
 
 from django.contrib import messages
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 
 from inspections.models import Defect, Inspection
 from playgrounds.models import PlayEquipment, Playground
 from tenants.forms import OrganizationRegistrationRequestForm
+
+
+def public_equipment_queryset():
+    today = timezone.localdate()
+
+    return (
+        PlayEquipment.objects
+        .filter(is_active=True, public_visible=True)
+        .filter(Q(demolition_date__isnull=True) | Q(demolition_date__gte=today))
+        .select_related("equipment_type", "photo", "supplier")
+        .order_by("sequence_number", "name")
+    )
 
 
 def index(request):
@@ -36,16 +49,7 @@ def public_playgrounds_api(request):
         .prefetch_related(
             Prefetch(
                 "equipment",
-                queryset=(
-                    PlayEquipment.objects
-                    .filter(
-                        is_active=True,
-                        public_visible=True,
-                        photo__isnull=False,
-                    )
-                    .select_related("photo", "equipment_type")
-                    .order_by("name")
-                ),
+                queryset=public_equipment_queryset().filter(photo__isnull=False),
             )
         )
         .filter(
@@ -163,12 +167,7 @@ def playground_detail(request, organization_slug, playground_slug):
         .prefetch_related(
             Prefetch(
                 "equipment",
-                queryset=(
-                    PlayEquipment.objects
-                    .filter(is_active=True, public_visible=True)
-                    .select_related("equipment_type", "photo")
-                    .order_by("name")
-                ),
+                queryset=public_equipment_queryset(),
             )
         ),
         organization__slug=organization_slug,
