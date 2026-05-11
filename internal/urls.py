@@ -19,6 +19,11 @@ urlpatterns = [
         name="dashboard",
     ),
     path(
+        "equipment/<int:equipment_id>/renovation/save/",
+        views.update_equipment_renovation,
+        name="update_equipment_renovation",
+    ),
+    path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/inspections/new/",
         views.create_inspection,
         name="create_inspection",
