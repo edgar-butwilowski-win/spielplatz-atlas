@@ -292,4 +292,4 @@ def register_organization(request):
 
 
 def register_organization_done(request):
-    return render(request, "public/register_organization_done")
+    return render(request, "public/register_organization_done.html")
