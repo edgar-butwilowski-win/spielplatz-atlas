@@ -193,7 +193,7 @@
                 multiple
             >
             <div class="help-text mt-1">
-                Bis zu drei Fotos pro Mangel. Die Bilder werden automatisch auf maximal 1200 Pixel Kantenlänge verkleinert und in der Datenbank gespeichert.
+                Bis zu drei Fotos pro Mangel.
             </div>
 
             {% if defect_images %}
@@ -206,9 +206,6 @@
                                     alt="Mangelfoto {{ forloop.counter }}"
                                 >
                                 <div class="p-2">
-                                    <div class="small text-secondary mb-2">
-                                        {{ defect_image.image.width }} × {{ defect_image.image.height }} px
-                                    </div>
                                     <div class="form-check">
                                         <input
                                             class="form-check-input"
