@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="de-CH">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}SpielplatzAtlas{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% block extra_head %}{% endblock %}
+
+    <style>
+        :root {
+            --atlas-primary: {% block atlas_primary %}#0F766E{% endblock %};
+            --atlas-secondary: {% block atlas_secondary %}#F59E0B{% endblock %};
+            --atlas-bg: #F8FAFC;
+            --atlas-text: #0F172A;
+            --atlas-navbar-height: 58px;
+        }
+
+        body {
+            background: var(--atlas-bg);
+            color: var(--atlas-text);
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            min-height: var(--atlas-navbar-height);
+        }
+
+        .brand-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-atlas-primary {
+            background: var(--atlas-primary);
+            border-color: var(--atlas-primary);
+            color: white;
+        }
+
+        .btn-atlas-primary:hover {
+            filter: brightness(0.92);
+            color: white;
+        }
+
+        .content-card {
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+        }
+
+        .section-label {
+            color: var(--atlas-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .atlas-menu {
+            position: relative;
+        }
+
+        .atlas-menu-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.35rem);
+            min-width: 220px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+            padding: 0.35rem 0;
+            z-index: 1050;
+        }
+
+        .atlas-menu-panel.show {
+            display: block;
+        }
+
+        .atlas-menu-panel a {
+            display: block;
+            padding: 0.5rem 0.9rem;
+            color: #0F172A;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .atlas-menu-panel a:hover {
+            background: #F1F5F9;
+        }
+
+        .atlas-menu-divider {
+            height: 1px;
+            background: #E2E8F0;
+            margin: 0.35rem 0;
+        }
+
+        @media (max-width: 767.98px) {
+            .navbar .container-fluid {
+                gap: 0.5rem;
+            }
+        }
+
+        {% block base_extra_style %}{% endblock %}
+    </style>
+
+    {% block extra_style %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-3 px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'public:index' %}">
+                <span class="brand-mark">A</span>
+                <span class="fw-bold">SpielplatzAtlas</span>
+            </a>
+
+            <div class="d-flex align-items-center gap-2 atlas-menu">
+                <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex">Über</a>
+                <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex">Impressum</a>
+                <a href="{% url 'public:register_organization' %}" class="btn btn-sm btn-atlas-primary d-none d-md-inline-flex">
+                    Organisation registrieren
+                </a>
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary atlas-menu-toggle"
+                    aria-label="Menü öffnen"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
+                <div class="atlas-menu-panel" id="atlas-menu-panel">
+                    <a class="d-md-none" href="{% url 'public:about' %}">Über</a>
+                    <a class="d-md-none" href="{% url 'public:imprint' %}">Impressum</a>
+                    <a class="d-md-none" href="{% url 'public:register_organization' %}">Organisation registrieren</a>
+                    <div class="atlas-menu-divider d-md-none"></div>
+                    <a href="{% url 'public:index' %}">Karte</a>
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'internal:dashboard' %}">Dashboard</a>
+                        {% if request.user.is_superuser or request.user.profile.may_manage_organization %}
+                            <a href="/admin/">Admin</a>
+                        {% endif %}
+                        <a href="{% url 'accounts:logout' %}">Logout</a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}">Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+        <div class="container-fluid px-3 px-lg-4 pt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} mb-2">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+    <script>
+        (function () {
+            function closeMenu() {
+                var panel = document.getElementById('atlas-menu-panel');
+                var button = document.querySelector('.atlas-menu-toggle');
+
+                if (panel) {
+                    panel.classList.remove('show');
+                }
+
+                if (button) {
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            }
+
+            document.addEventListener('click', function (event) {
+                var button = event.target.closest('.atlas-menu-toggle');
+                var panel = document.getElementById('atlas-menu-panel');
+
+                if (button && panel) {
+                    var isOpen = panel.classList.contains('show');
+                    panel.classList.toggle('show', !isOpen);
+                    button.setAttribute('aria-expanded', String(!isOpen));
+                    event.preventDefault();
+                    return;
+                }
+
+                if (!event.target.closest('.atlas-menu')) {
+                    closeMenu();
+                }
+            });
+        }());
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>
