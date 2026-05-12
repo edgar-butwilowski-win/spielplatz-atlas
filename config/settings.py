@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     "tenants",
     "accounts",
     "playgrounds",
-    "inspections",
+    "inspections.apps.InspectionsConfig",
     "media_assets",
     "public",
     "internal",
