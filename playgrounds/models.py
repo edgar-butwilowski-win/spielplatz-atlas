@@ -21,14 +21,29 @@ class Playground(models.Model):
 
     name = models.CharField("Name", max_length=200)
     slug = models.SlugField("URL-Kürzel", max_length=100)
+    number = models.PositiveIntegerField("Nummer", null=True, blank=True)
 
     address = models.CharField("Adresse", max_length=300, blank=True)
+    street_name = models.CharField("Strassenname", max_length=200, blank=True)
+    house_number = models.CharField("Hausnummer", max_length=40, blank=True)
     district = models.CharField("Quartier", max_length=100, blank=True)
 
     latitude = models.DecimalField("Breitengrad", max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField("Längengrad", max_digits=9, decimal_places=6, null=True, blank=True)
 
-    description = models.TextField("Beschreibung", blank=True)
+    description = models.TextField("Beschrieb", blank=True)
+    construction_costs = models.FloatField("Erstellungskosten", null=True, blank=True)
+
+    inspection_suspended_from = models.DateField(
+        "Inspektion aussetzen von",
+        null=True,
+        blank=True,
+    )
+    inspection_suspended_until = models.DateField(
+        "Inspektion aussetzen bis",
+        null=True,
+        blank=True,
+    )
 
     photo = models.ForeignKey(
         "media_assets.ImageAsset",
@@ -41,7 +56,7 @@ class Playground(models.Model):
     )
 
     is_active = models.BooleanField("Aktiv", default=True)
-    public_visible = models.BooleanField("Öffentlich sichtbar", default=True)
+    public_visible = models.BooleanField("Öffentlich", default=True)
 
     created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
 
@@ -53,7 +68,34 @@ class Playground(models.Model):
 
     def __str__(self):
         return f"{self.name} – {self.organization.name}"
-    
+
+    def clean(self):
+        super().clean()
+
+        if (
+            self.inspection_suspended_from
+            and self.inspection_suspended_until
+            and self.inspection_suspended_until < self.inspection_suspended_from
+        ):
+            raise ValidationError({
+                "inspection_suspended_until": "Das Enddatum darf nicht vor dem Startdatum liegen."
+            })
+
+    @property
+    def is_inspection_suspended(self):
+        today = timezone.localdate()
+
+        if not self.inspection_suspended_from:
+            return False
+
+        if self.inspection_suspended_from > today:
+            return False
+
+        if self.inspection_suspended_until is None:
+            return True
+
+        return today <= self.inspection_suspended_until
+
     def get_preview_photo(self):
         if self.photo_id:
             return self.photo
