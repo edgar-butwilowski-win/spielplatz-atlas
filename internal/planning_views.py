@@ -6,6 +6,8 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
+from datetime import timedelta
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -288,7 +290,7 @@ def my_inspections(request):
     refresh_task_statuses(unassigned_tasks)
 
     today = timezone.localdate()
-    upcoming_limit = today + timezone.timedelta(days=30)
+    upcoming_limit = today + timedelta(days=30)
 
     assigned_tasks = assigned_tasks.order_by("planned_date", "due_date", "playground__name")
     unassigned_tasks = unassigned_tasks.order_by("due_date", "playground__name")
