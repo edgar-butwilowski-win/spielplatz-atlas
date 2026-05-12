@@ -19,6 +19,11 @@ urlpatterns = [
         name="dashboard",
     ),
     path(
+        "my-inspections/",
+        planning_views.my_inspections,
+        name="my_inspections",
+    ),
+    path(
         "inspection-planning/",
         planning_views.inspection_planning,
         name="inspection_planning",
@@ -32,6 +37,11 @@ urlpatterns = [
         "inspection-tasks/<int:task_id>/save/",
         planning_views.update_inspection_task,
         name="update_inspection_task",
+    ),
+    path(
+        "inspection-tasks/<int:task_id>/accept/",
+        planning_views.accept_inspection_task,
+        name="accept_inspection_task",
     ),
     path(
         "inspection-tasks/<int:task_id>/start/",
