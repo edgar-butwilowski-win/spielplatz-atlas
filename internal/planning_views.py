@@ -10,9 +10,10 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -29,6 +30,14 @@ from .permissions import (
 from .views import create_default_answers
 
 
+ACTIVE_TASK_STATUSES = [
+    InspectionTask.STATUS_OPEN,
+    InspectionTask.STATUS_PLANNED,
+    InspectionTask.STATUS_OVERDUE,
+    InspectionTask.STATUS_SUSPENDED,
+]
+
+
 class InspectionTaskPlanningForm(forms.ModelForm):
     class Meta:
         model = InspectionTask
@@ -38,14 +47,9 @@ class InspectionTaskPlanningForm(forms.ModelForm):
             "note",
         )
         widgets = {
-            "planned_date": forms.DateInput(
-                attrs={
-                    "type": "date",
-                    "class": "form-control",
-                }
-            ),
+            "planned_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
             "assigned_to": forms.Select(attrs={"class": "form-select"}),
-            "note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+            "note": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
         }
 
     def __init__(self, *args, organization=None, **kwargs):
@@ -67,13 +71,13 @@ class InspectionTaskPlanningForm(forms.ModelForm):
             .filter(is_active=True)
             .filter(
                 Q(is_superuser=True)
-                | Q(
-                    profile__organization=self.organization,
-                    profile__is_active_for_organization=True,
-                )
-                & (
-                    Q(profile__is_org_admin=True)
-                    | Q(profile__can_inspect=True)
+                | (
+                    Q(profile__organization=self.organization)
+                    & Q(profile__is_active_for_organization=True)
+                    & (
+                        Q(profile__is_org_admin=True)
+                        | Q(profile__can_inspect=True)
+                    )
                 )
             )
             .distinct()
@@ -162,6 +166,27 @@ def choice_count_map(queryset, field_name, choices):
     ]
 
 
+def add_planning_forms(tasks):
+    task_list = list(tasks[:100])
+
+    for task in task_list:
+        task.planning_form = InspectionTaskPlanningForm(
+            instance=task,
+            organization=task.organization,
+        )
+
+    return task_list
+
+
+def planning_redirect_url(organization_id=None):
+    url = reverse("internal:inspection_planning")
+
+    if organization_id:
+        return f"{url}?organization={organization_id}"
+
+    return url
+
+
 @login_required
 def inspection_planning(request):
     scope = get_planning_scope(request.user)
@@ -184,14 +209,7 @@ def inspection_planning(request):
     filtered_tasks = tasks
 
     if status_filter == "active":
-        filtered_tasks = filtered_tasks.filter(
-            status__in=[
-                InspectionTask.STATUS_OPEN,
-                InspectionTask.STATUS_PLANNED,
-                InspectionTask.STATUS_OVERDUE,
-                InspectionTask.STATUS_SUSPENDED,
-            ]
-        )
+        filtered_tasks = filtered_tasks.filter(status__in=ACTIVE_TASK_STATUSES)
     elif status_filter:
         filtered_tasks = filtered_tasks.filter(status=status_filter)
 
@@ -199,15 +217,7 @@ def inspection_planning(request):
         filtered_tasks = filtered_tasks.filter(inspection_type=inspection_type_filter)
 
     organizations = Organization.objects.filter(is_active=True).order_by("name") if scope["is_superadmin"] else []
-
-    forms_by_task_id = {}
     can_manage_selected_organization = scope["can_manage"] and selected_organization is not None
-
-    for task in filtered_tasks[:100]:
-        forms_by_task_id[task.id] = InspectionTaskPlanningForm(
-            instance=task,
-            organization=task.organization,
-        )
 
     return render(
         request,
@@ -216,8 +226,7 @@ def inspection_planning(request):
             **scope,
             "selected_organization": selected_organization,
             "organizations": organizations,
-            "tasks": filtered_tasks[:100],
-            "forms_by_task_id": forms_by_task_id,
+            "tasks": add_planning_forms(filtered_tasks),
             "status_filter": status_filter,
             "inspection_type_filter": inspection_type_filter,
             "status_choices": [("active", "Aktive Aufträge")] + list(InspectionTask.STATUS_CHOICES),
@@ -254,7 +263,7 @@ def rebuild_inspection_planning(request):
             f"Erstellt: {result['created']}, aktualisiert: {result['updated']}, unverändert: {result['unchanged']}."
         ),
     )
-    return redirect(f"{request.path_info.replace('/rebuild/', '/') }?organization={organization.id}")
+    return redirect(planning_redirect_url(organization.id))
 
 
 @login_required
@@ -287,14 +296,14 @@ def update_inspection_task(request, task_id):
             task.save()
             task.refresh_status(save=True)
             messages.success(request, "Der Kontrollauftrag wurde gespeichert.")
-        except forms.ValidationError as error:
+        except ValidationError as error:
             messages.error(request, error.messages[0] if error.messages else str(error))
     else:
         for errors in form.errors.values():
             for error in errors:
                 messages.error(request, error)
 
-    return redirect(f"/internal/inspection-planning/?organization={task.organization_id}")
+    return redirect(planning_redirect_url(task.organization_id))
 
 
 @login_required
@@ -309,14 +318,14 @@ def start_inspection_from_task(request, task_id):
 
     if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
         messages.error(request, "Aus diesem Kontrollauftrag kann keine neue Kontrolle gestartet werden.")
-        return redirect(f"/internal/inspection-planning/?organization={task.organization_id}")
+        return redirect(planning_redirect_url(task.organization_id))
 
     if task.playground.is_inspection_suspended:
         messages.error(
             request,
             "Für diesen Spielplatz ist die Inspektion aktuell ausgesetzt. Es kann keine neue Kontrolle erfasst werden.",
         )
-        return redirect(f"/internal/inspection-planning/?organization={task.organization_id}")
+        return redirect(planning_redirect_url(task.organization_id))
 
     inspection = Inspection.objects.create(
         playground=task.playground,
