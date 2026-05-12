@@ -1,0 +1,73 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">Start</a>
+    &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+    &rsaquo; <a href="{% url 'admin:playgrounds_playground_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+    &rsaquo; Spielplätze abgleichen
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>Spielplätze abgleichen</h1>
+
+    <p>
+        Hier können Spielplätze aus einem GeoJSON-Webservice mit den lokalen Spielplätzen abgeglichen werden.
+        Der Abgleich erfolgt über die UUID. Bestehende Spielplätze werden nicht gelöscht.
+    </p>
+
+    <div class="module aligned">
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if organization %}
+                <div class="form-row">
+                    <div>
+                        <label>Organisation:</label>
+                        <div class="readonly">{{ organization.name }}</div>
+                    </div>
+                </div>
+            {% elif organizations %}
+                <div class="form-row">
+                    <div>
+                        <label for="id_organization" class="required">Organisation:</label>
+                        <select name="organization" id="id_organization" required>
+                            <option value="">---------</option>
+                            {% for item in organizations %}
+                                <option value="{{ item.id }}">{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="form-row{% if form.service_url.errors %} errors{% endif %}">
+                {{ form.service_url.errors }}
+                <div>
+                    {{ form.service_url.label_tag }}
+                    {{ form.service_url }}
+                    {% if form.service_url.help_text %}
+                        <div class="help">{{ form.service_url.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="submit-row">
+                <input type="submit" value="Spielplätze abgleichen" class="default">
+                <a href="{% url 'admin:playgrounds_playground_changelist' %}" class="closelink">Abbrechen</a>
+            </div>
+        </form>
+    </div>
+
+    <h2>Abgleichregeln</h2>
+    <ul>
+        <li>Neue Spielplätze werden angelegt, wenn ihre UUID noch nicht vorhanden ist.</li>
+        <li>Bestehende Spielplätze werden anhand der UUID aktualisiert.</li>
+        <li>Lokale Spielplätze werden nie gelöscht.</li>
+        <li>Leere Zeichenketten und der Zahlenwert -1 überschreiben bestehende lokale Werte nicht.</li>
+    </ul>
+</div>
+{% endblock %}
