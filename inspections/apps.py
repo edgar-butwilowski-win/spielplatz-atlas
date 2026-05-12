@@ -10,4 +10,9 @@ from django.apps import AppConfig
 
 
 class InspectionsConfig(AppConfig):
-    name = 'inspections'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "inspections"
+    verbose_name = "Kontrollen"
+
+    def ready(self):
+        import inspections.signals  # noqa: F401
