@@ -8,7 +8,7 @@
 
 from django.urls import path
 
-from . import dashboard, planning_views, views
+from . import control_status, dashboard, planning_views, views
 
 app_name = "internal"
 
@@ -17,6 +17,11 @@ urlpatterns = [
         "dashboard/",
         dashboard.dashboard,
         name="dashboard",
+    ),
+    path(
+        "control-status/",
+        control_status.control_status,
+        name="control_status",
     ),
     path(
         "my-inspections/",
