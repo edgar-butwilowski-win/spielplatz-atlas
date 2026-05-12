@@ -6,7 +6,10 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
+from datetime import timedelta
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -278,6 +281,237 @@ class Inspection(models.Model):
 
     def __str__(self):
         return f"{self.playground} – {self.get_inspection_type_display()} – {self.inspected_at}"
+
+
+class InspectionRule(models.Model):
+    DEFAULT_INTERVAL_DAYS = {
+        Inspection.TYPE_VISUAL: 7,
+        Inspection.TYPE_OPERATIONAL: 90,
+        Inspection.TYPE_ANNUAL: 365,
+    }
+
+    organization = models.ForeignKey(
+        "tenants.Organization",
+        on_delete=models.CASCADE,
+        related_name="inspection_rules",
+        verbose_name="Organisation",
+    )
+
+    inspection_type = models.CharField(
+        "Kontrollart",
+        max_length=30,
+        choices=Inspection.TYPE_CHOICES,
+    )
+
+    interval_days = models.PositiveIntegerField(
+        "Intervall in Tagen",
+        help_text="Intervall für die Kontrollplanung auf Basis von SN EN 1176/1177.",
+    )
+
+    applies_to_all_playgrounds = models.BooleanField(
+        "Gilt für alle Spielplätze",
+        default=True,
+    )
+
+    is_active = models.BooleanField("Aktiv", default=True)
+
+    created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
+    updated_at = models.DateTimeField("Aktualisiert am", auto_now=True)
+
+    class Meta:
+        unique_together = [("organization", "inspection_type")]
+        ordering = ["organization__name", "inspection_type"]
+        verbose_name = "Kontrollregel"
+        verbose_name_plural = "Kontrollregeln"
+
+    def __str__(self):
+        return f"{self.organization} – {self.get_inspection_type_display()} alle {self.interval_days} Tage"
+
+    @classmethod
+    def get_default_interval_days(cls, inspection_type):
+        return cls.DEFAULT_INTERVAL_DAYS.get(inspection_type, 365)
+
+
+class InspectionTask(models.Model):
+    STATUS_OPEN = "open"
+    STATUS_PLANNED = "planned"
+    STATUS_COMPLETED = "completed"
+    STATUS_OVERDUE = "overdue"
+    STATUS_SUSPENDED = "suspended"
+    STATUS_CANCELLED = "cancelled"
+
+    STATUS_CHOICES = [
+        (STATUS_OPEN, "Offen"),
+        (STATUS_PLANNED, "Geplant"),
+        (STATUS_COMPLETED, "Erledigt"),
+        (STATUS_OVERDUE, "Überfällig"),
+        (STATUS_SUSPENDED, "Ausgesetzt"),
+        (STATUS_CANCELLED, "Storniert"),
+    ]
+
+    SOURCE_AUTOMATIC = "automatic"
+    SOURCE_MANUAL = "manual"
+
+    SOURCE_CHOICES = [
+        (SOURCE_AUTOMATIC, "Automatisch"),
+        (SOURCE_MANUAL, "Manuell"),
+    ]
+
+    organization = models.ForeignKey(
+        "tenants.Organization",
+        on_delete=models.CASCADE,
+        related_name="inspection_tasks",
+        verbose_name="Organisation",
+    )
+
+    playground = models.ForeignKey(
+        "playgrounds.Playground",
+        on_delete=models.CASCADE,
+        related_name="inspection_tasks",
+        verbose_name="Spielplatz",
+    )
+
+    inspection_type = models.CharField(
+        "Kontrollart",
+        max_length=30,
+        choices=Inspection.TYPE_CHOICES,
+    )
+
+    due_date = models.DateField("Fällig am")
+    planned_date = models.DateField("Geplant am", null=True, blank=True)
+
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="assigned_inspection_tasks",
+        null=True,
+        blank=True,
+        verbose_name="Zugewiesen an",
+    )
+
+    status = models.CharField(
+        "Status",
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default=STATUS_OPEN,
+    )
+
+    source = models.CharField(
+        "Quelle",
+        max_length=30,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_AUTOMATIC,
+    )
+
+    created_from_inspection = models.ForeignKey(
+        Inspection,
+        on_delete=models.SET_NULL,
+        related_name="created_follow_up_tasks",
+        null=True,
+        blank=True,
+        verbose_name="Erzeugt aus Kontrolle",
+    )
+
+    completed_by_inspection = models.ForeignKey(
+        Inspection,
+        on_delete=models.SET_NULL,
+        related_name="completed_planning_tasks",
+        null=True,
+        blank=True,
+        verbose_name="Erledigt durch Kontrolle",
+    )
+
+    note = models.TextField("Interne Bemerkung", blank=True)
+
+    created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
+    updated_at = models.DateTimeField("Aktualisiert am", auto_now=True)
+
+    class Meta:
+        ordering = ["due_date", "planned_date", "playground__name"]
+        indexes = [
+            models.Index(fields=["organization", "status", "due_date"]),
+            models.Index(fields=["playground", "inspection_type", "status"]),
+        ]
+        verbose_name = "Kontrollauftrag"
+        verbose_name_plural = "Kontrollaufträge"
+
+    def __str__(self):
+        return f"{self.playground} – {self.get_inspection_type_display()} – fällig am {self.due_date}"
+
+    def clean(self):
+        super().clean()
+
+        if self.playground_id and self.organization_id:
+            if self.playground.organization_id != self.organization_id:
+                raise ValidationError("Der Spielplatz gehört nicht zur ausgewählten Organisation.")
+
+        if self.assigned_to_id:
+            profile = getattr(self.assigned_to, "profile", None)
+
+            if not self.assigned_to.is_superuser:
+                if not profile or profile.organization_id != self.organization_id or not profile.may_inspect:
+                    raise ValidationError({
+                        "assigned_to": "Diese Person darf für diese Organisation keine Kontrollen durchführen."
+                    })
+
+    @property
+    def effective_status(self):
+        today = timezone.localdate()
+
+        if self.status in [self.STATUS_COMPLETED, self.STATUS_CANCELLED]:
+            return self.status
+
+        if self.playground and self.playground.is_inspection_suspended:
+            return self.STATUS_SUSPENDED
+
+        if self.due_date < today:
+            return self.STATUS_OVERDUE
+
+        if self.planned_date:
+            return self.STATUS_PLANNED
+
+        return self.STATUS_OPEN
+
+    def refresh_status(self, save=True):
+        effective_status = self.effective_status
+
+        if effective_status != self.status:
+            self.status = effective_status
+
+            if save:
+                self.save(update_fields=["status", "updated_at"])
+
+        return self.status
+
+    @classmethod
+    def calculate_due_date(cls, playground, inspection_type, reference_inspection=None):
+        organization = playground.organization
+        rule, _ = InspectionRule.objects.get_or_create(
+            organization=organization,
+            inspection_type=inspection_type,
+            defaults={
+                "interval_days": InspectionRule.get_default_interval_days(inspection_type),
+                "applies_to_all_playgrounds": True,
+                "is_active": True,
+            },
+        )
+
+        if reference_inspection:
+            base_date = reference_inspection.inspected_at
+        else:
+            latest_inspection = (
+                Inspection.objects
+                .filter(
+                    playground=playground,
+                    inspection_type=inspection_type,
+                    status=Inspection.STATUS_COMPLETED,
+                )
+                .order_by("-inspected_at", "-completed_at", "-created_at")
+                .first()
+            )
+            base_date = latest_inspection.inspected_at if latest_inspection else timezone.localdate()
+
+        return base_date + timedelta(days=rule.interval_days)
 
 
 class InspectionScope(models.Model):
