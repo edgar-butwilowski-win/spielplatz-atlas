@@ -152,6 +152,23 @@ def get_task_queryset_for_scope(scope, selected_organization):
     return tasks
 
 
+def get_inspection_task_for_user(task_id, user):
+    task = get_object_or_404(
+        InspectionTask.objects.select_related("organization", "playground", "assigned_to"),
+        id=task_id,
+    )
+
+    require_inspection_permission(user, task.organization)
+
+    if user.is_superuser:
+        return task
+
+    if task.assigned_to_id and task.assigned_to_id != user.id:
+        raise PermissionDenied("Dieser Kontrollauftrag ist einer anderen Person zugewiesen.")
+
+    return task
+
+
 def choice_count_map(queryset, field_name, choices):
     raw_counts = queryset.values(field_name).annotate(count=Count("id"))
     counts = {entry[field_name]: entry["count"] for entry in raw_counts}
@@ -239,6 +256,63 @@ def inspection_planning(request):
 
 
 @login_required
+def my_inspections(request):
+    scope = get_planning_scope(request.user)
+
+    if not scope or not scope["can_inspect"]:
+        raise PermissionDenied("Keine Berechtigung für die persönliche Kontrollliste.")
+
+    if scope["organization"]:
+        require_inspection_permission(request.user, scope["organization"])
+
+    tasks = InspectionTask.objects.select_related(
+        "organization",
+        "playground",
+        "assigned_to",
+    ).filter(status__in=ACTIVE_TASK_STATUSES)
+
+    if request.user.is_superuser:
+        assigned_tasks = tasks.filter(assigned_to=request.user)
+        unassigned_tasks = tasks.filter(assigned_to__isnull=True)
+    else:
+        assigned_tasks = tasks.filter(
+            organization=scope["organization"],
+            assigned_to=request.user,
+        )
+        unassigned_tasks = tasks.filter(
+            organization=scope["organization"],
+            assigned_to__isnull=True,
+        )
+
+    refresh_task_statuses(assigned_tasks)
+    refresh_task_statuses(unassigned_tasks)
+
+    today = timezone.localdate()
+    upcoming_limit = today + timezone.timedelta(days=30)
+
+    assigned_tasks = assigned_tasks.order_by("planned_date", "due_date", "playground__name")
+    unassigned_tasks = unassigned_tasks.order_by("due_date", "playground__name")
+
+    return render(
+        request,
+        "internal/my_inspections.html",
+        {
+            **scope,
+            "today": today,
+            "assigned_today": assigned_tasks.filter(planned_date=today),
+            "assigned_overdue": assigned_tasks.filter(status=InspectionTask.STATUS_OVERDUE),
+            "assigned_upcoming": assigned_tasks.exclude(status=InspectionTask.STATUS_OVERDUE).filter(
+                Q(planned_date__isnull=True, due_date__lte=upcoming_limit)
+                | Q(planned_date__gte=today, planned_date__lte=upcoming_limit)
+            ),
+            "unassigned_due": unassigned_tasks.filter(
+                status__in=[InspectionTask.STATUS_OPEN, InspectionTask.STATUS_OVERDUE]
+            )[:25],
+        },
+    )
+
+
+@login_required
 @require_POST
 def rebuild_inspection_planning(request):
     scope = get_planning_scope(request.user)
@@ -308,24 +382,45 @@ def update_inspection_task(request, task_id):
 
 @login_required
 @require_POST
-def start_inspection_from_task(request, task_id):
-    task = get_object_or_404(
-        InspectionTask.objects.select_related("organization", "playground"),
-        id=task_id,
-    )
+def accept_inspection_task(request, task_id):
+    task = get_inspection_task_for_user(task_id, request.user)
 
-    require_inspection_permission(request.user, task.organization)
+    if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
+        messages.error(request, "Dieser Kontrollauftrag kann nicht übernommen werden.")
+        return redirect("internal:my_inspections")
+
+    if task.assigned_to_id and task.assigned_to_id != request.user.id:
+        raise PermissionDenied("Dieser Kontrollauftrag ist bereits zugewiesen.")
+
+    task.assigned_to = request.user
+
+    if not task.planned_date:
+        task.planned_date = timezone.localdate()
+
+    task.status = InspectionTask.STATUS_PLANNED
+    task.full_clean()
+    task.save(update_fields=["assigned_to", "planned_date", "status", "updated_at"])
+    task.refresh_status(save=True)
+
+    messages.success(request, "Der Kontrollauftrag wurde in Ihre persönliche Liste übernommen.")
+    return redirect("internal:my_inspections")
+
+
+@login_required
+@require_POST
+def start_inspection_from_task(request, task_id):
+    task = get_inspection_task_for_user(task_id, request.user)
 
     if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
         messages.error(request, "Aus diesem Kontrollauftrag kann keine neue Kontrolle gestartet werden.")
-        return redirect(planning_redirect_url(task.organization_id))
+        return redirect("internal:my_inspections")
 
     if task.playground.is_inspection_suspended:
         messages.error(
             request,
             "Für diesen Spielplatz ist die Inspektion aktuell ausgesetzt. Es kann keine neue Kontrolle erfasst werden.",
         )
-        return redirect(planning_redirect_url(task.organization_id))
+        return redirect("internal:my_inspections")
 
     inspection = Inspection.objects.create(
         playground=task.playground,
