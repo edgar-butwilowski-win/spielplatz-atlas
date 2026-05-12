@@ -6,6 +6,8 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -19,17 +21,24 @@ class Playground(models.Model):
         verbose_name="Organisation",
     )
 
+    uuid = models.UUIDField(
+        "UUID",
+        default=uuid.uuid4,
+        unique=True,
+        help_text="Eindeutige UUID des Spielplatzes. Beim Webservice-Abgleich wird darüber synchronisiert.",
+    )
+
     name = models.CharField("Name", max_length=200)
     slug = models.SlugField("URL-Kürzel", max_length=100)
-    number = models.PositiveIntegerField("Nummer", null=True, blank=True)
+    number = models.IntegerField("Nummer", null=True, blank=True)
 
     address = models.CharField("Adresse", max_length=300, blank=True)
     street_name = models.CharField("Strassenname", max_length=200, blank=True)
     house_number = models.CharField("Hausnummer", max_length=40, blank=True)
     district = models.CharField("Quartier", max_length=100, blank=True)
 
-    latitude = models.DecimalField("Breitengrad", max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField("Längengrad", max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField("Breitengrad / Y", max_digits=16, decimal_places=8, null=True, blank=True)
+    longitude = models.DecimalField("Längengrad / X", max_digits=16, decimal_places=8, null=True, blank=True)
 
     description = models.TextField("Beschrieb", blank=True)
     construction_costs = models.FloatField("Erstellungskosten", null=True, blank=True)
