@@ -159,6 +159,7 @@ def complete_matching_task_for_inspection(inspection):
         .filter(
             playground=inspection.playground,
             inspection_type=inspection.inspection_type,
+            completed_by_inspection__isnull=True,
             status__in=[
                 InspectionTask.STATUS_OPEN,
                 InspectionTask.STATUS_PLANNED,
@@ -166,6 +167,7 @@ def complete_matching_task_for_inspection(inspection):
                 InspectionTask.STATUS_SUSPENDED,
             ],
         )
+        .exclude(created_from_inspection=inspection)
         .order_by("due_date", "created_at")
         .first()
     )
