@@ -157,7 +157,7 @@
                     <div class="col-lg-8">
                         <h1 class="h4 fw-bold mb-1">Spielplätze auf der Karte</h1>
                         <div class="text-secondary">
-                            Angezeigt werden aktive, öffentlich sichtbare Spielplätze mit Koordinaten.
+                            Angezeigt werden aktive Spielplätze mit einem LV95-Koordinatenpaar.
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -172,19 +172,46 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.10.0/proj4.js"></script>
+    <script src="https://unpkg.com/proj4leaflet@1.0.2/src/proj4leaflet.js"></script>
 
     <script>
+        const swissResolutions = [
+            4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000,
+            1750, 1500, 1250, 1000, 750, 650, 500, 250, 100,
+            50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5
+        ];
+
+        const crs2056 = new L.Proj.CRS(
+            "EPSG:2056",
+            "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs",
+            {
+                origin: [2420000, 1350000],
+                resolutions: swissResolutions,
+                bounds: L.bounds([2420000, 1030000], [2900000, 1350000])
+            }
+        );
+
         const map = L.map("map", {
+            crs: crs2056,
             zoomControl: true,
-            scrollWheelZoom: true
+            scrollWheelZoom: true,
+            minZoom: 0,
+            maxZoom: 26
         });
 
-        const defaultCenter = [47.4999, 8.7237];
-        map.setView(defaultCenter, 13);
+        function lv95ToLatLng(x, y) {
+            return crs2056.unproject(L.point(Number(x), Number(y)));
+        }
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-            maxZoom: 19,
-            attribution: "&copy; OpenStreetMap-Mitwirkende"
+        const defaultCenter = lv95ToLatLng(2697000, 1262000);
+        map.setView(defaultCenter, 20);
+
+        L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", {
+            minZoom: 0,
+            maxZoom: 26,
+            tileSize: 256,
+            attribution: "&copy; swisstopo"
         }).addTo(map);
 
         const markersLayer = L.layerGroup().addTo(map);
@@ -233,20 +260,25 @@
 
             for (const feature of features) {
                 const coords = feature.geometry.coordinates;
-                const lat = coords[1];
-                const lng = coords[0];
+                const x = coords[0];
+                const y = coords[1];
 
-                const marker = L.marker([lat, lng]);
+                if (!x || !y) {
+                    continue;
+                }
+
+                const latLng = lv95ToLatLng(x, y);
+                const marker = L.marker(latLng);
                 marker.bindPopup(markerHtml(feature));
                 marker.addTo(markersLayer);
 
-                bounds.push([lat, lng]);
+                bounds.push(latLng);
             }
 
             if (bounds.length > 0) {
-                map.fitBounds(bounds, {
+                map.fitBounds(L.latLngBounds(bounds), {
                     padding: [28, 28],
-                    maxZoom: 15
+                    maxZoom: 24
                 });
             }
         }
