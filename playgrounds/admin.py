@@ -77,16 +77,60 @@ class PlaygroundAdmin(admin.ModelAdmin):
 
     form = PlaygroundAdminForm
 
+    fieldsets = (
+        ("Grunddaten", {
+            "fields": (
+                "organization",
+                "name",
+                "slug",
+                "number",
+                "description",
+                "construction_costs",
+            )
+        }),
+        ("Adresse und Lage", {
+            "fields": (
+                "address",
+                "street_name",
+                "house_number",
+                "district",
+                "latitude",
+                "longitude",
+            )
+        }),
+        ("Inspektionen", {
+            "fields": (
+                "inspection_suspended_from",
+                "inspection_suspended_until",
+            )
+        }),
+        ("Foto", {
+            "fields": (
+                "photo",
+                "photo_upload",
+            )
+        }),
+        ("Sichtbarkeit", {
+            "fields": (
+                "is_active",
+                "public_visible",
+            )
+        }),
+    )
+
     list_display = (
         "name",
+        "number",
         "organization",
         "district",
         "public_visible",
         "is_active",
+        "inspection_suspended_from",
+        "inspection_suspended_until",
         "created_at",
     )
     list_filter = ("organization", "public_visible", "is_active", "district")
-    search_fields = ("name", "address", "district")
+    search_fields = ("name", "number", "address", "street_name", "house_number", "district")
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ("photo",)
 
@@ -103,35 +147,23 @@ class PlaygroundAdmin(admin.ModelAdmin):
 
         return qs.none()
 
-    def get_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return (
-                "organization",
-                "name",
-                "slug",
-                "address",
-                "district",
-                "latitude",
-                "longitude",
-                "description",
-                "photo",
-                "photo_upload",
-                "is_active",
-                "public_visible",
-            )
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
 
-        return (
-            "name",
-            "slug",
-            "address",
-            "district",
-            "latitude",
-            "longitude",
-            "description",
-            "photo",
-            "photo_upload",
-            "public_visible",
-        )
+        if request.user.is_superuser:
+            return fieldsets
+
+        filtered_fieldsets = []
+
+        for title, options in fieldsets:
+            fields = tuple(
+                field for field in options.get("fields", ())
+                if field not in ("organization", "is_active")
+            )
+            filtered_options = {**options, "fields": fields}
+            filtered_fieldsets.append((title, filtered_options))
+
+        return tuple(filtered_fieldsets)
 
     def get_readonly_fields(self, request, obj=None):
         return ()
