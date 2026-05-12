@@ -30,6 +30,47 @@ def public_equipment_queryset():
     )
 
 
+def user_can_view_private_playground(user, playground):
+    if not user.is_authenticated:
+        return False
+
+    if user.is_superuser:
+        return True
+
+    profile = getattr(user, "profile", None)
+
+    return bool(
+        profile
+        and profile.is_active_for_organization
+        and profile.organization_id == playground.organization_id
+        and profile.may_view_internal
+    )
+
+
+def playground_base_queryset_for_user(user):
+    qs = Playground.objects.filter(
+        is_active=True,
+        organization__is_active=True,
+        organization__is_public=True,
+    )
+
+    if not user.is_authenticated:
+        return qs.filter(public_visible=True)
+
+    if user.is_superuser:
+        return qs
+
+    profile = getattr(user, "profile", None)
+
+    if profile and profile.is_active_for_organization and profile.may_view_internal:
+        return qs.filter(
+            Q(public_visible=True)
+            | Q(organization_id=profile.organization_id)
+        )
+
+    return qs.filter(public_visible=True)
+
+
 def index(request):
     return render(request, "public/index.html")
 
@@ -44,7 +85,7 @@ def imprint(request):
 
 def public_playgrounds_api(request):
     playgrounds = (
-        Playground.objects
+        playground_base_queryset_for_user(request.user)
         .select_related("organization", "photo")
         .prefetch_related(
             Prefetch(
@@ -53,10 +94,6 @@ def public_playgrounds_api(request):
             )
         )
         .filter(
-            is_active=True,
-            public_visible=True,
-            organization__is_active=True,
-            organization__is_public=True,
             latitude__isnull=False,
             longitude__isnull=False,
         )
@@ -90,6 +127,7 @@ def public_playgrounds_api(request):
                 "address": playground.address,
                 "district": playground.district,
                 "organization": playground.organization.name,
+                "is_public": playground.public_visible,
                 "preview_photo_url": preview_photo_url,
                 "detail_url": reverse(
                     "public:playground_detail",
@@ -162,7 +200,7 @@ def build_defect_groups(defects):
 
 def playground_detail(request, organization_slug, playground_slug):
     playground = get_object_or_404(
-        Playground.objects
+        playground_base_queryset_for_user(request.user)
         .select_related("organization", "photo")
         .prefetch_related(
             Prefetch(
@@ -172,10 +210,6 @@ def playground_detail(request, organization_slug, playground_slug):
         ),
         organization__slug=organization_slug,
         slug=playground_slug,
-        is_active=True,
-        public_visible=True,
-        organization__is_active=True,
-        organization__is_public=True,
     )
 
     preview_photo = playground.get_preview_photo()
@@ -203,6 +237,9 @@ def playground_detail(request, organization_slug, playground_slug):
                 can_open_defect = profile.may_view_internal
                 can_view_equipment_renovation = profile.may_view_internal
                 can_edit_equipment_renovation = profile.may_maintain
+
+    inspection_is_suspended = playground.is_inspection_suspended
+    can_start_inspection = can_create_inspection and not inspection_is_suspended
 
     visible_defects = (
         Defect.objects
@@ -268,6 +305,8 @@ def playground_detail(request, organization_slug, playground_slug):
         "public_defects": visible_defects,
         "defect_groups": defect_groups,
         "can_create_inspection": can_create_inspection,
+        "can_start_inspection": can_start_inspection,
+        "inspection_is_suspended": inspection_is_suspended,
         "can_create_defect": can_create_defect,
         "can_open_defect": can_open_defect,
         "can_view_equipment_renovation": can_view_equipment_renovation,
