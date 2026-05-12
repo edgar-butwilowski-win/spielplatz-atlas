@@ -59,6 +59,9 @@
             <span class="fw-bold">SpielplatzAtlas</span>
         </a>
         <div class="d-flex align-items-center gap-2">
+            {% if can_inspect or can_manage or is_superadmin %}
+                <a href="{% url 'internal:inspection_planning' %}" class="btn btn-sm btn-outline-primary">Einsatzplanung</a>
+            {% endif %}
             <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
             {% if can_manage or is_superadmin %}
                 <a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>
