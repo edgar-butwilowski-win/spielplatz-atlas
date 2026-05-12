@@ -8,7 +8,7 @@
 
 from django.urls import path
 
-from . import dashboard, views
+from . import dashboard, planning_views, views
 
 app_name = "internal"
 
@@ -17,6 +17,26 @@ urlpatterns = [
         "dashboard/",
         dashboard.dashboard,
         name="dashboard",
+    ),
+    path(
+        "inspection-planning/",
+        planning_views.inspection_planning,
+        name="inspection_planning",
+    ),
+    path(
+        "inspection-planning/rebuild/",
+        planning_views.rebuild_inspection_planning,
+        name="rebuild_inspection_planning",
+    ),
+    path(
+        "inspection-tasks/<int:task_id>/save/",
+        planning_views.update_inspection_task,
+        name="update_inspection_task",
+    ),
+    path(
+        "inspection-tasks/<int:task_id>/start/",
+        planning_views.start_inspection_from_task,
+        name="start_inspection_from_task",
     ),
     path(
         "equipment/<int:equipment_id>/renovation/save/",
