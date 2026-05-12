@@ -7,6 +7,7 @@
 # unless expressly permitted in writing.
 
 from django.contrib import admin
+from django.db.models import Q
 
 from accounts.admin_utils import get_user_organization
 from playgrounds.models import Playground
@@ -197,7 +198,8 @@ class InspectionTaskAdmin(admin.ModelAdmin):
                     profile__organization=organization,
                     profile__is_active_for_organization=True,
                 ).filter(
-                    profile__can_inspect=True
+                    Q(profile__can_inspect=True)
+                    | Q(profile__is_org_admin=True)
                 )
 
             if db_field.name in ["created_from_inspection", "completed_by_inspection"]:
