@@ -22,6 +22,7 @@ from inspections.models import (
     InspectionCriterionApplicability,
     InspectionScope,
 )
+from inspections.planning import update_planning_after_completed_inspection
 from playgrounds.models import (
     PlayEquipment,
     Playground,
@@ -527,7 +528,9 @@ def complete_inspection(request, inspection_id):
         ]
     )
 
-    messages.success(request, "Die Kontrolle wurde abgeschlossen.")
+    update_planning_after_completed_inspection(inspection)
+
+    messages.success(request, "Die Kontrolle wurde abgeschlossen. Die nächste fällige Kontrolle wurde in der Einsatzplanung aktualisiert.")
     return redirect("internal:inspection_detail", inspection_id=inspection.id)
 
 
