@@ -16,4 +16,3 @@ class InspectionsConfig(AppConfig):
 
     def ready(self):
         import inspections.signals  # noqa: F401
-        import inspections.admin_planning  # noqa: F401
