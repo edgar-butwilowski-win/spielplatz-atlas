@@ -54,11 +54,21 @@ def create_inspection(request, organization_slug, playground_slug):
         organization__slug=organization_slug,
         slug=playground_slug,
         is_active=True,
-        public_visible=True,
         organization__is_active=True,
     )
 
     require_inspection_permission(request.user, playground.organization)
+
+    if playground.is_inspection_suspended:
+        messages.error(
+            request,
+            "Für diesen Spielplatz ist die Inspektion aktuell ausgesetzt. Es kann keine neue Kontrolle erfasst werden.",
+        )
+        return redirect(
+            "public:playground_detail",
+            organization_slug=playground.organization.slug,
+            playground_slug=playground.slug,
+        )
 
     if request.method == "POST":
         inspection_type = request.POST.get("inspection_type") or Inspection.TYPE_VISUAL
@@ -133,7 +143,6 @@ def create_defect(request, organization_slug, playground_slug):
         organization__slug=organization_slug,
         slug=playground_slug,
         is_active=True,
-        public_visible=True,
         organization__is_active=True,
     )
 
