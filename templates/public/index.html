@@ -61,8 +61,9 @@ function markerHtml(feature) {
     const organization = props.organization || "";
     const detailUrl = props.detail_url || "#";
     const previewPhotoUrl = props.preview_photo_url || "";
+    const nextInspectionLabel = props.next_inspection_label || "wird geplant";
     const photoHtml = previewPhotoUrl ? `<div class="mb-2"><img src="${previewPhotoUrl}" alt="Vorschaubild von ${title}" style="width: 220px; height: 120px; object-fit: cover; border-radius: 0.75rem; display: block;"></div>` : "";
-    return `<div style="min-width: 220px;">${photoHtml}<div class="popup-title">${title}</div><div class="popup-meta">${address}</div><div class="popup-meta">${district}</div><div class="popup-meta mb-2">${organization}</div><a href="${detailUrl}" class="btn btn-sm btn-atlas-primary">Details anzeigen</a></div>`;
+    return `<div style="min-width: 220px;">${photoHtml}<div class="popup-title">${title}</div><div class="popup-meta">${address}</div><div class="popup-meta">${district}</div><div class="popup-meta mb-2">${organization}</div><div class="popup-meta mb-2"><strong>Nächste Kontrolle:</strong> ${nextInspectionLabel}</div><a href="${detailUrl}" class="btn btn-sm btn-atlas-primary">Details anzeigen</a></div>`;
 }
 function renderMarkers(features) {
     markersLayer.clearLayers();
