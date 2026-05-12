@@ -1,0 +1,337 @@
+# Copyright (c) 2026 Fachstelle Geoinformation
+# Author: Edgar Butwilowski
+# All rights reserved.
+#
+# This source code is the property of the copyright holder.
+# Unauthorized copying, modification, distribution, or use is prohibited
+# unless expressly permitted in writing.
+
+from django import forms
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_POST
+
+from inspections.models import Inspection, InspectionTask
+from inspections.planning import rebuild_planning_for_organization, refresh_task_statuses
+from tenants.models import Organization
+
+from .permissions import (
+    get_active_profile_for_organization,
+    require_inspection_permission,
+    require_internal_view_permission,
+    require_org_admin_permission,
+)
+from .views import create_default_answers
+
+
+class InspectionTaskPlanningForm(forms.ModelForm):
+    class Meta:
+        model = InspectionTask
+        fields = (
+            "planned_date",
+            "assigned_to",
+            "note",
+        )
+        widgets = {
+            "planned_date": forms.DateInput(
+                attrs={
+                    "type": "date",
+                    "class": "form-control",
+                }
+            ),
+            "assigned_to": forms.Select(attrs={"class": "form-select"}),
+            "note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
+        }
+
+    def __init__(self, *args, organization=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organization = organization
+        self.fields["planned_date"].required = False
+        self.fields["assigned_to"].required = False
+        self.fields["note"].required = False
+        self.fields["assigned_to"].queryset = self.get_assignable_users()
+
+    def get_assignable_users(self):
+        User = get_user_model()
+
+        if not self.organization:
+            return User.objects.none()
+
+        return (
+            User.objects
+            .filter(is_active=True)
+            .filter(
+                Q(is_superuser=True)
+                | Q(
+                    profile__organization=self.organization,
+                    profile__is_active_for_organization=True,
+                )
+                & (
+                    Q(profile__is_org_admin=True)
+                    | Q(profile__can_inspect=True)
+                )
+            )
+            .distinct()
+            .order_by("last_name", "first_name", "username")
+        )
+
+    def clean_planned_date(self):
+        planned_date = self.cleaned_data.get("planned_date")
+
+        if planned_date and planned_date < timezone.localdate():
+            raise forms.ValidationError("Das geplante Datum darf nicht in der Vergangenheit liegen.")
+
+        return planned_date
+
+
+def get_planning_scope(user):
+    if user.is_superuser:
+        return {
+            "organization": None,
+            "is_superadmin": True,
+            "can_manage": True,
+            "can_inspect": True,
+            "can_view_internal": True,
+        }
+
+    profile = getattr(user, "profile", None)
+
+    if not profile:
+        return None
+
+    profile = get_active_profile_for_organization(user, profile.organization)
+
+    if not profile or not profile.may_view_internal:
+        return None
+
+    return {
+        "organization": profile.organization,
+        "is_superadmin": False,
+        "can_manage": profile.may_manage_organization,
+        "can_inspect": profile.may_inspect,
+        "can_view_internal": profile.may_view_internal,
+    }
+
+
+def get_selected_organization(request, scope):
+    if not scope["is_superadmin"]:
+        return scope["organization"]
+
+    organization_id = request.GET.get("organization") or request.POST.get("organization")
+
+    if organization_id:
+        return get_object_or_404(Organization, id=organization_id, is_active=True)
+
+    return None
+
+
+def get_task_queryset_for_scope(scope, selected_organization):
+    tasks = InspectionTask.objects.select_related(
+        "organization",
+        "playground",
+        "assigned_to",
+        "created_from_inspection",
+        "completed_by_inspection",
+    )
+
+    if scope["is_superadmin"]:
+        if selected_organization:
+            tasks = tasks.filter(organization=selected_organization)
+    else:
+        tasks = tasks.filter(organization=scope["organization"])
+
+    return tasks
+
+
+def choice_count_map(queryset, field_name, choices):
+    raw_counts = queryset.values(field_name).annotate(count=Count("id"))
+    counts = {entry[field_name]: entry["count"] for entry in raw_counts}
+
+    return [
+        {
+            "key": key,
+            "label": label,
+            "count": counts.get(key, 0),
+        }
+        for key, label in choices
+    ]
+
+
+@login_required
+def inspection_planning(request):
+    scope = get_planning_scope(request.user)
+
+    if not scope:
+        raise PermissionDenied("Keine Berechtigung für die interne Einsatzplanung.")
+
+    if scope["organization"]:
+        require_internal_view_permission(request.user, scope["organization"])
+
+    selected_organization = get_selected_organization(request, scope)
+    tasks = get_task_queryset_for_scope(scope, selected_organization)
+    refresh_task_statuses(tasks.exclude(
+        status__in=[InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]
+    ))
+
+    status_filter = request.GET.get("status") or "active"
+    inspection_type_filter = request.GET.get("inspection_type") or ""
+
+    filtered_tasks = tasks
+
+    if status_filter == "active":
+        filtered_tasks = filtered_tasks.filter(
+            status__in=[
+                InspectionTask.STATUS_OPEN,
+                InspectionTask.STATUS_PLANNED,
+                InspectionTask.STATUS_OVERDUE,
+                InspectionTask.STATUS_SUSPENDED,
+            ]
+        )
+    elif status_filter:
+        filtered_tasks = filtered_tasks.filter(status=status_filter)
+
+    if inspection_type_filter:
+        filtered_tasks = filtered_tasks.filter(inspection_type=inspection_type_filter)
+
+    organizations = Organization.objects.filter(is_active=True).order_by("name") if scope["is_superadmin"] else []
+
+    forms_by_task_id = {}
+    can_manage_selected_organization = scope["can_manage"] and selected_organization is not None
+
+    for task in filtered_tasks[:100]:
+        forms_by_task_id[task.id] = InspectionTaskPlanningForm(
+            instance=task,
+            organization=task.organization,
+        )
+
+    return render(
+        request,
+        "internal/inspection_planning.html",
+        {
+            **scope,
+            "selected_organization": selected_organization,
+            "organizations": organizations,
+            "tasks": filtered_tasks[:100],
+            "forms_by_task_id": forms_by_task_id,
+            "status_filter": status_filter,
+            "inspection_type_filter": inspection_type_filter,
+            "status_choices": [("active", "Aktive Aufträge")] + list(InspectionTask.STATUS_CHOICES),
+            "inspection_type_choices": Inspection.TYPE_CHOICES,
+            "task_counts_by_status": choice_count_map(tasks, "status", InspectionTask.STATUS_CHOICES),
+            "can_manage_selected_organization": can_manage_selected_organization,
+            "today": timezone.localdate(),
+        },
+    )
+
+
+@login_required
+@require_POST
+def rebuild_inspection_planning(request):
+    scope = get_planning_scope(request.user)
+
+    if not scope:
+        raise PermissionDenied("Keine Berechtigung für die interne Einsatzplanung.")
+
+    organization = get_selected_organization(request, scope)
+
+    if not organization:
+        messages.error(request, "Bitte zuerst eine Organisation auswählen.")
+        return redirect("internal:inspection_planning")
+
+    require_org_admin_permission(request.user, organization)
+
+    result = rebuild_planning_for_organization(organization)
+
+    messages.success(
+        request,
+        (
+            "Die Kontrollplanung wurde neu berechnet. "
+            f"Erstellt: {result['created']}, aktualisiert: {result['updated']}, unverändert: {result['unchanged']}."
+        ),
+    )
+    return redirect(f"{request.path_info.replace('/rebuild/', '/') }?organization={organization.id}")
+
+
+@login_required
+@require_POST
+def update_inspection_task(request, task_id):
+    task = get_object_or_404(
+        InspectionTask.objects.select_related("organization", "playground"),
+        id=task_id,
+    )
+
+    require_org_admin_permission(request.user, task.organization)
+
+    form = InspectionTaskPlanningForm(
+        request.POST,
+        instance=task,
+        organization=task.organization,
+    )
+
+    if form.is_valid():
+        task = form.save(commit=False)
+
+        if task.status not in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
+            if task.planned_date or task.assigned_to_id:
+                task.status = InspectionTask.STATUS_PLANNED
+            else:
+                task.status = InspectionTask.STATUS_OPEN
+
+        try:
+            task.full_clean()
+            task.save()
+            task.refresh_status(save=True)
+            messages.success(request, "Der Kontrollauftrag wurde gespeichert.")
+        except forms.ValidationError as error:
+            messages.error(request, error.messages[0] if error.messages else str(error))
+    else:
+        for errors in form.errors.values():
+            for error in errors:
+                messages.error(request, error)
+
+    return redirect(f"/internal/inspection-planning/?organization={task.organization_id}")
+
+
+@login_required
+@require_POST
+def start_inspection_from_task(request, task_id):
+    task = get_object_or_404(
+        InspectionTask.objects.select_related("organization", "playground"),
+        id=task_id,
+    )
+
+    require_inspection_permission(request.user, task.organization)
+
+    if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
+        messages.error(request, "Aus diesem Kontrollauftrag kann keine neue Kontrolle gestartet werden.")
+        return redirect(f"/internal/inspection-planning/?organization={task.organization_id}")
+
+    if task.playground.is_inspection_suspended:
+        messages.error(
+            request,
+            "Für diesen Spielplatz ist die Inspektion aktuell ausgesetzt. Es kann keine neue Kontrolle erfasst werden.",
+        )
+        return redirect(f"/internal/inspection-planning/?organization={task.organization_id}")
+
+    inspection = Inspection.objects.create(
+        playground=task.playground,
+        inspection_type=task.inspection_type,
+        inspected_at=timezone.localdate(),
+        inspector=request.user,
+        result=Inspection.RESULT_OK,
+    )
+
+    create_default_answers(inspection)
+
+    if not task.assigned_to_id:
+        task.assigned_to = request.user
+        task.status = InspectionTask.STATUS_PLANNED
+        task.save(update_fields=["assigned_to", "status", "updated_at"])
+
+    messages.success(request, "Die Kontrolle wurde aus der Einsatzplanung gestartet.")
+    return redirect("internal:inspection_detail", inspection_id=inspection.id)
