@@ -37,8 +37,8 @@ class Playground(models.Model):
     house_number = models.CharField("Hausnummer", max_length=40, blank=True)
     district = models.CharField("Quartier", max_length=100, blank=True)
 
-    latitude = models.DecimalField("Breitengrad / Y", max_digits=16, decimal_places=8, null=True, blank=True)
-    longitude = models.DecimalField("Längengrad / X", max_digits=16, decimal_places=8, null=True, blank=True)
+    latitude = models.DecimalField("LV95 Y", max_digits=16, decimal_places=8, null=True, blank=True)
+    longitude = models.DecimalField("LV95 X", max_digits=16, decimal_places=8, null=True, blank=True)
 
     description = models.TextField("Beschrieb", blank=True)
     construction_costs = models.FloatField("Erstellungskosten", null=True, blank=True)
@@ -90,6 +90,21 @@ class Playground(models.Model):
                 "inspection_suspended_until": "Das Enddatum darf nicht vor dem Startdatum liegen."
             })
 
+        if bool(self.longitude) != bool(self.latitude):
+            raise ValidationError(
+                "Bitte immer ein vollständiges LV95-Koordinatenpaar mit X und Y erfassen."
+            )
+
+        if self.longitude and not (2400000 <= self.longitude <= 2900000):
+            raise ValidationError({
+                "longitude": "Bitte einen gültigen LV95-X-Wert erfassen."
+            })
+
+        if self.latitude and not (1000000 <= self.latitude <= 1350000):
+            raise ValidationError({
+                "latitude": "Bitte einen gültigen LV95-Y-Wert erfassen."
+            })
+
     @property
     def is_inspection_suspended(self):
         today = timezone.localdate()
@@ -104,6 +119,14 @@ class Playground(models.Model):
             return True
 
         return today <= self.inspection_suspended_until
+
+    @property
+    def lv95_x(self):
+        return self.longitude
+
+    @property
+    def lv95_y(self):
+        return self.latitude
 
     def get_preview_photo(self):
         if self.photo_id:
