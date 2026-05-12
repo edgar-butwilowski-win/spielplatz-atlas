@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="de-CH">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Einsatzplanung – SpielplatzAtlas</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --atlas-primary: #0F766E;
+            --atlas-secondary: #F59E0B;
+            --atlas-bg: #F8FAFC;
+            --atlas-text: #0F172A;
+        }
+
+        body { background: var(--atlas-bg); color: var(--atlas-text); }
+        .navbar { background: white; border-bottom: 1px solid #E2E8F0; }
+        .brand-mark {
+            width: 34px; height: 34px; border-radius: 12px;
+            background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700;
+        }
+        .content-card, .metric-card {
+            background: white; border: 1px solid #E2E8F0; border-radius: 1.25rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
+        }
+        .metric-value { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; }
+        .metric-label { color: #64748B; font-size: 0.9rem; }
+        .section-label {
+            color: var(--atlas-primary); font-size: 0.82rem; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+        }
+        .table td, .table th { vertical-align: middle; }
+        .task-note { min-width: 16rem; }
+    </style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+            <span class="brand-mark">A</span>
+            <span class="fw-bold">SpielplatzAtlas</span>
+        </a>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'internal:dashboard' %}" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+            <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
+            {% if can_manage or is_superadmin %}
+                <a href="/admin/" class="btn btn-sm btn-outline-secondary">Admin</a>
+            {% endif %}
+            <a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
+    <div class="mb-4">
+        <div class="section-label mb-2">Interne Einsatzplanung</div>
+        <h1 class="fw-bold mb-2">Kontrollaufträge planen</h1>
+        <p class="text-secondary fs-5 mb-0">
+            {% if selected_organization %}
+                Fällige und geplante Kontrollen für {{ selected_organization.name }}.
+            {% elif is_superadmin %}
+                Bitte eine Organisation auswählen, um die Planung gezielt zu bearbeiten.
+            {% endif %}
+        </p>
+    </div>
+
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="row g-3 mb-4">
+        {% for item in task_counts_by_status %}
+            <div class="col-md-6 col-xl-2">
+                <div class="metric-card p-3 h-100">
+                    <div class="metric-value">{{ item.count }}</div>
+                    <div class="metric-label">{{ item.label }}</div>
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+
+    <section class="content-card p-3 p-lg-4 mb-4">
+        <form method="get" class="row g-3 align-items-end">
+            {% if is_superadmin %}
+                <div class="col-md-4 col-xl-3">
+                    <label class="form-label" for="organization">Organisation</label>
+                    <select class="form-select" id="organization" name="organization">
+                        <option value="">Alle Organisationen</option>
+                        {% for organization in organizations %}
+                            <option value="{{ organization.id }}" {% if selected_organization and selected_organization.id == organization.id %}selected{% endif %}>{{ organization.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            {% endif %}
+            <div class="col-md-4 col-xl-3">
+                <label class="form-label" for="status">Status</label>
+                <select class="form-select" id="status" name="status">
+                    {% for key, label in status_choices %}
+                        <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 col-xl-3">
+                <label class="form-label" for="inspection_type">Kontrollart</label>
+                <select class="form-select" id="inspection_type" name="inspection_type">
+                    <option value="">Alle Kontrollarten</option>
+                    {% for key, label in inspection_type_choices %}
+                        <option value="{{ key }}" {% if inspection_type_filter == key %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 col-xl-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Filtern</button>
+                <a href="{% url 'internal:inspection_planning' %}" class="btn btn-outline-secondary">Zurücksetzen</a>
+            </div>
+        </form>
+
+        {% if can_manage_selected_organization %}
+            <form method="post" action="{% url 'internal:rebuild_inspection_planning' %}" class="mt-3">
+                {% csrf_token %}
+                <input type="hidden" name="organization" value="{{ selected_organization.id }}">
+                <button type="submit" class="btn btn-sm btn-outline-primary">Kontrollplanung neu berechnen</button>
+            </form>
+        {% endif %}
+    </section>
+
+    <section class="content-card p-3 p-lg-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h5 fw-bold mb-0">Kontrollaufträge</h2>
+            <span class="text-secondary small">Maximal 100 Einträge</span>
+        </div>
+
+        {% if tasks %}
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                    <tr>
+                        <th>Fällig</th>
+                        <th>Spielplatz</th>
+                        {% if is_superadmin %}<th>Organisation</th>{% endif %}
+                        <th>Kontrollart</th>
+                        <th>Status</th>
+                        <th>Planung</th>
+                        <th>Aktion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for task in tasks %}
+                        <tr>
+                            <td>
+                                <span class="fw-semibold {% if task.status == 'overdue' %}text-danger{% endif %}">
+                                    {{ task.due_date|date:"d.m.Y" }}
+                                </span>
+                            </td>
+                            <td>{{ task.playground.name }}</td>
+                            {% if is_superadmin %}<td>{{ task.organization.name }}</td>{% endif %}
+                            <td>{{ task.get_inspection_type_display }}</td>
+                            <td>{{ task.get_status_display }}</td>
+                            <td>
+                                {% if can_manage_selected_organization or can_manage and not is_superadmin %}
+                                    <form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="row g-2 align-items-start">
+                                        {% csrf_token %}
+                                        <div class="col-12 col-xl-3">
+                                            {{ task.planning_form.planned_date }}
+                                        </div>
+                                        <div class="col-12 col-xl-4">
+                                            {{ task.planning_form.assigned_to }}
+                                        </div>
+                                        <div class="col-12 col-xl-4 task-note">
+                                            {{ task.planning_form.note }}
+                                        </div>
+                                        <div class="col-12 col-xl-1">
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Speichern</button>
+                                        </div>
+                                    </form>
+                                {% else %}
+                                    <div>{{ task.planned_date|date:"d.m.Y"|default:"–" }}</div>
+                                    <div class="text-secondary small">{{ task.assigned_to|default:"Nicht zugewiesen" }}</div>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if can_inspect and task.status != 'completed' and task.status != 'cancelled' %}
+                                    <form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-success">Kontrolle starten</button>
+                                    </form>
+                                {% else %}
+                                    <span class="text-secondary">–</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-secondary">Keine Kontrollaufträge für die aktuelle Auswahl vorhanden.</div>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>
