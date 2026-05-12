@@ -7,7 +7,9 @@
 # unless expressly permitted in writing.
 
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.shortcuts import redirect, render
+from django.urls import path, reverse
 from PIL import Image as PillowImage
 
 from accounts.admin_utils import get_user_organization
@@ -21,6 +23,7 @@ from .models import (
     PlaygroundAccessory,
     PlaygroundSurface,
 )
+from .webservice_sync import PlaygroundSyncError, sync_playgrounds_from_url
 
 
 def create_image_asset_from_upload(uploaded_file, organization):
@@ -61,6 +64,15 @@ class PlaygroundAdminForm(forms.ModelForm):
         fields = "__all__"
 
 
+class PlaygroundSyncForm(forms.Form):
+    service_url = forms.URLField(
+        label="Webservice-URL",
+        required=True,
+        help_text="URL eines GeoJSON-Webservice mit Spielplatz-Objekten.",
+        widget=forms.URLInput(attrs={"class": "vURLField", "size": 100}),
+    )
+
+
 class PlayEquipmentAdminForm(forms.ModelForm):
     photo_upload = forms.ImageField(
         label="Neues Foto hochladen",
@@ -81,6 +93,7 @@ class PlaygroundAdmin(admin.ModelAdmin):
         ("Grunddaten", {
             "fields": (
                 "organization",
+                "uuid",
                 "name",
                 "slug",
                 "number",
@@ -121,6 +134,7 @@ class PlaygroundAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "number",
+        "uuid",
         "organization",
         "district",
         "public_visible",
@@ -130,9 +144,92 @@ class PlaygroundAdmin(admin.ModelAdmin):
         "created_at",
     )
     list_filter = ("organization", "public_visible", "is_active", "district")
-    search_fields = ("name", "number", "address", "street_name", "house_number", "district")
+    search_fields = ("name", "uuid", "number", "address", "street_name", "house_number", "district")
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ("photo",)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "sync/",
+                self.admin_site.admin_view(self.sync_playgrounds_view),
+                name="playgrounds_playground_sync",
+            ),
+        ]
+        return custom_urls + urls
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["sync_url"] = reverse("admin:playgrounds_playground_sync")
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def sync_playgrounds_view(self, request):
+        organization = None
+
+        if not request.user.is_superuser:
+            organization = get_user_organization(request.user)
+
+            if organization is None:
+                messages.error(request, "Für Ihr Benutzerkonto ist keine Organisation hinterlegt.")
+                return redirect("admin:playgrounds_playground_changelist")
+
+        if request.method == "POST":
+            form = PlaygroundSyncForm(request.POST)
+
+            if form.is_valid():
+                target_organization = organization
+
+                if request.user.is_superuser:
+                    organization_id = request.POST.get("organization")
+
+                    if organization_id:
+                        from tenants.models import Organization
+                        target_organization = Organization.objects.filter(id=organization_id).first()
+
+                if target_organization is None:
+                    messages.error(request, "Bitte eine Organisation für den Abgleich auswählen.")
+                    return redirect("admin:playgrounds_playground_sync")
+
+                try:
+                    result = sync_playgrounds_from_url(
+                        form.cleaned_data["service_url"],
+                        target_organization,
+                    )
+                except PlaygroundSyncError as error:
+                    messages.error(request, str(error))
+                except Exception as error:
+                    messages.error(request, f"Der Abgleich ist fehlgeschlagen: {error}")
+                else:
+                    messages.success(
+                        request,
+                        (
+                            "Spielplätze abgeglichen: "
+                            f"{result['created']} neu, "
+                            f"{result['updated']} aktualisiert, "
+                            f"{result['unchanged']} unverändert, "
+                            f"{result['skipped']} übersprungen."
+                        ),
+                    )
+                    return redirect("admin:playgrounds_playground_changelist")
+        else:
+            form = PlaygroundSyncForm()
+
+        organizations = []
+
+        if request.user.is_superuser:
+            from tenants.models import Organization
+            organizations = Organization.objects.filter(is_active=True).order_by("name")
+
+        context = {
+            **self.admin_site.each_context(request),
+            "title": "Spielplätze abgleichen",
+            "form": form,
+            "organization": organization,
+            "organizations": organizations,
+            "opts": self.model._meta,
+        }
+        return render(request, "admin/playgrounds/playground/sync.html", context)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
