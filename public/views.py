@@ -19,6 +19,29 @@ from playgrounds.models import PlayEquipment, Playground
 from tenants.forms import OrganizationRegistrationRequestForm
 
 
+MONTH_NAMES_DE = {
+    1: "Januar",
+    2: "Februar",
+    3: "März",
+    4: "April",
+    5: "Mai",
+    6: "Juni",
+    7: "Juli",
+    8: "August",
+    9: "September",
+    10: "Oktober",
+    11: "November",
+    12: "Dezember",
+}
+
+
+def format_month_year(date_value):
+    if not date_value:
+        return "wird geplant"
+
+    return f"{MONTH_NAMES_DE[date_value.month]} {date_value.year}"
+
+
 def public_equipment_queryset():
     today = timezone.localdate()
 
@@ -94,6 +117,7 @@ def get_public_next_inspection_context(playground):
     return {
         "task": task,
         "display_date": display_date,
+        "display_label": format_month_year(display_date),
         "inspection_type_label": task.get_inspection_type_display(),
         "has_date": True,
     }
@@ -158,11 +182,7 @@ def public_playgrounds_api(request):
                 "organization": playground.organization.name,
                 "is_public": playground.public_visible,
                 "preview_photo_url": preview_photo_url,
-                "next_inspection_label": (
-                    next_inspection["display_date"].strftime("%B %Y")
-                    if next_inspection.get("has_date")
-                    else next_inspection["label"]
-                ),
+                "next_inspection_label": next_inspection.get("display_label") or next_inspection["label"],
                 "detail_url": reverse(
                     "public:playground_detail",
                     kwargs={
