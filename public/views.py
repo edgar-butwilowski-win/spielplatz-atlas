@@ -14,6 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from inspections.models import Defect, Inspection
+from inspections.planning import get_next_public_task_for_playground
 from playgrounds.models import PlayEquipment, Playground
 from tenants.forms import OrganizationRegistrationRequestForm
 
@@ -71,6 +72,33 @@ def playground_base_queryset_for_user(user):
     return qs.filter(public_visible=True)
 
 
+def get_public_next_inspection_context(playground):
+    if playground.is_inspection_suspended:
+        return {
+            "label": "wird geplant",
+            "inspection_type_label": "",
+            "has_date": False,
+        }
+
+    task = get_next_public_task_for_playground(playground)
+
+    if not task:
+        return {
+            "label": "wird geplant",
+            "inspection_type_label": "",
+            "has_date": False,
+        }
+
+    display_date = task.planned_date or task.due_date
+
+    return {
+        "task": task,
+        "display_date": display_date,
+        "inspection_type_label": task.get_inspection_type_display(),
+        "has_date": True,
+    }
+
+
 def index(request):
     return render(request, "public/index.html")
 
@@ -105,6 +133,7 @@ def public_playgrounds_api(request):
     for playground in playgrounds:
         preview_photo = playground.get_preview_photo()
         preview_photo_url = None
+        next_inspection = get_public_next_inspection_context(playground)
 
         if preview_photo:
             preview_photo_url = reverse(
@@ -129,6 +158,11 @@ def public_playgrounds_api(request):
                 "organization": playground.organization.name,
                 "is_public": playground.public_visible,
                 "preview_photo_url": preview_photo_url,
+                "next_inspection_label": (
+                    next_inspection["display_date"].strftime("%B %Y")
+                    if next_inspection.get("has_date")
+                    else next_inspection["label"]
+                ),
                 "detail_url": reverse(
                     "public:playground_detail",
                     kwargs={
@@ -240,6 +274,7 @@ def playground_detail(request, organization_slug, playground_slug):
 
     inspection_is_suspended = playground.is_inspection_suspended
     can_start_inspection = can_create_inspection and not inspection_is_suspended
+    next_public_inspection = get_public_next_inspection_context(playground)
 
     visible_defects = (
         Defect.objects
@@ -307,6 +342,7 @@ def playground_detail(request, organization_slug, playground_slug):
         "can_create_inspection": can_create_inspection,
         "can_start_inspection": can_start_inspection,
         "inspection_is_suspended": inspection_is_suspended,
+        "next_public_inspection": next_public_inspection,
         "can_create_defect": can_create_defect,
         "can_open_defect": can_open_defect,
         "can_view_equipment_renovation": can_view_equipment_renovation,
