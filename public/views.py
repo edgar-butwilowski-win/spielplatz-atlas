@@ -184,16 +184,17 @@ def get_playground_detail_permissions(user, playground):
     if profile.organization_id != playground.organization_id:
         return permissions
 
+    is_org_admin = bool(profile.is_org_admin or user.is_staff)
     can_view_internal = bool(
-        profile.may_view_internal
-        or profile.is_org_admin
+        is_org_admin
+        or profile.may_view_internal
         or profile.can_view_internal
         or profile.can_inspect
         or profile.can_maintain
     )
-    can_inspect = bool(profile.may_inspect or profile.is_org_admin or profile.can_inspect)
+    can_inspect = bool(is_org_admin or profile.may_inspect or profile.can_inspect)
     can_edit_defects = bool(
-        profile.is_org_admin
+        is_org_admin
         or profile.can_maintain
         or profile.can_inspect
         or profile.may_maintain
@@ -204,7 +205,7 @@ def get_playground_detail_permissions(user, playground):
     permissions["can_open_defect"] = can_view_internal
     permissions["can_view_equipment_renovation"] = can_view_internal
     permissions["can_edit_equipment_renovation"] = bool(
-        profile.is_org_admin
+        is_org_admin
         or profile.can_maintain
         or profile.may_maintain
     )
