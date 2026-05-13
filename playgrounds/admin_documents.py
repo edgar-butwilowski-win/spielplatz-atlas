@@ -68,7 +68,7 @@ class PlaygroundDocumentAdmin(admin.ModelAdmin):
         "created_at",
     )
     search_fields = (
-        "id",
+        "=id",
         "playground__name",
         "playground__organization__name",
     )
