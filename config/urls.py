@@ -9,8 +9,8 @@
 from django.contrib import admin
 from django.urls import include, path
 
-admin.site.site_header = "SpielplatzAtlas"
-admin.site.site_title = "SpielplatzAtlas"
+admin.site.site_header = "playsafeswiss"
+admin.site.site_title = "playsafeswiss"
 admin.site.index_title = "Verwaltung und Stammdaten"
 
 urlpatterns = [
