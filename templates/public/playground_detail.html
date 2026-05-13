@@ -1,4 +1,5 @@
 {% extends "public/base_public.html" %}
+{% load l10n %}
 
 {% block title %}{{ playground.name }} - SpielplatzAtlas{% endblock %}
 {% block atlas_primary %}{{ playground.organization.primary_color|default:"#0F766E" }}{% endblock %}
@@ -44,8 +45,8 @@
                         <div class="col-6"><div class="meta-label">Quartier</div><div class="fw-semibold">{{ playground.district|default:"-" }}</div></div>
                         <div class="col-6"><div class="meta-label">Status</div>{% if playground.public_visible %}<span class="status-pill">Öffentlich sichtbar</span>{% else %}<span class="lifecycle-pill lifecycle-pill-warning">Intern sichtbar</span>{% endif %}</div>
                         {% if playground.latitude and playground.longitude %}
-                            <div class="col-12"><div class="meta-label">Schweizer Koordinaten</div><div class="fw-semibold">{{ playground.longitude }}, {{ playground.latitude }}</div></div>
-                            {% if request.user.is_authenticated %}<div class="col-12"><a href="https://stadtplan.winterthur.ch/mini?gbapp=portal&amp;topic=Spielplatzkarte&amp;infoactive=1&amp;maponly=1&amp;onlymap=1&amp;scale=200&amp;x={{ playground.longitude }}&amp;y={{ playground.latitude }}&amp;back=Hintergrundkarte_LK_AV_Situationsplan" class="btn btn-atlas-primary w-100" target="_blank" rel="noopener noreferrer">Fachkarte anzeigen</a></div>{% endif %}
+                            <div class="col-12"><div class="meta-label">Schweizer Koordinaten</div><div class="fw-semibold">{{ playground.longitude|floatformat:2|unlocalize }}, {{ playground.latitude|floatformat:2|unlocalize }}</div></div>
+                            {% if request.user.is_authenticated %}<div class="col-12"><a href="https://stadtplan.winterthur.ch/mini?gbapp=portal&amp;topic=Spielplatzkarte&amp;infoactive=1&amp;maponly=1&amp;onlymap=1&amp;scale=200&amp;x={{ playground.longitude|unlocalize }}&amp;y={{ playground.latitude|unlocalize }}&amp;back=Hintergrundkarte_LK_AV_Situationsplan" class="btn btn-atlas-primary w-100" target="_blank" rel="noopener noreferrer">Fachkarte anzeigen</a></div>{% endif %}
                         {% endif %}
                     </div>
                 </div>
