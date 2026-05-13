@@ -18,6 +18,11 @@ urlpatterns = [
     path("impressum/", views.imprint, name="imprint"),
     path("api/playgrounds/", views.public_playgrounds_api, name="playgrounds_api"),
     path(
+        "playground-documents/<int:document_id>/download/",
+        views.playground_document_download,
+        name="playground_document_download",
+    ),
+    path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/",
         views.playground_detail,
         name="playground_detail",
