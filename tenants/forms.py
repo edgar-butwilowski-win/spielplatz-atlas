@@ -7,11 +7,21 @@
 # unless expressly permitted in writing.
 
 from django import forms
+from django.contrib.auth import get_user_model
 
-from .models import OrganizationRegistrationRequest
+from .models import Organization, OrganizationRegistrationRequest
 
 
 class OrganizationRegistrationRequestForm(forms.ModelForm):
+    website = forms.CharField(
+        required=False,
+        label="Website",
+        widget=forms.TextInput(attrs={
+            "autocomplete": "off",
+            "tabindex": "-1",
+        }),
+    )
+
     class Meta:
         model = OrganizationRegistrationRequest
         fields = [
@@ -61,6 +71,71 @@ class OrganizationRegistrationRequestForm(forms.ModelForm):
             }),
         }
 
+    def clean_website(self):
+        value = self.cleaned_data.get("website", "")
+
+        if value:
+            raise forms.ValidationError("Die Anfrage konnte nicht verarbeitet werden.")
+
+        return value
+
+    def clean_organization_name(self):
+        name = self.cleaned_data["organization_name"].strip()
+
+        if Organization.objects.filter(name__iexact=name).exists():
+            raise forms.ValidationError(
+                "Für diese Organisation besteht bereits ein Eintrag."
+            )
+
+        pending_request_exists = OrganizationRegistrationRequest.objects.filter(
+            organization_name__iexact=name,
+            status=OrganizationRegistrationRequest.STATUS_PENDING,
+        ).exists()
+
+        if pending_request_exists:
+            raise forms.ValidationError(
+                "Für diese Organisation liegt bereits eine offene Anfrage vor."
+            )
+
+        return name
+
     def clean_organization_slug(self):
         slug = self.cleaned_data["organization_slug"].strip().lower()
+
+        if Organization.objects.filter(slug__iexact=slug).exists():
+            raise forms.ValidationError(
+                "Diese URL-Kennung wird bereits verwendet."
+            )
+
+        pending_request_exists = OrganizationRegistrationRequest.objects.filter(
+            organization_slug__iexact=slug,
+            status=OrganizationRegistrationRequest.STATUS_PENDING,
+        ).exists()
+
+        if pending_request_exists:
+            raise forms.ValidationError(
+                "Für diese URL-Kennung liegt bereits eine offene Anfrage vor."
+            )
+
         return slug
+
+    def clean_admin_email(self):
+        email = self.cleaned_data["admin_email"].strip().lower()
+        User = get_user_model()
+
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(
+                "Für diese E-Mail-Adresse besteht bereits ein Benutzerkonto."
+            )
+
+        pending_request_exists = OrganizationRegistrationRequest.objects.filter(
+            admin_email__iexact=email,
+            status=OrganizationRegistrationRequest.STATUS_PENDING,
+        ).exists()
+
+        if pending_request_exists:
+            raise forms.ValidationError(
+                "Für diese E-Mail-Adresse liegt bereits eine offene Anfrage vor."
+            )
+
+        return email
