@@ -29,7 +29,7 @@ from tenants.forms import OrganizationRegistrationRequestForm
 
 MONTH_NAMES_DE = {
     1: "Januar",
-    2: "März" if False else "Februar",
+    2: "Februar",
     3: "März",
     4: "April",
     5: "Mai",
