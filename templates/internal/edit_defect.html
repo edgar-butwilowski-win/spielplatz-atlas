@@ -76,6 +76,10 @@
             </a>
 
             <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'notifications:list' %}" class="btn btn-sm btn-outline-secondary">
+                    Systemnachrichten
+                </a>
+
                 <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-sm btn-outline-secondary">
                     Zum Spielplatz
                 </a>
@@ -169,6 +173,17 @@
                     </div>
                 </div>
 
+                <div class="col-lg-4">
+                    <div class="small text-secondary mb-1">Zuständige Person</div>
+                    <div class="fw-semibold">
+                        {% if current_assignment and current_assignment.assigned_to %}
+                            {{ current_assignment.assigned_to.get_full_name|default:current_assignment.assigned_to.username }}
+                        {% else %}
+                            Noch nicht zugewiesen
+                        {% endif %}
+                    </div>
+                </div>
+
                 {% if defect.inspection_answer %}
                     <div class="col-12">
                         <div class="small text-secondary mb-1">Entstanden aus Prüfpunkt</div>
@@ -182,6 +197,33 @@
                 {% endif %}
             </div>
         </div>
+
+        {% if can_edit_defect %}
+            <form method="post" action="{% url 'notifications:assign_defect' defect.id %}" class="content-card p-3 p-lg-4 mb-4">
+                {% csrf_token %}
+                <h2 class="h5 fw-bold mb-2">Zuweisung und Systemnachricht</h2>
+                <p class="text-secondary mb-3">
+                    Die ausgewählte Person erhält eine Systemnachricht. Wenn Push-Benachrichtigungen aktiviert sind, wird zusätzlich eine Meldung auf dem Gerät ausgelöst.
+                </p>
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-12 col-lg-8">
+                        <label class="form-label fw-semibold" for="{{ assignment_form.assigned_to.id_for_label }}">
+                            {{ assignment_form.assigned_to.label }}
+                        </label>
+                        {{ assignment_form.assigned_to }}
+                        {% if assignment_form.assigned_to.help_text %}
+                            <div class="form-text">{{ assignment_form.assigned_to.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <button type="submit" class="btn btn-atlas-primary w-100">
+                            Zuweisung speichern
+                        </button>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
 
         <form method="post" enctype="multipart/form-data" class="content-card p-3 p-lg-4">
             {% csrf_token %}
