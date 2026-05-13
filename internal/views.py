@@ -23,6 +23,7 @@ from inspections.models import (
     InspectionScope,
 )
 from inspections.planning import update_planning_after_completed_inspection
+from notifications.forms import DefectAssignmentForm
 from playgrounds.models import (
     PlayEquipment,
     Playground,
@@ -299,6 +300,8 @@ def edit_defect(request, defect_id):
             "equipment",
             "surface",
             "accessory",
+            "assignment",
+            "assignment__assigned_to",
         ).prefetch_related("images", "images__image"),
         id=defect_id,
     )
@@ -336,12 +339,21 @@ def edit_defect(request, defect_id):
         for field in form.fields.values():
             field.disabled = True
 
+    current_assignment = getattr(defect, "assignment", None)
+    assignment_form = DefectAssignmentForm(
+        initial={"assigned_to": current_assignment.assigned_to if current_assignment else None},
+        organization=playground.organization,
+        current_user=request.user,
+    )
+
     return render(
         request,
         "internal/edit_defect.html",
         {
             "defect": defect,
             "form": form,
+            "assignment_form": assignment_form,
+            "current_assignment": current_assignment,
             "playground": playground,
             "defect_images": defect.images.select_related("image").all(),
             "can_edit_defect": can_edit_defect,
