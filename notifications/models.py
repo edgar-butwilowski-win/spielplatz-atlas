@@ -119,6 +119,56 @@ class SystemNotification(models.Model):
         return reverse("internal:edit_defect", kwargs={"defect_id": defect.id})
 
 
+class DefectAssignment(models.Model):
+    defect = models.OneToOneField(
+        "inspections.Defect",
+        on_delete=models.CASCADE,
+        related_name="assignment",
+        verbose_name="Mangel",
+    )
+
+    organization = models.ForeignKey(
+        "tenants.Organization",
+        on_delete=models.CASCADE,
+        related_name="defect_assignments",
+        verbose_name="Organisation",
+    )
+
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_defects",
+        verbose_name="Zuständige Person",
+    )
+
+    assigned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_defect_changes",
+        verbose_name="Zugewiesen durch",
+    )
+
+    assigned_at = models.DateTimeField("Zugewiesen am", default=timezone.now)
+    note = models.TextField("Interne Bemerkung zur Zuweisung", blank=True)
+
+    class Meta:
+        ordering = ["-assigned_at"]
+        indexes = [
+            models.Index(fields=["organization", "assigned_to", "assigned_at"]),
+        ]
+        verbose_name = "Mangel-Zuweisung"
+        verbose_name_plural = "Mangel-Zuweisungen"
+
+    def __str__(self):
+        if self.assigned_to:
+            return f"{self.defect} – {self.assigned_to}"
+        return f"{self.defect} – keine Zuweisung"
+
+
 class PushSubscription(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
