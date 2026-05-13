@@ -13,8 +13,12 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from accounts.admin_utils import get_user_organization
+from inspections.models import Defect
+from internal.permissions import require_maintenance_permission
 
+from .forms import DefectAssignmentForm
 from .models import PushSubscription, SystemNotification
+from .services import assign_defect
 
 
 @login_required
@@ -41,6 +45,58 @@ def notification_list(request):
             "push_enabled": bool(getattr(settings, "WEBPUSH_VAPID_PUBLIC_KEY", "")),
         },
     )
+
+
+@login_required
+@require_POST
+def assign_defect_view(request, defect_id):
+    defect = get_object_or_404(
+        Defect.objects.select_related(
+            "playground",
+            "playground__organization",
+            "equipment",
+            "surface",
+            "accessory",
+        ),
+        id=defect_id,
+    )
+
+    if not defect.playground:
+        messages.error(request, "Dieser Mangel ist keinem Spielplatz zugeordnet.")
+        return redirect("public:index")
+
+    organization = defect.playground.organization
+    require_maintenance_permission(request.user, organization)
+
+    form = DefectAssignmentForm(
+        request.POST,
+        organization=organization,
+        current_user=request.user,
+    )
+
+    if form.is_valid():
+        assigned_to = form.cleaned_data["assigned_to"]
+        _, notification = assign_defect(
+            defect=defect,
+            assigned_to=assigned_to,
+            assigned_by=request.user,
+        )
+
+        if assigned_to:
+            if notification and notification.delivery_status == SystemNotification.STATUS_SENT:
+                messages.success(request, "Der Mangel wurde zugewiesen. Die Push-Meldung wurde gesendet.")
+            elif notification and notification.delivery_status == SystemNotification.STATUS_NO_SUBSCRIPTION:
+                messages.info(request, "Der Mangel wurde zugewiesen. Die Person hat noch kein Push-Gerät registriert.")
+            else:
+                messages.info(request, "Der Mangel wurde zugewiesen. Die Systemnachricht wurde gespeichert.")
+        else:
+            messages.success(request, "Die Zuweisung wurde entfernt.")
+    else:
+        for errors in form.errors.values():
+            for error in errors:
+                messages.error(request, error)
+
+    return redirect("internal:edit_defect", defect_id=defect.id)
 
 
 @login_required
