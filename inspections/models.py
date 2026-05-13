@@ -696,6 +696,14 @@ class Defect(models.Model):
         (SOURCE_OTHER, "Sonstiges"),
     ]
 
+    URGENCY_A = "a_immediate"
+    URGENCY_B = "b_medium_term"
+
+    URGENCY_CHOICES = [
+        (URGENCY_A, "A (sofort)"),
+        (URGENCY_B, "B (mittelfristig)"),
+    ]
+
     inspection = models.ForeignKey(
         Inspection,
         on_delete=models.SET_NULL,
@@ -785,6 +793,14 @@ class Defect(models.Model):
         default=False,
     )
 
+    urgency = models.CharField(
+        "Dringlichkeit",
+        max_length=30,
+        choices=URGENCY_CHOICES,
+        blank=True,
+        help_text="Nur erfassen, wenn ein Sicherheitsrisiko besteht.",
+    )
+
     status = models.CharField(
         "Status",
         max_length=30,
@@ -831,7 +847,22 @@ class Defect(models.Model):
 
         return f"Mangel #{self.id}"
 
+    def clean(self):
+        super().clean()
+
+        if self.has_safety_risk and not self.urgency:
+            self.urgency = self.URGENCY_A
+
+        if not self.has_safety_risk:
+            self.urgency = ""
+
     def save(self, *args, **kwargs):
+        if self.has_safety_risk and not self.urgency:
+            self.urgency = self.URGENCY_A
+
+        if not self.has_safety_risk:
+            self.urgency = ""
+
         if self.inspection_answer_id:
             if not self.inspection_id:
                 self.inspection = self.inspection_answer.inspection
