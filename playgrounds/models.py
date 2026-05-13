@@ -437,3 +437,6 @@ class PlaygroundAccessory(models.Model):
 
     def __str__(self):
         return f"{self.name} – {self.playground.name}"
+
+
+from .document_models import PlaygroundDocument
