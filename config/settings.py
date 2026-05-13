@@ -21,7 +21,18 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+import environ
 from django.core.exceptions import ImproperlyConfigured
+
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load local environment variables from .env when present.
+# Real secrets stay outside Git and can differ between DEV, TEST and PROD.
+env_file = BASE_DIR / ".env"
+if env_file.exists():
+    environ.Env.read_env(env_file)
 
 
 def env_bool(name, default=False):
@@ -40,10 +51,6 @@ def env_list(name, default=None):
         return default or []
 
     return [item.strip() for item in value.split(",") if item.strip()]
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
