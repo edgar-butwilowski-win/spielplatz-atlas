@@ -95,8 +95,14 @@ class SystemNotification(models.Model):
     class Meta:
         ordering = ["-created_at"]
         indexes = [
-            models.Index(fields=["organization", "recipient", "read_at"]),
-            models.Index(fields=["recipient", "delivery_status", "created_at"]),
+            models.Index(
+                fields=["organization", "recipient", "read_at"],
+                name="notificatio_organiz_a630a1_idx",
+            ),
+            models.Index(
+                fields=["recipient", "delivery_status", "created_at"],
+                name="notificatio_recipie_0d6a5d_idx",
+            ),
         ]
         verbose_name = "Systemnachricht"
         verbose_name_plural = "Systemnachrichten"
@@ -158,7 +164,10 @@ class DefectAssignment(models.Model):
     class Meta:
         ordering = ["-assigned_at"]
         indexes = [
-            models.Index(fields=["organization", "assigned_to", "assigned_at"]),
+            models.Index(
+                fields=["organization", "assigned_to", "assigned_at"],
+                name="notificatio_organiz_8d0483_idx",
+            ),
         ]
         verbose_name = "Mangel-Zuweisung"
         verbose_name_plural = "Mangel-Zuweisungen"
@@ -196,7 +205,10 @@ class PushSubscription(models.Model):
     class Meta:
         ordering = ["user__username", "-last_seen_at"]
         indexes = [
-            models.Index(fields=["user", "organization", "is_active"]),
+            models.Index(
+                fields=["user", "organization", "is_active"],
+                name="notificatio_user_id_1754cd_idx",
+            ),
         ]
         verbose_name = "Push-Gerät"
         verbose_name_plural = "Push-Geräte"
