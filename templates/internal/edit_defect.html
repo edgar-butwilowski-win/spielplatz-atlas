@@ -63,6 +63,30 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
+
+        .atlas-menu { position: relative; }
+        .atlas-menu-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.35rem);
+            min-width: 220px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+            padding: 0.35rem 0;
+            z-index: 1050;
+        }
+        .atlas-menu-panel.show { display: block; }
+        .atlas-menu-panel a {
+            display: block;
+            padding: 0.5rem 0.9rem;
+            color: #0F172A;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .atlas-menu-panel a:hover { background: #F1F5F9; }
     </style>
 </head>
 
@@ -75,11 +99,7 @@
                 <span class="fw-bold">SpielplatzAtlas</span>
             </a>
 
-            <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'notifications:list' %}" class="btn btn-sm btn-outline-secondary">
-                    Systemnachrichten
-                </a>
-
+            <div class="d-flex align-items-center gap-2 atlas-menu">
                 <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-sm btn-outline-secondary">
                     Zum Spielplatz
                 </a>
@@ -89,6 +109,13 @@
                         Zur Kontrolle
                     </a>
                 {% endif %}
+
+                <button type="button" class="btn btn-sm btn-outline-secondary atlas-menu-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+                <div class="atlas-menu-panel" id="atlas-menu-panel">
+                    <a href="{% url 'notifications:list' %}">Systemnachrichten</a>
+                    <a href="{% url 'internal:dashboard' %}">Dashboard</a>
+                    <a href="/logout/">Logout</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -246,6 +273,31 @@
         </form>
     </main>
 
+    <script>
+        function closeMenu() {
+            const panel = document.getElementById('atlas-menu-panel');
+            const button = document.querySelector('.atlas-menu-toggle');
+            if (panel) { panel.classList.remove('show'); }
+            if (button) { button.setAttribute('aria-expanded', 'false'); }
+        }
+
+        document.addEventListener('click', function (event) {
+            const button = event.target.closest('.atlas-menu-toggle');
+            const panel = document.getElementById('atlas-menu-panel');
+
+            if (button && panel) {
+                const isOpen = panel.classList.contains('show');
+                panel.classList.toggle('show', !isOpen);
+                button.setAttribute('aria-expanded', String(!isOpen));
+                event.preventDefault();
+                return;
+            }
+
+            if (!event.target.closest('.atlas-menu')) {
+                closeMenu();
+            }
+        });
+    </script>
 </body>
 
 </html>
