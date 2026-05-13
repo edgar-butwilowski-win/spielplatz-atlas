@@ -7,11 +7,17 @@
 # unless expressly permitted in writing.
 
 from django.db import transaction
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
-from .models import Inspection
+from .models import Defect, Inspection
 from .planning import update_planning_after_completed_inspection
+
+
+@receiver(pre_save, sender=Defect)
+def clear_urgency_without_safety_risk(sender, instance, **kwargs):
+    if not instance.has_safety_risk:
+        instance.urgency = ""
 
 
 @receiver(post_save, sender=Inspection)
