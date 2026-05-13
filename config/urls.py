@@ -16,6 +16,7 @@ admin.site.index_title = "Verwaltung und Stammdaten"
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("internal/", include("internal.urls")),
+    path("internal/", include("notifications.urls")),
     path("media-assets/", include("media_assets.urls")),
     path("", include("accounts.urls")),
     path("", include("public.urls")),
