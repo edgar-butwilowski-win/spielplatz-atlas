@@ -14,6 +14,35 @@ from playgrounds.models import PlayEquipment, Playground
 from .models import ImageAsset
 
 
+def image_is_used_as_defect_image(image):
+    return image.defect_images.exists()
+
+
+def image_is_public_playground_photo(image):
+    return Playground.objects.filter(
+        photo=image,
+        is_active=True,
+        public_visible=True,
+    ).exists()
+
+
+def image_is_public_equipment_photo(image):
+    return PlayEquipment.objects.filter(
+        photo=image,
+        is_active=True,
+        public_visible=True,
+        playground__is_active=True,
+        playground__public_visible=True,
+    ).exists()
+
+
+def image_is_public_playground_or_equipment_photo(image):
+    return (
+        image_is_public_playground_photo(image)
+        or image_is_public_equipment_photo(image)
+    )
+
+
 def user_may_view_organization_image(user, image):
     if not user.is_authenticated:
         return False
@@ -38,40 +67,16 @@ def user_may_view_organization_image(user, image):
     ).exists()
 
 
-def image_is_used_as_defect_image(image):
-    return image.defect_images.exists()
-
-
-def image_is_public_playground_or_equipment_photo(image):
-    if image_is_used_as_defect_image(image):
-        return False
-
-    if Playground.objects.filter(
-        photo=image,
-        is_active=True,
-        public_visible=True,
-        organization__is_active=True,
-        organization__is_public=True,
-    ).exists():
-        return True
-
-    return PlayEquipment.objects.filter(
-        photo=image,
-        is_active=True,
-        public_visible=True,
-        playground__is_active=True,
-        playground__public_visible=True,
-        playground__organization__is_active=True,
-        playground__organization__is_public=True,
-    ).exists()
-
-
 def user_may_view_image(user, image):
-    if image_is_public_playground_or_equipment_photo(image):
-        return True
-
+    # Mangelbilder enthalten potenziell interne Feststellungen und bleiben immer
+    # auf eingeloggte Benutzer der zuständigen Organisation beschränkt.
     if image_is_used_as_defect_image(image):
         return user_may_view_organization_image(user, image)
+
+    # Hauptfotos von öffentlich sichtbaren Spielplätzen und Spielgeräten sind
+    # Bestandteil der öffentlichen Website und dürfen ohne Login ausgeliefert werden.
+    if image_is_public_playground_or_equipment_photo(image):
+        return True
 
     if image.public_visible:
         return True
