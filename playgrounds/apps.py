@@ -10,4 +10,9 @@ from django.apps import AppConfig
 
 
 class PlaygroundsConfig(AppConfig):
-    name = 'playgrounds'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "playgrounds"
+
+    def ready(self):
+        # Ergänzende Admin-Registrierungen in separaten Dateien laden.
+        from . import admin_documents  # noqa: F401
