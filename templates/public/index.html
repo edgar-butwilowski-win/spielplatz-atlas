@@ -57,13 +57,14 @@ function safeText(value) {
     return (value || "").toString();
 }
 function safeUrl(value, fallback) {
+    const fallbackValue = fallback === undefined ? "#" : fallback;
     const url = safeText(value).trim();
 
-    if (!url) { return fallback || "#"; }
+    if (!url) { return fallbackValue; }
 
     if (url.startsWith("/") && !url.startsWith("//")) { return url; }
 
-    return fallback || "#";
+    return fallbackValue;
 }
 function appendTextElement(parent, className, text, tagName) {
     const element = document.createElement(tagName || "div");
