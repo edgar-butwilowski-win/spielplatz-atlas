@@ -2,3 +2,5 @@
 __pycache__/
 users.txt
 db.sqlite3
+.env
+*.pem
