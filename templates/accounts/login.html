@@ -16,6 +16,7 @@
             --atlas-secondary: #F59E0B;
             --atlas-bg: #F8FAFC;
             --atlas-text: #0F172A;
+            --atlas-navbar-height: 58px;
         }
 
         body {
@@ -27,6 +28,7 @@
         .navbar {
             background: white;
             border-bottom: 1px solid #E2E8F0;
+            min-height: var(--atlas-navbar-height);
         }
 
         .brand-mark {
@@ -58,19 +60,105 @@
             filter: brightness(0.92);
             color: white;
         }
+
+        .login-icon-button {
+            width: 34px;
+            height: 31px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .login-icon-button svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .atlas-menu {
+            position: relative;
+        }
+
+        .atlas-menu-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.35rem);
+            min-width: 220px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+            padding: 0.35rem 0;
+            z-index: 1050;
+        }
+
+        .atlas-menu-panel.show {
+            display: block;
+        }
+
+        .atlas-menu-panel a {
+            display: block;
+            padding: 0.5rem 0.9rem;
+            color: #0F172A;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .atlas-menu-panel a:hover {
+            background: #F1F5F9;
+        }
+
+        @media (max-width: 767.98px) {
+            .navbar .container-fluid {
+                gap: 0.5rem;
+            }
+
+            .navbar-brand .fw-bold {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg sticky-top">
     <div class="container-fluid px-3 px-lg-4">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'public:index' %}">
             <span class="brand-mark">A</span>
             <span class="fw-bold">SpielplatzAtlas</span>
         </a>
 
-        <div class="d-flex align-items-center gap-2">
-            <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
+        <div class="d-flex align-items-center gap-2 atlas-menu">
+            <a href="{% url 'public:index' %}" class="btn btn-sm btn-outline-secondary">Karte</a>
+            <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary">Über</a>
+            <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex">Impressum</a>
+            {% if not request.user.is_authenticated %}
+                <a href="{% url 'public:register_organization' %}" class="btn btn-sm btn-atlas-primary d-none d-md-inline-flex">Teilnehmen</a>
+                <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-outline-secondary login-icon-button" aria-label="Login" title="Login">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <path d="M10 17l5-5-5-5"></path>
+                        <path d="M15 12H3"></path>
+                    </svg>
+                </a>
+            {% else %}
+                <button
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary atlas-menu-toggle"
+                    aria-label="Menü öffnen"
+                    aria-expanded="false"
+                >
+                    ☰
+                </button>
+                <div class="atlas-menu-panel" id="atlas-menu-panel">
+                    <a href="{% url 'internal:dashboard' %}">Dashboard</a>
+                    {% if request.user.is_superuser or request.user.profile.may_manage_organization %}
+                        <a href="/admin/">Admin</a>
+                    {% endif %}
+                    <a href="{% url 'accounts:logout' %}">Logout</a>
+                </div>
+            {% endif %}
         </div>
     </div>
 </nav>
@@ -139,6 +227,40 @@
         </div>
     </div>
 </main>
+
+<script>
+    (function () {
+        function closeMenu() {
+            var panel = document.getElementById('atlas-menu-panel');
+            var button = document.querySelector('.atlas-menu-toggle');
+
+            if (panel) {
+                panel.classList.remove('show');
+            }
+
+            if (button) {
+                button.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        document.addEventListener('click', function (event) {
+            var button = event.target.closest('.atlas-menu-toggle');
+            var panel = document.getElementById('atlas-menu-panel');
+
+            if (button && panel) {
+                var isOpen = panel.classList.contains('show');
+                panel.classList.toggle('show', !isOpen);
+                button.setAttribute('aria-expanded', String(!isOpen));
+                event.preventDefault();
+                return;
+            }
+
+            if (!event.target.closest('.atlas-menu')) {
+                closeMenu();
+            }
+        });
+    }());
+</script>
 
 </body>
 </html>
