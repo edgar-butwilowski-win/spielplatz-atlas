@@ -22,6 +22,7 @@ from .services import assign_defect
 
 
 @login_required
+@ensure_csrf_cookie
 def notification_list(request):
     organization = get_user_organization(request.user)
 
@@ -33,8 +34,20 @@ def notification_list(request):
         recipient=request.user,
     ).select_related("organization", "related_defect")
 
+    active_push_subscriptions_count = 0
+
     if not request.user.is_superuser:
         notifications = notifications.filter(organization=organization)
+        active_push_subscriptions_count = PushSubscription.objects.filter(
+            user=request.user,
+            organization=organization,
+            is_active=True,
+        ).count()
+    else:
+        active_push_subscriptions_count = PushSubscription.objects.filter(
+            user=request.user,
+            is_active=True,
+        ).count()
 
     return render(
         request,
@@ -43,6 +56,7 @@ def notification_list(request):
             "notifications": notifications[:100],
             "webpush_public_key": getattr(settings, "WEBPUSH_VAPID_PUBLIC_KEY", ""),
             "push_enabled": bool(getattr(settings, "WEBPUSH_VAPID_PUBLIC_KEY", "")),
+            "active_push_subscriptions_count": active_push_subscriptions_count,
         },
     )
 
@@ -147,7 +161,7 @@ def save_push_subscription(request):
     if not endpoint or not p256dh_key or not auth_key:
         return JsonResponse({"ok": False, "error": "Unvollständige Push-Daten."}, status=400)
 
-    PushSubscription.objects.update_or_create(
+    subscription, _ = PushSubscription.objects.update_or_create(
         endpoint=endpoint,
         defaults={
             "user": request.user,
@@ -159,4 +173,10 @@ def save_push_subscription(request):
         },
     )
 
-    return JsonResponse({"ok": True})
+    active_count = PushSubscription.objects.filter(
+        user=request.user,
+        organization=organization,
+        is_active=True,
+    ).count()
+
+    return JsonResponse({"ok": True, "subscription_id": subscription.id, "active_count": active_count})
