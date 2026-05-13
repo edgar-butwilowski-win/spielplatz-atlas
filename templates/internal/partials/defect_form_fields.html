@@ -280,6 +280,7 @@
 
 <script>
     (function () {
+        const defaultUrgency = 'a_immediate';
         const safetyRiskCheckbox = document.getElementById('{{ form.has_safety_risk.id_for_label }}');
         const urgencyFieldWrapper = document.querySelector('[data-urgency-field]');
         const urgencySelect = document.getElementById('{{ form.urgency.id_for_label }}');
@@ -293,6 +294,10 @@
 
             urgencyFieldWrapper.classList.toggle('d-none', !isVisible);
             urgencySelect.disabled = !isVisible;
+
+            if (isVisible && !urgencySelect.value) {
+                urgencySelect.value = defaultUrgency;
+            }
 
             if (!isVisible) {
                 urgencySelect.value = '';
