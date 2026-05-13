@@ -59,7 +59,26 @@
         }
         .atlas-menu-panel a:hover { background: #F1F5F9; }
         .table td, .table th { vertical-align: middle; }
-        .task-note { min-width: 16rem; }
+        .planning-column { min-width: 46rem; }
+        .action-column { width: 9rem; min-width: 9rem; }
+        .planning-form {
+            display: grid;
+            grid-template-columns: minmax(11rem, 1fr) minmax(14rem, 1.35fr) minmax(16rem, 1.35fr) auto;
+            gap: 0.5rem;
+            align-items: start;
+        }
+        .planning-form .btn { white-space: nowrap; }
+        .task-note textarea { min-height: 3rem; }
+        .task-action-form { margin: 0; }
+        .task-action-form .btn {
+            white-space: normal;
+            min-width: 8rem;
+        }
+        @media (max-width: 1199.98px) {
+            .planning-column { min-width: 22rem; }
+            .planning-form { grid-template-columns: 1fr; }
+            .planning-form .btn { width: 100%; }
+        }
         @media (max-width: 991.98px) {
             .atlas-direct-link { display: none !important; }
         }
@@ -198,8 +217,8 @@
                         {% if is_superadmin %}<th>Organisation</th>{% endif %}
                         <th>Kontrollart</th>
                         <th>Status</th>
-                        <th>Planung</th>
-                        <th>Aktion</th>
+                        <th class="planning-column">Planung</th>
+                        <th class="action-column">Aktion</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -214,20 +233,20 @@
                             {% if is_superadmin %}<td>{{ task.organization.name }}</td>{% endif %}
                             <td>{{ task.get_inspection_type_display }}</td>
                             <td>{{ task.get_status_display }}</td>
-                            <td>
+                            <td class="planning-column">
                                 {% if can_manage_selected_organization or can_manage and not is_superadmin %}
-                                    <form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="row g-2 align-items-start">
+                                    <form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="planning-form">
                                         {% csrf_token %}
-                                        <div class="col-12 col-xl-3">
+                                        <div>
                                             {{ task.planning_form.planned_date }}
                                         </div>
-                                        <div class="col-12 col-xl-4">
+                                        <div>
                                             {{ task.planning_form.assigned_to }}
                                         </div>
-                                        <div class="col-12 col-xl-4 task-note">
+                                        <div class="task-note">
                                             {{ task.planning_form.note }}
                                         </div>
-                                        <div class="col-12 col-xl-1">
+                                        <div>
                                             <button type="submit" class="btn btn-sm btn-outline-primary">Speichern</button>
                                         </div>
                                     </form>
@@ -236,9 +255,9 @@
                                     <div class="text-secondary small">{{ task.assigned_to|default:"Nicht zugewiesen" }}</div>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="action-column">
                                 {% if can_inspect and task.status != 'completed' and task.status != 'cancelled' %}
-                                    <form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}">
+                                    <form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}" class="task-action-form">
                                         {% csrf_token %}
                                         <button type="submit" class="btn btn-sm btn-success">Kontrolle starten</button>
                                     </form>
