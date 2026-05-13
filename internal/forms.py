@@ -137,6 +137,21 @@ def clean_target_by_type(cleaned_data):
     raise forms.ValidationError("Bitte eine gültige Objektart auswählen.")
 
 
+def clean_urgency_by_safety_risk(cleaned_data):
+    has_safety_risk = cleaned_data.get("has_safety_risk")
+    urgency = cleaned_data.get("urgency")
+
+    if has_safety_risk and not urgency:
+        raise forms.ValidationError(
+            "Bitte die Dringlichkeit auswählen, wenn ein Sicherheitsrisiko besteht."
+        )
+
+    if not has_safety_risk:
+        cleaned_data["urgency"] = ""
+
+    return cleaned_data
+
+
 class EquipmentRenovationForm(forms.ModelForm):
     class Meta:
         model = PlayEquipment
@@ -212,6 +227,7 @@ class DefectCreateForm(forms.ModelForm):
             "internal_description",
             "internal_note",
             "has_safety_risk",
+            "urgency",
             "status",
             "planned_resolution_date",
             "public_visible",
@@ -280,7 +296,8 @@ class DefectCreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         cleaned_data = clean_target_by_type(cleaned_data)
-        return clean_single_target(cleaned_data)
+        cleaned_data = clean_single_target(cleaned_data)
+        return clean_urgency_by_safety_risk(cleaned_data)
 
 
 class DefectFromInspectionAnswerForm(forms.ModelForm):
@@ -292,6 +309,7 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
             "internal_description",
             "internal_note",
             "has_safety_risk",
+            "urgency",
             "status",
             "planned_resolution_date",
             "public_visible",
@@ -350,6 +368,10 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
         self.fields["planned_resolution_date"].required = False
         self.fields["public_note"].required = False
 
+    def clean(self):
+        cleaned_data = super().clean()
+        return clean_urgency_by_safety_risk(cleaned_data)
+
 
 class DefectEditForm(forms.ModelForm):
     class Meta:
@@ -361,6 +383,7 @@ class DefectEditForm(forms.ModelForm):
             "internal_description",
             "internal_note",
             "has_safety_risk",
+            "urgency",
             "status",
             "planned_resolution_date",
             "public_visible",
@@ -379,3 +402,7 @@ class DefectEditForm(forms.ModelForm):
         self.fields["internal_note"].required = False
         self.fields["planned_resolution_date"].required = False
         self.fields["public_note"].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        return clean_urgency_by_safety_risk(cleaned_data)
