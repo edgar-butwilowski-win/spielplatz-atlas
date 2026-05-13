@@ -18,6 +18,9 @@
 .lifecycle-pill-info { background: #EFF6FF; color: #1D4ED8; }
 .lifecycle-pill-danger { background: #FEE2E2; color: #B91C1C; }
 .renovation-panel { border: 1px solid #E2E8F0; border-radius: 0.9rem; background: #F8FAFC; padding: 0.75rem; }
+.document-panel { border-top: 1px solid #E2E8F0; padding-top: 1rem; }
+.document-link { display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 999px; border: 1px solid #CBD5E1; padding: 0.35rem 0.7rem; background: #F8FAFC; color: #0F172A; text-decoration: none; font-size: 0.875rem; font-weight: 600; }
+.document-link:hover { background: #E2E8F0; color: #0F172A; }
 .empty-state { border: 1px dashed #CBD5E1; border-radius: 1rem; background: #F8FAFC; }
 .defect-card { border-radius: 1rem; }
 .internal-defect-row { background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 0.75rem; padding: 0.5rem; }
@@ -45,8 +48,31 @@
                         <div class="col-6"><div class="meta-label">Quartier</div><div class="fw-semibold">{{ playground.district|default:"-" }}</div></div>
                         <div class="col-6"><div class="meta-label">Status</div>{% if playground.public_visible %}<span class="status-pill">Öffentlich sichtbar</span>{% else %}<span class="lifecycle-pill lifecycle-pill-warning">Intern sichtbar</span>{% endif %}</div>
                         {% if playground.latitude and playground.longitude %}
-                            <div class="col-12"><div class="meta-label">Schweizer Koordinaten</div><div class="fw-semibold">{{ playground.longitude|floatformat:2|unlocalize }}, {{ playground.latitude|floatformat:2|unlocalize }}</div></div>
+                            <div class="col-12"><div class="meta-label">Schweizer Koordinaten</div><div class="fw-semibold">{{ lv95_x_display }}, {{ lv95_y_display }}</div></div>
                             {% if request.user.is_authenticated %}<div class="col-12"><a href="https://stadtplan.winterthur.ch/mini?gbapp=portal&amp;topic=Spielplatzkarte&amp;infoactive=1&amp;maponly=1&amp;onlymap=1&amp;scale=200&amp;x={{ playground.longitude|unlocalize }}&amp;y={{ playground.latitude|unlocalize }}&amp;back=Hintergrundkarte_LK_AV_Situationsplan" class="btn btn-atlas-primary w-100" target="_blank" rel="noopener noreferrer">Fachkarte anzeigen</a></div>{% endif %}
+                        {% endif %}
+                        {% if can_view_playground_documents and certificate_documents or can_view_playground_documents and acceptance_documents %}
+                            <div class="col-12">
+                                <div class="document-panel">
+                                    <div class="meta-label mb-2">Dokumente</div>
+                                    {% if certificate_documents %}
+                                        <div class="mb-3">
+                                            <div class="small fw-semibold mb-2">Zertifikatsdokumente</div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                {% for document in certificate_documents %}<a href="{% url 'public:playground_document_download' document.id %}" class="document-link">PDF #{{ document.id }}</a>{% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    {% if acceptance_documents %}
+                                        <div>
+                                            <div class="small fw-semibold mb-2">Abnahmedokumente</div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                {% for document in acceptance_documents %}<a href="{% url 'public:playground_document_download' document.id %}" class="document-link">PDF #{{ document.id }}</a>{% endfor %}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
