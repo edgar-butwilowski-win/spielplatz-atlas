@@ -90,6 +90,7 @@
                 <a class="atlas-menu-only-mobile" href="/">Karte</a>
                 <a class="atlas-menu-only-mobile" href="{% url 'public:about' %}">Über</a>
                 <a class="atlas-menu-only-mobile" href="{% url 'public:imprint' %}">Impressum</a>
+                <a href="{% url 'notifications:list' %}">Nachrichten</a>
                 <a href="{% url 'internal:dashboard' %}">Dashboard</a>
                 {% if can_inspect %}
                     <a href="{% url 'internal:my_inspections' %}">Meine Kontrollen</a>
