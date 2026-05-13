@@ -11,20 +11,25 @@ import hashlib
 from django.contrib import messages
 from django.core.cache import cache
 from django.db.models import Prefetch, Q
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
 from inspections.models import Defect, Inspection
 from inspections.planning import get_next_public_task_for_playground
+from playgrounds.document_models import PlaygroundDocument
+from playgrounds.document_permissions import (
+    user_may_view_playground_document,
+    user_may_view_playground_documents,
+)
 from playgrounds.models import PlayEquipment, Playground
 from tenants.forms import OrganizationRegistrationRequestForm
 
 
 MONTH_NAMES_DE = {
     1: "Januar",
-    2: "Februar",
+    2: "März" if False else "Februar",
     3: "März",
     4: "April",
     5: "Mai",
@@ -103,6 +108,13 @@ def format_month_year(date_value):
         return "wird geplant"
 
     return f"{MONTH_NAMES_DE[date_value.month]} {date_value.year}"
+
+
+def format_lv95_coordinate(value):
+    if value is None:
+        return ""
+
+    return f"{value:.2f}"
 
 
 def public_equipment_queryset():
@@ -393,6 +405,25 @@ def playground_detail(request, organization_slug, playground_slug):
     can_open_defect = permissions["can_open_defect"]
     can_view_equipment_renovation = permissions["can_view_equipment_renovation"]
     can_edit_equipment_renovation = permissions["can_edit_equipment_renovation"]
+    can_view_playground_documents = user_may_view_playground_documents(
+        request.user,
+        playground,
+    )
+
+    playground_documents = []
+    certificate_documents = []
+    acceptance_documents = []
+
+    if can_view_playground_documents:
+        playground_documents = list(playground.documents.all())
+        certificate_documents = [
+            document for document in playground_documents
+            if document.document_type == PlaygroundDocument.DOCUMENT_TYPE_CERTIFICATE
+        ]
+        acceptance_documents = [
+            document for document in playground_documents
+            if document.document_type == PlaygroundDocument.DOCUMENT_TYPE_ACCEPTANCE
+        ]
 
     inspection_is_suspended = playground.is_inspection_suspended
     can_start_inspection = can_create_inspection and not inspection_is_suspended
@@ -469,12 +500,37 @@ def playground_detail(request, organization_slug, playground_slug):
         "can_open_defect": can_open_defect,
         "can_view_equipment_renovation": can_view_equipment_renovation,
         "can_edit_equipment_renovation": can_edit_equipment_renovation,
+        "can_view_playground_documents": can_view_playground_documents,
+        "certificate_documents": certificate_documents,
+        "acceptance_documents": acceptance_documents,
         "renovation_type_choices": PlayEquipment.RENOVATION_TYPE_CHOICES,
         "preview_photo": preview_photo,
         "latest_completed_inspection": latest_completed_inspection,
+        "lv95_x_display": format_lv95_coordinate(playground.longitude),
+        "lv95_y_display": format_lv95_coordinate(playground.latitude),
     }
 
     return render(request, "public/playground_detail.html", context)
+
+
+def playground_document_download(request, document_id):
+    document = get_object_or_404(
+        PlaygroundDocument.objects.select_related(
+            "playground",
+            "playground__organization",
+        ),
+        id=document_id,
+    )
+
+    if not user_may_view_playground_document(request.user, document):
+        raise Http404("Dokument nicht gefunden.")
+
+    response = HttpResponse(
+        document.data,
+        content_type=document.mime_type,
+    )
+    response["Content-Disposition"] = f'attachment; filename="{document.download_filename}"'
+    return response
 
 
 def register_organization(request):
