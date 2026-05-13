@@ -11,6 +11,7 @@ app_name = "notifications"
 urlpatterns = [
     path("notifications/", views.notification_list, name="list"),
     path("notifications/<int:notification_id>/read/", views.mark_notification_read, name="mark_read"),
+    path("defects/<int:defect_id>/assign/", views.assign_defect_view, name="assign_defect"),
     path("push-subscriptions/save/", views.save_push_subscription, name="save_push_subscription"),
     path("service-worker.js", views.service_worker, name="service_worker"),
 ]
