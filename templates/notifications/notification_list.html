@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="de-CH">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Systemnachrichten – SpielplatzAtlas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #F8FAFC; color: #0F172A; }
+        .navbar { background: white; border-bottom: 1px solid #E2E8F0; }
+        .brand-mark { width: 34px; height: 34px; border-radius: 12px; background: linear-gradient(135deg, #0F766E, #F59E0B); display: inline-flex; align-items: center; justify-content: center; color: white; font-weight: 700; }
+        .content-card { background: white; border: 1px solid #E2E8F0; border-radius: 1.25rem; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06); }
+        .btn-atlas-primary { background: #0F766E; border-color: #0F766E; color: white; }
+        .btn-atlas-primary:hover { filter: brightness(0.92); color: white; }
+        .notification-unread { border-left: 5px solid #0F766E; }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid px-3 px-lg-4">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+                <span class="brand-mark">A</span>
+                <span class="fw-bold">SpielplatzAtlas</span>
+            </a>
+            <a href="{% url 'internal:dashboard' %}" class="btn btn-sm btn-outline-secondary">Internes Dashboard</a>
+        </div>
+    </nav>
+
+    <main class="container py-4">
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="content-card p-3 p-lg-4 mb-4">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+                <div>
+                    <h1 class="h3 fw-bold mb-2">Systemnachrichten</h1>
+                    <p class="text-secondary mb-0">Hier erscheinen interne Nachrichten, zum Beispiel zugewiesene Mängel.</p>
+                </div>
+
+                {% if push_enabled %}
+                    <button type="button" id="enable-push" class="btn btn-atlas-primary">
+                        Push-Benachrichtigungen aktivieren
+                    </button>
+                {% else %}
+                    <span class="badge text-bg-light border fs-6">Web-Push nicht konfiguriert</span>
+                {% endif %}
+            </div>
+            <div id="push-status" class="small text-secondary mt-3"></div>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+            {% for notification in notifications %}
+                <div class="content-card p-3 {% if not notification.is_read %}notification-unread{% endif %}">
+                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">{{ notification.title }}</h2>
+                            <div class="text-secondary small mb-2">
+                                {{ notification.created_at|date:"d.m.Y H:i" }} · {{ notification.organization.name }}
+                            </div>
+                            <p class="mb-2">{{ notification.message }}</p>
+                            <div class="small text-secondary">
+                                Zustellung: {{ notification.get_delivery_status_display }}
+                            </div>
+                        </div>
+
+                        <form method="post" action="{% url 'notifications:mark_read' notification.id %}" class="align-self-lg-center">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-secondary">
+                                Öffnen
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="content-card p-4 text-center text-secondary">
+                    Es sind noch keine Systemnachrichten vorhanden.
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    {% if push_enabled %}
+        <script>
+            (function () {
+                const publicKey = "{{ webpush_public_key|escapejs }}";
+                const statusElement = document.getElementById("push-status");
+                const button = document.getElementById("enable-push");
+
+                function setStatus(message) {
+                    if (statusElement) {
+                        statusElement.textContent = message;
+                    }
+                }
+
+                function urlBase64ToUint8Array(base64String) {
+                    const padding = "=".repeat((4 - base64String.length % 4) % 4);
+                    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+                    const rawData = window.atob(base64);
+                    const outputArray = new Uint8Array(rawData.length);
+
+                    for (let i = 0; i < rawData.length; ++i) {
+                        outputArray[i] = rawData.charCodeAt(i);
+                    }
+                    return outputArray;
+                }
+
+                function getCookie(name) {
+                    const value = `; ${document.cookie}`;
+                    const parts = value.split(`; ${name}=`);
+                    if (parts.length === 2) {
+                        return parts.pop().split(";").shift();
+                    }
+                    return "";
+                }
+
+                async function enablePush() {
+                    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+                        setStatus("Dieses Gerät unterstützt Web-Push-Benachrichtigungen nicht.");
+                        return;
+                    }
+
+                    const permission = await Notification.requestPermission();
+                    if (permission !== "granted") {
+                        setStatus("Benachrichtigungen wurden nicht erlaubt.");
+                        return;
+                    }
+
+                    const registration = await navigator.serviceWorker.register("{% url 'notifications:service_worker' %}");
+                    const subscription = await registration.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: urlBase64ToUint8Array(publicKey)
+                    });
+
+                    const response = await fetch("{% url 'notifications:save_push_subscription' %}", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": getCookie("csrftoken")
+                        },
+                        body: JSON.stringify(subscription)
+                    });
+
+                    if (!response.ok) {
+                        setStatus("Push-Benachrichtigungen konnten nicht gespeichert werden.");
+                        return;
+                    }
+
+                    setStatus("Push-Benachrichtigungen sind für dieses Gerät aktiviert.");
+                }
+
+                if (button) {
+                    button.addEventListener("click", function () {
+                        enablePush().catch(function () {
+                            setStatus("Push-Benachrichtigungen konnten nicht aktiviert werden.");
+                        });
+                    });
+                }
+            })();
+        </script>
+    {% endif %}
+</body>
+
+</html>
