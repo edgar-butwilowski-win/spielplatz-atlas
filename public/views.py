@@ -158,6 +158,60 @@ def playground_base_queryset_for_user(user):
     return qs.filter(public_visible=True)
 
 
+def get_playground_detail_permissions(user, playground):
+    permissions = {
+        "can_create_inspection": False,
+        "can_create_defect": False,
+        "can_open_defect": False,
+        "can_view_equipment_renovation": False,
+        "can_edit_equipment_renovation": False,
+    }
+
+    if not user.is_authenticated:
+        return permissions
+
+    if user.is_superuser:
+        return {key: True for key in permissions}
+
+    profile = getattr(user, "profile", None)
+
+    if not profile:
+        return permissions
+
+    if not profile.is_active_for_organization:
+        return permissions
+
+    if profile.organization_id != playground.organization_id:
+        return permissions
+
+    can_view_internal = bool(
+        profile.may_view_internal
+        or profile.is_org_admin
+        or profile.can_view_internal
+        or profile.can_inspect
+        or profile.can_maintain
+    )
+    can_inspect = bool(profile.may_inspect or profile.is_org_admin or profile.can_inspect)
+    can_edit_defects = bool(
+        profile.is_org_admin
+        or profile.can_maintain
+        or profile.can_inspect
+        or profile.may_maintain
+    )
+
+    permissions["can_create_inspection"] = can_inspect
+    permissions["can_create_defect"] = can_edit_defects
+    permissions["can_open_defect"] = can_view_internal
+    permissions["can_view_equipment_renovation"] = can_view_internal
+    permissions["can_edit_equipment_renovation"] = bool(
+        profile.is_org_admin
+        or profile.can_maintain
+        or profile.may_maintain
+    )
+
+    return permissions
+
+
 def get_public_next_inspection_context(playground):
     if playground.is_inspection_suspended:
         return {
@@ -331,29 +385,13 @@ def playground_detail(request, organization_slug, playground_slug):
 
     preview_photo = playground.get_preview_photo()
     equipment_list = list(playground.equipment.all())
+    permissions = get_playground_detail_permissions(request.user, playground)
 
-    can_create_inspection = False
-    can_create_defect = False
-    can_open_defect = False
-    can_view_equipment_renovation = False
-    can_edit_equipment_renovation = False
-
-    if request.user.is_authenticated:
-        if request.user.is_superuser:
-            can_create_inspection = True
-            can_create_defect = True
-            can_open_defect = True
-            can_view_equipment_renovation = True
-            can_edit_equipment_renovation = True
-        else:
-            profile = getattr(request.user, "profile", None)
-
-            if profile and profile.organization_id == playground.organization_id:
-                can_create_inspection = profile.may_inspect
-                can_create_defect = profile.may_maintain
-                can_open_defect = profile.may_view_internal
-                can_view_equipment_renovation = profile.may_view_internal
-                can_edit_equipment_renovation = profile.may_maintain
+    can_create_inspection = permissions["can_create_inspection"]
+    can_create_defect = permissions["can_create_defect"]
+    can_open_defect = permissions["can_open_defect"]
+    can_view_equipment_renovation = permissions["can_view_equipment_renovation"]
+    can_edit_equipment_renovation = permissions["can_edit_equipment_renovation"]
 
     inspection_is_suspended = playground.is_inspection_suspended
     can_start_inspection = can_create_inspection and not inspection_is_suspended
