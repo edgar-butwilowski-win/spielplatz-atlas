@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "media_assets",
     "public",
     "internal",
+    "notifications.apps.NotificationsConfig",
 ]
 
 MIDDLEWARE = [
@@ -169,6 +170,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "public:index"
 LOGOUT_REDIRECT_URL = "public:index"
+
+WEBPUSH_VAPID_PUBLIC_KEY = os.environ.get("WEBPUSH_VAPID_PUBLIC_KEY", "")
+WEBPUSH_VAPID_PRIVATE_KEY = os.environ.get("WEBPUSH_VAPID_PRIVATE_KEY", "")
+WEBPUSH_VAPID_EMAIL = os.environ.get("WEBPUSH_VAPID_EMAIL", "")
 
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", default=not DEBUG)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", default=not DEBUG)
