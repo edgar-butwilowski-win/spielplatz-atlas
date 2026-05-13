@@ -21,6 +21,27 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
+
+def env_bool(name, default=False):
+    value = os.environ.get(name)
+
+    if value is None:
+        return default
+
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_list(name, default=None):
+    value = os.environ.get(name)
+
+    if value is None:
+        return default or []
+
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,16 +49,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "django-insecure-spielplatz-atlas-local-development-key",
-)
+DEBUG = env_bool("DJANGO_DEBUG", default=True)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
-ALLOWED_HOSTS = []
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-spielplatz-atlas-local-development-key"
+    else:
+        raise ImproperlyConfigured("DJANGO_SECRET_KEY muss im Produktionsbetrieb gesetzt sein.")
+
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", default=[])
+
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
 
 
 # Application definition
@@ -63,6 +87,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -144,3 +169,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "public:index"
 LOGOUT_REDIRECT_URL = "public:index"
+
+SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", default=not DEBUG)
+CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", default=not DEBUG)
+SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", default=not DEBUG)
+SECURE_HSTS_SECONDS = int(os.environ.get("DJANGO_SECURE_HSTS_SECONDS", "31536000" if not DEBUG else "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=not DEBUG)
+SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", default=not DEBUG)
+SECURE_CONTENT_TYPE_NOSNIFF = True
