@@ -1,11 +1,3 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
-
 from django.core.exceptions import PermissionDenied
 
 
@@ -64,6 +56,18 @@ def require_maintenance_permission(user, organization):
         return True
 
     raise PermissionDenied("Keine Berechtigung für Mängel und Unterhalt.")
+
+
+def require_defect_permission(user, organization):
+    if user.is_superuser:
+        return True
+
+    profile = get_active_profile_for_organization(user, organization)
+
+    if profile and (profile.may_maintain or profile.may_inspect):
+        return True
+
+    raise PermissionDenied("Keine Berechtigung zum Bearbeiten von Mängeln.")
 
 
 def require_org_admin_permission(user, organization):
