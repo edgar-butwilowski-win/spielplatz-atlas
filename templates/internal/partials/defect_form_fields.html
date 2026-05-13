@@ -141,7 +141,10 @@
 
     {% for field in form %}
         {% if field.name != 'target_type' and field.name != 'equipment' and field.name != 'surface' and field.name != 'accessory' %}
-            <div class="col-12 {% if field.name == 'source_type' or field.name == 'reported_at' or field.name == 'has_safety_risk' or field.name == 'status' or field.name == 'planned_resolution_date' or field.name == 'public_visible' %}col-lg-6{% endif %}">
+            <div
+                class="col-12 {% if field.name == 'source_type' or field.name == 'reported_at' or field.name == 'has_safety_risk' or field.name == 'urgency' or field.name == 'status' or field.name == 'planned_resolution_date' or field.name == 'public_visible' %}col-lg-6{% endif %}"
+                {% if field.name == 'urgency' %}data-urgency-field{% endif %}
+            >
                 {% if field.field.widget.input_type == "checkbox" %}
                     <div class="form-check {% if field.name == 'has_safety_risk' %}mt-lg-4{% endif %}">
                         {{ field }}
@@ -274,3 +277,29 @@
         })();
     </script>
 {% endif %}
+
+<script>
+    (function () {
+        const safetyRiskCheckbox = document.getElementById('{{ form.has_safety_risk.id_for_label }}');
+        const urgencyFieldWrapper = document.querySelector('[data-urgency-field]');
+        const urgencySelect = document.getElementById('{{ form.urgency.id_for_label }}');
+
+        if (!safetyRiskCheckbox || !urgencyFieldWrapper || !urgencySelect) {
+            return;
+        }
+
+        function updateUrgencyVisibility() {
+            const isVisible = safetyRiskCheckbox.checked;
+
+            urgencyFieldWrapper.classList.toggle('d-none', !isVisible);
+            urgencySelect.disabled = !isVisible;
+
+            if (!isVisible) {
+                urgencySelect.value = '';
+            }
+        }
+
+        safetyRiskCheckbox.addEventListener('change', updateUrgencyVisibility);
+        updateUrgencyVisibility();
+    })();
+</script>
