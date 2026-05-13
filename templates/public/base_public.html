@@ -30,15 +30,18 @@
         }
 
         .brand-mark {
-            width: 34px;
-            height: 34px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
+            width: 42px;
+            height: 42px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 700;
+            flex: 0 0 auto;
+        }
+
+        .brand-mark svg {
+            width: 100%;
+            height: 100%;
+            display: block;
         }
 
         .btn-atlas-primary {
@@ -132,8 +135,35 @@
 <body class="{% block body_class %}{% endblock %}">
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container-fluid px-3 px-lg-4">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'public:index' %}">
-                <span class="brand-mark">A</span>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'public:index' %}" aria-label="SpielplatzAtlas Startseite">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 128 128" role="img" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logo-blue" x1="20" y1="10" x2="105" y2="112" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#38BDF8"/>
+                                <stop offset="1" stop-color="#0284C7"/>
+                            </linearGradient>
+                            <linearGradient id="logo-green" x1="12" y1="42" x2="118" y2="114" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#84CC16"/>
+                                <stop offset="1" stop-color="#22C55E"/>
+                            </linearGradient>
+                        </defs>
+
+                        <path d="M11 92 L39 78 L68 90 L43 112 L17 111 Q8 110 11 92 Z" fill="#22C55E"/>
+                        <path d="M35 72 L65 61 L91 76 L69 99 L41 88 Z" fill="#84CC16"/>
+                        <path d="M66 88 L94 72 L117 88 L117 106 Q117 113 110 114 L71 113 L48 102 Z" fill="url(#logo-green)"/>
+                        <path d="M44 113 L69 99 L92 114 Z" fill="#0EA5E9"/>
+                        <path d="M17 92 L39 78 M38 88 L69 99 M65 61 L52 84 M68 90 L94 72" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <path d="M42 13 C28 13 17 24 17 38 C17 57 42 80 42 80 C42 80 67 57 67 38 C67 24 56 13 42 13 Z" fill="url(#logo-blue)"/>
+                        <circle cx="42" cy="38" r="11" fill="#FFFFFF"/>
+
+                        <path d="M75 44 L94 30 L113 44 Q116 47 112 50 L76 50 Q71 50 75 44 Z" fill="#84CC16"/>
+                        <path d="M80 52 V99 M106 52 V101 M80 70 H106 M86 70 V86 M94 70 V86 M102 70 V86 M80 86 H106" fill="none" stroke="#075985" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M78 69 L65 100 M70 88 H82" fill="none" stroke="#075985" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M106 65 C121 68 120 88 111 94 C105 98 106 105 118 105" fill="none" stroke="#0EA5E9" stroke-width="11" stroke-linecap="round"/>
+                    </svg>
+                </span>
                 <span class="fw-bold">SpielplatzAtlas</span>
             </a>
 
