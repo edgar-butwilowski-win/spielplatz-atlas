@@ -12,11 +12,37 @@ from django.shortcuts import get_object_or_404
 from .models import ImageAsset
 
 
-def image_content(request, image_id):
+def user_may_view_image(user, image):
+    if image.public_visible:
+        return True
+
+    if not user.is_authenticated:
+        return False
+
+    if user.is_superuser:
+        return True
+
+    profile = getattr(user, "profile", None)
+
+    return bool(
+        profile
+        and profile.is_active_for_organization
+        and profile.may_view_internal
+        and image.organization_id == profile.organization_id
+    )
+
+
+def get_permitted_image_or_404(request, image_id):
     image = get_object_or_404(ImageAsset, id=image_id)
 
-    if not image.public_visible and not request.user.is_authenticated:
+    if not user_may_view_image(request.user, image):
         raise Http404("Bild nicht gefunden.")
+
+    return image
+
+
+def image_content(request, image_id):
+    image = get_permitted_image_or_404(request, image_id)
 
     return HttpResponse(
         image.data,
@@ -25,10 +51,7 @@ def image_content(request, image_id):
 
 
 def image_thumbnail(request, image_id):
-    image = get_object_or_404(ImageAsset, id=image_id)
-
-    if not image.public_visible and not request.user.is_authenticated:
-        raise Http404("Bild nicht gefunden.")
+    image = get_permitted_image_or_404(request, image_id)
 
     if image.thumbnail_data:
         return HttpResponse(
