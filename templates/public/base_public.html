@@ -165,6 +165,12 @@
                     </button>
                     <div class="atlas-menu-panel" id="atlas-menu-panel">
                         <a href="{% url 'internal:dashboard' %}">Dashboard</a>
+                        {% if request.user.is_superuser or request.user.profile.may_inspect %}
+                            <a href="{% url 'internal:my_inspections' %}">Meine Kontrollen</a>
+                        {% endif %}
+                        {% if request.user.is_superuser or request.user.profile.may_inspect or request.user.profile.may_manage_organization %}
+                            <a href="{% url 'internal:inspection_planning' %}">Einsatzplanung</a>
+                        {% endif %}
                         {% if request.user.is_superuser or request.user.profile.may_manage_organization %}
                             <a href="/admin/">Admin</a>
                         {% endif %}
