@@ -142,9 +142,7 @@ def clean_urgency_by_safety_risk(cleaned_data):
     urgency = cleaned_data.get("urgency")
 
     if has_safety_risk and not urgency:
-        raise forms.ValidationError(
-            "Bitte die Dringlichkeit auswählen, wenn ein Sicherheitsrisiko besteht."
-        )
+        cleaned_data["urgency"] = Defect.URGENCY_A
 
     if not has_safety_risk:
         cleaned_data["urgency"] = ""
