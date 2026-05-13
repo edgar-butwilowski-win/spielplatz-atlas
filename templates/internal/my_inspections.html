@@ -14,10 +14,11 @@
             --atlas-secondary: #F59E0B;
             --atlas-bg: #F8FAFC;
             --atlas-text: #0F172A;
+            --atlas-navbar-height: 58px;
         }
 
         body { background: var(--atlas-bg); color: var(--atlas-text); }
-        .navbar { background: white; border-bottom: 1px solid #E2E8F0; }
+        .navbar { background: white; border-bottom: 1px solid #E2E8F0; min-height: var(--atlas-navbar-height); }
         .brand-mark {
             width: 34px; height: 34px; border-radius: 12px;
             background: linear-gradient(135deg, var(--atlas-primary), var(--atlas-secondary));
@@ -32,8 +33,35 @@
             color: var(--atlas-primary); font-size: 0.82rem; font-weight: 700;
             letter-spacing: 0.08em; text-transform: uppercase;
         }
+        .atlas-menu { position: relative; }
+        .atlas-menu-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.35rem);
+            min-width: 220px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+            padding: 0.35rem 0;
+            z-index: 1050;
+        }
+        .atlas-menu-panel.show { display: block; }
+        .atlas-menu-panel a {
+            display: block;
+            padding: 0.5rem 0.9rem;
+            color: #0F172A;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .atlas-menu-panel a:hover { background: #F1F5F9; }
         .task-meta { color: #64748B; font-size: 0.92rem; }
         .empty-state { color: #64748B; }
+        @media (max-width: 767.98px) {
+            .navbar .container-fluid { gap: 0.5rem; }
+            .navbar-brand .fw-bold { display: none; }
+        }
     </style>
 </head>
 
@@ -44,13 +72,24 @@
             <span class="brand-mark">A</span>
             <span class="fw-bold">SpielplatzAtlas</span>
         </a>
-        <div class="d-flex align-items-center gap-2">
-            {% if can_manage or is_superadmin %}
-                <a href="{% url 'internal:inspection_planning' %}" class="btn btn-sm btn-outline-primary">Einsatzplanung</a>
-            {% endif %}
-            <a href="{% url 'internal:dashboard' %}" class="btn btn-sm btn-outline-secondary">Dashboard</a>
+        <div class="d-flex align-items-center gap-2 atlas-menu">
             <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
-            <a href="/logout/" class="btn btn-sm btn-outline-secondary">Logout</a>
+            <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary">Über</a>
+            <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex">Impressum</a>
+            <button type="button" class="btn btn-sm btn-outline-secondary atlas-menu-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+            <div class="atlas-menu-panel" id="atlas-menu-panel">
+                <a href="{% url 'internal:dashboard' %}">Dashboard</a>
+                {% if can_inspect %}
+                    <a href="{% url 'internal:my_inspections' %}">Meine Kontrollen</a>
+                {% endif %}
+                {% if can_inspect or can_manage or is_superadmin %}
+                    <a href="{% url 'internal:inspection_planning' %}">Einsatzplanung</a>
+                {% endif %}
+                {% if can_manage or is_superadmin %}
+                    <a href="/admin/">Admin</a>
+                {% endif %}
+                <a href="/logout/">Logout</a>
+            </div>
         </div>
     </div>
 </nav>
@@ -140,5 +179,31 @@
         {% endif %}
     </section>
 </main>
+
+<script>
+    function closeMenu() {
+        const panel = document.getElementById('atlas-menu-panel');
+        const button = document.querySelector('.atlas-menu-toggle');
+        if (panel) { panel.classList.remove('show'); }
+        if (button) { button.setAttribute('aria-expanded', 'false'); }
+    }
+
+    document.addEventListener('click', function (event) {
+        const button = event.target.closest('.atlas-menu-toggle');
+        const panel = document.getElementById('atlas-menu-panel');
+
+        if (button && panel) {
+            const isOpen = panel.classList.contains('show');
+            panel.classList.toggle('show', !isOpen);
+            button.setAttribute('aria-expanded', String(!isOpen));
+            event.preventDefault();
+            return;
+        }
+
+        if (!event.target.closest('.atlas-menu')) {
+            closeMenu();
+        }
+    });
+</script>
 </body>
 </html>
