@@ -14,6 +14,29 @@
         .btn-atlas-primary { background: #0F766E; border-color: #0F766E; color: white; }
         .btn-atlas-primary:hover { filter: brightness(0.92); color: white; }
         .notification-unread { border-left: 5px solid #0F766E; }
+        .atlas-menu { position: relative; }
+        .atlas-menu-panel {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 0.35rem);
+            min-width: 220px;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+            padding: 0.35rem 0;
+            z-index: 1050;
+        }
+        .atlas-menu-panel.show { display: block; }
+        .atlas-menu-panel a {
+            display: block;
+            padding: 0.5rem 0.9rem;
+            color: #0F172A;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .atlas-menu-panel a:hover { background: #F1F5F9; }
     </style>
 </head>
 
@@ -24,7 +47,14 @@
                 <span class="brand-mark">A</span>
                 <span class="fw-bold">SpielplatzAtlas</span>
             </a>
-            <a href="{% url 'internal:dashboard' %}" class="btn btn-sm btn-outline-secondary">Internes Dashboard</a>
+            <div class="d-flex align-items-center gap-2 atlas-menu">
+                <button type="button" class="btn btn-sm btn-outline-secondary atlas-menu-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
+                <div class="atlas-menu-panel" id="atlas-menu-panel">
+                    <a href="{% url 'notifications:list' %}">Systemnachrichten</a>
+                    <a href="{% url 'internal:dashboard' %}">Internes Dashboard</a>
+                    <a href="/logout/">Logout</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -52,7 +82,11 @@
                     <span class="badge text-bg-light border fs-6">Web-Push nicht konfiguriert</span>
                 {% endif %}
             </div>
-            <div id="push-status" class="small text-secondary mt-3"></div>
+            <div id="push-status" class="small text-secondary mt-3">
+                {% if active_push_subscriptions_count %}
+                    Aktive Push-Geräte für dieses Konto: {{ active_push_subscriptions_count }}
+                {% endif %}
+            </div>
         </div>
 
         <div class="d-flex flex-column gap-3">
@@ -120,6 +154,19 @@
                     return "";
                 }
 
+                async function getSubscription(registration) {
+                    let subscription = await registration.pushManager.getSubscription();
+
+                    if (!subscription) {
+                        subscription = await registration.pushManager.subscribe({
+                            userVisibleOnly: true,
+                            applicationServerKey: urlBase64ToUint8Array(publicKey)
+                        });
+                    }
+
+                    return subscription;
+                }
+
                 async function enablePush() {
                     if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
                         setStatus("Dieses Gerät unterstützt Web-Push-Benachrichtigungen nicht.");
@@ -133,10 +180,8 @@
                     }
 
                     const registration = await navigator.serviceWorker.register("{% url 'notifications:service_worker' %}");
-                    const subscription = await registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: urlBase64ToUint8Array(publicKey)
-                    });
+                    await navigator.serviceWorker.ready;
+                    const subscription = await getSubscription(registration);
 
                     const response = await fetch("{% url 'notifications:save_push_subscription' %}", {
                         method: "POST",
@@ -147,22 +192,80 @@
                         body: JSON.stringify(subscription)
                     });
 
-                    if (!response.ok) {
-                        setStatus("Push-Benachrichtigungen konnten nicht gespeichert werden.");
+                    let result = null;
+                    try {
+                        result = await response.json();
+                    } catch (error) {
+                        result = null;
+                    }
+
+                    if (!response.ok || !result || !result.ok) {
+                        const errorMessage = result && result.error ? result.error : "Push-Benachrichtigungen konnten nicht gespeichert werden.";
+                        setStatus(errorMessage);
                         return;
                     }
 
-                    setStatus("Push-Benachrichtigungen sind für dieses Gerät aktiviert.");
+                    setStatus(`Push-Benachrichtigungen sind für dieses Gerät aktiviert. Aktive Push-Geräte für dieses Konto: ${result.active_count}.`);
                 }
 
                 if (button) {
                     button.addEventListener("click", function () {
-                        enablePush().catch(function () {
-                            setStatus("Push-Benachrichtigungen konnten nicht aktiviert werden.");
+                        enablePush().catch(function (error) {
+                            setStatus(`Push-Benachrichtigungen konnten nicht aktiviert werden: ${error.message}`);
                         });
                     });
                 }
+
+                function closeMenu() {
+                    const panel = document.getElementById('atlas-menu-panel');
+                    const menuButton = document.querySelector('.atlas-menu-toggle');
+                    if (panel) { panel.classList.remove('show'); }
+                    if (menuButton) { menuButton.setAttribute('aria-expanded', 'false'); }
+                }
+
+                document.addEventListener('click', function (event) {
+                    const menuButton = event.target.closest('.atlas-menu-toggle');
+                    const panel = document.getElementById('atlas-menu-panel');
+
+                    if (menuButton && panel) {
+                        const isOpen = panel.classList.contains('show');
+                        panel.classList.toggle('show', !isOpen);
+                        menuButton.setAttribute('aria-expanded', String(!isOpen));
+                        event.preventDefault();
+                        return;
+                    }
+
+                    if (!event.target.closest('.atlas-menu')) {
+                        closeMenu();
+                    }
+                });
             })();
+        </script>
+    {% else %}
+        <script>
+            function closeMenu() {
+                const panel = document.getElementById('atlas-menu-panel');
+                const button = document.querySelector('.atlas-menu-toggle');
+                if (panel) { panel.classList.remove('show'); }
+                if (button) { button.setAttribute('aria-expanded', 'false'); }
+            }
+
+            document.addEventListener('click', function (event) {
+                const button = event.target.closest('.atlas-menu-toggle');
+                const panel = document.getElementById('atlas-menu-panel');
+
+                if (button && panel) {
+                    const isOpen = panel.classList.contains('show');
+                    panel.classList.toggle('show', !isOpen);
+                    button.setAttribute('aria-expanded', String(!isOpen));
+                    event.preventDefault();
+                    return;
+                }
+
+                if (!event.target.closest('.atlas-menu')) {
+                    closeMenu();
+                }
+            });
         </script>
     {% endif %}
 </body>
