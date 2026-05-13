@@ -53,17 +53,73 @@ map.setView(lv95ToLatLng(2697000, 1262000), 20);
 L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.5, attribution: "&copy; swisstopo" }).addTo(map);
 const markersLayer = L.layerGroup().addTo(map);
 let allFeatures = [];
-function markerHtml(feature) {
-    const props = feature.properties;
-    const title = props.name || "Spielplatz";
-    const address = props.address || "";
-    const district = props.district || "";
-    const organization = props.organization || "";
-    const detailUrl = props.detail_url || "#";
-    const previewPhotoUrl = props.preview_photo_url || "";
-    const nextInspectionLabel = props.next_inspection_label || "wird geplant";
-    const photoHtml = previewPhotoUrl ? `<div class="mb-2"><img src="${previewPhotoUrl}" alt="Vorschaubild von ${title}" style="width: 220px; height: 120px; object-fit: cover; border-radius: 0.75rem; display: block;"></div>` : "";
-    return `<div style="min-width: 220px;">${photoHtml}<div class="popup-title">${title}</div><div class="popup-meta">${address}</div><div class="popup-meta">${district}</div><div class="popup-meta mb-2">${organization}</div><div class="popup-meta mb-2"><strong>Nächste Kontrolle:</strong> ${nextInspectionLabel}</div><a href="${detailUrl}" class="btn btn-sm btn-atlas-primary">Details anzeigen</a></div>`;
+function safeText(value) {
+    return (value || "").toString();
+}
+function safeUrl(value, fallback) {
+    const url = safeText(value).trim();
+
+    if (!url) { return fallback || "#"; }
+
+    if (url.startsWith("/") && !url.startsWith("//")) { return url; }
+
+    return fallback || "#";
+}
+function appendTextElement(parent, className, text, tagName) {
+    const element = document.createElement(tagName || "div");
+    element.className = className;
+    element.textContent = safeText(text);
+    parent.appendChild(element);
+    return element;
+}
+function markerPopupContent(feature) {
+    const props = feature.properties || {};
+    const title = safeText(props.name || "Spielplatz");
+    const detailUrl = safeUrl(props.detail_url, "#");
+    const previewPhotoUrl = safeUrl(props.preview_photo_url, "");
+    const nextInspectionLabel = safeText(props.next_inspection_label || "wird geplant");
+
+    const wrapper = document.createElement("div");
+    wrapper.style.minWidth = "220px";
+
+    if (previewPhotoUrl) {
+        const photoWrapper = document.createElement("div");
+        photoWrapper.className = "mb-2";
+
+        const image = document.createElement("img");
+        image.src = previewPhotoUrl;
+        image.alt = `Vorschaubild von ${title}`;
+        image.style.width = "220px";
+        image.style.height = "120px";
+        image.style.objectFit = "cover";
+        image.style.borderRadius = "0.75rem";
+        image.style.display = "block";
+
+        photoWrapper.appendChild(image);
+        wrapper.appendChild(photoWrapper);
+    }
+
+    appendTextElement(wrapper, "popup-title", title);
+    appendTextElement(wrapper, "popup-meta", props.address);
+    appendTextElement(wrapper, "popup-meta", props.district);
+    appendTextElement(wrapper, "popup-meta mb-2", props.organization);
+
+    const inspectionMeta = document.createElement("div");
+    inspectionMeta.className = "popup-meta mb-2";
+
+    const label = document.createElement("strong");
+    label.textContent = "Nächste Kontrolle:";
+    inspectionMeta.appendChild(label);
+    inspectionMeta.appendChild(document.createTextNode(` ${nextInspectionLabel}`));
+    wrapper.appendChild(inspectionMeta);
+
+    const detailLink = document.createElement("a");
+    detailLink.href = detailUrl;
+    detailLink.className = "btn btn-sm btn-atlas-primary";
+    detailLink.textContent = "Details anzeigen";
+    wrapper.appendChild(detailLink);
+
+    return wrapper;
 }
 function renderMarkers(features) {
     markersLayer.clearLayers();
@@ -75,7 +131,7 @@ function renderMarkers(features) {
         if (!x || !y) { continue; }
         const latLng = lv95ToLatLng(x, y);
         const marker = L.marker(latLng);
-        marker.bindPopup(markerHtml(feature));
+        marker.bindPopup(markerPopupContent(feature));
         marker.addTo(markersLayer);
         bounds.push(latLng);
     }
