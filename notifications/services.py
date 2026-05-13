@@ -7,7 +7,35 @@ import json
 from django.conf import settings
 from django.utils import timezone
 
-from .models import PushSubscription, SystemNotification
+from .models import DefectAssignment, PushSubscription, SystemNotification
+
+
+def assign_defect(defect, assigned_to, assigned_by=None):
+    playground = defect.playground
+
+    if not playground:
+        return None, None
+
+    assignment, _ = DefectAssignment.objects.update_or_create(
+        defect=defect,
+        defaults={
+            "organization": playground.organization,
+            "assigned_to": assigned_to,
+            "assigned_by": assigned_by,
+            "assigned_at": timezone.now(),
+        },
+    )
+
+    notification = None
+
+    if assigned_to:
+        notification = create_defect_assignment_notification(
+            defect=defect,
+            recipient=assigned_to,
+            created_by=assigned_by,
+        )
+
+    return assignment, notification
 
 
 def create_defect_assignment_notification(defect, recipient, created_by=None):
