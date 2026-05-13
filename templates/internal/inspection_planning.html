@@ -60,6 +60,12 @@
         .atlas-menu-panel a:hover { background: #F1F5F9; }
         .table td, .table th { vertical-align: middle; }
         .task-note { min-width: 16rem; }
+        @media (max-width: 991.98px) {
+            .atlas-direct-link { display: none !important; }
+        }
+        @media (min-width: 992px) {
+            .atlas-menu-only-mobile { display: none !important; }
+        }
         @media (max-width: 767.98px) {
             .navbar .container-fluid { gap: 0.5rem; }
             .navbar-brand .fw-bold { display: none; }
@@ -75,11 +81,14 @@
             <span class="fw-bold">SpielplatzAtlas</span>
         </a>
         <div class="d-flex align-items-center gap-2 atlas-menu">
-            <a href="/" class="btn btn-sm btn-outline-secondary">Karte</a>
-            <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary">Über</a>
-            <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex">Impressum</a>
+            <a href="/" class="btn btn-sm btn-outline-secondary atlas-direct-link">Karte</a>
+            <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">Über</a>
+            <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">Impressum</a>
             <button type="button" class="btn btn-sm btn-outline-secondary atlas-menu-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
             <div class="atlas-menu-panel" id="atlas-menu-panel">
+                <a class="atlas-menu-only-mobile" href="/">Karte</a>
+                <a class="atlas-menu-only-mobile" href="{% url 'public:about' %}">Über</a>
+                <a class="atlas-menu-only-mobile" href="{% url 'public:imprint' %}">Impressum</a>
                 <a href="{% url 'internal:dashboard' %}">Dashboard</a>
                 {% if can_inspect %}
                     <a href="{% url 'internal:my_inspections' %}">Meine Kontrollen</a>
