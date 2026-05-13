@@ -6,7 +6,10 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
+import hashlib
+
 from django.contrib import messages
+from django.core.cache import cache
 from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -33,6 +36,66 @@ MONTH_NAMES_DE = {
     11: "November",
     12: "Dezember",
 }
+
+REGISTRATION_RATE_LIMIT_WINDOW_SECONDS = 60 * 60
+REGISTRATION_MAX_ATTEMPTS_PER_IP = 6
+REGISTRATION_MAX_ATTEMPTS_PER_EMAIL = 3
+
+
+def get_client_ip(request):
+    return request.META.get("REMOTE_ADDR") or "unknown"
+
+
+def stable_hash(value):
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def rate_limit_key(prefix, value):
+    return f"spielplatzatlas:{prefix}:{stable_hash(value)}"
+
+
+def get_rate_limit_count(key):
+    return int(cache.get(key, 0) or 0)
+
+
+def increment_rate_limit(key, timeout_seconds):
+    if cache.add(key, 1, timeout_seconds):
+        return 1
+
+    try:
+        return cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, timeout_seconds)
+        return 1
+
+
+def get_registration_rate_limit_keys(request):
+    keys = [
+        rate_limit_key("organization-registration-ip", get_client_ip(request)),
+    ]
+
+    email = (request.POST.get("admin_email") or "").strip().lower()
+
+    if email:
+        keys.append(rate_limit_key("organization-registration-email", email))
+
+    return keys
+
+
+def registration_is_rate_limited(request):
+    keys = get_registration_rate_limit_keys(request)
+    ip_count = get_rate_limit_count(keys[0])
+    email_count = get_rate_limit_count(keys[1]) if len(keys) > 1 else 0
+
+    return (
+        ip_count >= REGISTRATION_MAX_ATTEMPTS_PER_IP
+        or email_count >= REGISTRATION_MAX_ATTEMPTS_PER_EMAIL
+    )
+
+
+def register_registration_attempt(request):
+    for key in get_registration_rate_limit_keys(request):
+        increment_rate_limit(key, REGISTRATION_RATE_LIMIT_WINDOW_SECONDS)
 
 
 def format_month_year(date_value):
@@ -379,13 +442,24 @@ def register_organization(request):
     if request.method == "POST":
         form = OrganizationRegistrationRequestForm(request.POST)
 
-        if form.is_valid():
+        if registration_is_rate_limited(request):
+            form.add_error(
+                None,
+                (
+                    "Es gab zu viele Anfragen. "
+                    "Bitte versuchen Sie es später erneut."
+                ),
+            )
+        elif form.is_valid():
+            register_registration_attempt(request)
             form.save()
             messages.success(
                 request,
                 "Vielen Dank. Ihre Organisationsanfrage wurde eingereicht und wird geprüft.",
             )
             return redirect("public:register_organization_done")
+        else:
+            register_registration_attempt(request)
     else:
         form = OrganizationRegistrationRequestForm()
 
