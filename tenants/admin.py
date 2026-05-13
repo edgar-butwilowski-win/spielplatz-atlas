@@ -28,6 +28,7 @@ from media_assets.models import ImageAsset
 
 from .models import Organization, OrganizationRegistrationRequest
 
+
 def ensure_org_admin_group():
     group, _ = Group.objects.get_or_create(name="Organisations-Admins")
 
@@ -61,6 +62,7 @@ def ensure_org_admin_group():
     group.permissions.set(permissions)
 
     return group
+
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
@@ -153,20 +155,6 @@ def approve_registration_requests(modeladmin, request, queryset):
             )
             continue
 
-        organization = Organization.objects.create(
-            name=registration_request.organization_name,
-            slug=registration_request.organization_slug,
-            is_active=True,
-            is_public=True,
-        )
-
-        organization = Organization.objects.create(
-            name=registration_request.organization_name,
-            slug=registration_request.organization_slug,
-            is_active=True,
-            is_public=True,
-        )
-
         username = registration_request.admin_email.lower()
 
         if User.objects.filter(username__iexact=username).exists():
@@ -177,6 +165,13 @@ def approve_registration_requests(modeladmin, request, queryset):
                 level=messages.WARNING,
             )
             continue
+
+        organization = Organization.objects.create(
+            name=registration_request.organization_name,
+            slug=registration_request.organization_slug,
+            is_active=True,
+            is_public=True,
+        )
 
         temporary_password = get_random_string(16)
 
@@ -195,8 +190,11 @@ def approve_registration_requests(modeladmin, request, queryset):
         UserProfile.objects.create(
             user=user,
             organization=organization,
-            role=UserProfile.ROLE_ORG_ADMIN,
             is_active_for_organization=True,
+            is_org_admin=True,
+            can_view_internal=True,
+            can_inspect=True,
+            can_maintain=True,
         )
 
         org_admin_group = ensure_org_admin_group()
