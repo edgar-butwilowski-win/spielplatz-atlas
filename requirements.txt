@@ -1,6 +1,7 @@
 asgiref==3.11.1
 Django==6.0.5
 django-environ==0.13.0
-et_xmlfile==2.0.0
+net_xmlfile==2.0.0
 pillow==12.2.0
+pywebpush==2.1.2
 sqlparse==0.5.5
