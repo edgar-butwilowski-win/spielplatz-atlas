@@ -76,7 +76,7 @@ INSTALLED_APPS = [
 
     "tenants",
     "accounts",
-    "playgrounds",
+    "playgrounds.apps.PlaygroundsConfig",
     "inspections.apps.InspectionsConfig",
     "media_assets",
     "public",
