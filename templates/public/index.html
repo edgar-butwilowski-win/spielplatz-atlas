@@ -16,6 +16,48 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 .map-toolbar { flex: 0 0 auto; }
 #map { flex: 1 1 auto; min-height: 0; width: 100%; }
 .leaflet-popup-content { margin: 14px 16px; }
+.playground-marker-wrapper { background: transparent; border: 0; }
+.playground-marker {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: #14B8A6;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.playground-marker::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    width: 11px;
+    height: 11px;
+    background: #14B8A6;
+    border-right: 3px solid #FFFFFF;
+    border-bottom: 3px solid #FFFFFF;
+    border-radius: 2px;
+    transform: translateX(-50%) rotate(45deg);
+}
+.playground-marker svg {
+    width: 23px;
+    height: 23px;
+    fill: none;
+    stroke: #FFFFFF;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.playground-marker-wrapper:hover .playground-marker,
+.playground-marker-wrapper:focus .playground-marker,
+.playground-marker-wrapper:focus-visible .playground-marker {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.36);
+}
 .popup-title { font-weight: 700; margin-bottom: 0.25rem; }
 .popup-meta { color: #64748B; font-size: 0.9rem; }
 @media (max-width: 767.98px) { .map-page { padding-top: 0.75rem; padding-bottom: 0.75rem; } }
@@ -52,6 +94,24 @@ function lv95ToLatLng(x, y) { return crs2056.unproject(L.point(Number(x), Number
 map.setView(lv95ToLatLng(2697000, 1262000), 20);
 L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.5, attribution: "&copy; swisstopo" }).addTo(map);
 const markersLayer = L.layerGroup().addTo(map);
+const playgroundIcon = L.divIcon({
+    className: "playground-marker-wrapper",
+    html: `
+        <div class="playground-marker" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+                <path d="M9 7h14" />
+                <path d="M11 7L7 25" />
+                <path d="M21 7l4 18" />
+                <path d="M13 9l1.5 10" />
+                <path d="M19 9l-1.5 10" />
+                <path d="M13 20h6" />
+            </svg>
+        </div>
+    `,
+    iconSize: [36, 42],
+    iconAnchor: [18, 42],
+    popupAnchor: [0, -38],
+});
 let allFeatures = [];
 function safeText(value) {
     return (value || "").toString();
@@ -131,7 +191,8 @@ function renderMarkers(features) {
         const y = coords[1];
         if (!x || !y) { continue; }
         const latLng = lv95ToLatLng(x, y);
-        const marker = L.marker(latLng);
+        const markerTitle = safeText((feature.properties || {}).name || "Spielplatz");
+        const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
         marker.bindPopup(markerPopupContent(feature));
         marker.addTo(markersLayer);
         bounds.push(latLng);
