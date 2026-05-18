@@ -89,8 +89,21 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 <script>
 const swissResolutions = [4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250, 1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5];
 const crs2056 = new L.Proj.CRS("EPSG:2056", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs", { origin: [2420000, 1350000], resolutions: swissResolutions, bounds: L.bounds([2420000, 1030000], [2900000, 1350000]) });
-const map = L.map("map", { crs: crs2056, zoomControl: true, scrollWheelZoom: true, minZoom: 0, maxZoom: 26 });
 function lv95ToLatLng(x, y) { return crs2056.unproject(L.point(Number(x), Number(y))); }
+const swissMapPaddingMeters = 10000;
+const swissMapBounds = L.latLngBounds(
+    lv95ToLatLng(2480000 - swissMapPaddingMeters, 1070000 - swissMapPaddingMeters),
+    lv95ToLatLng(2840000 + swissMapPaddingMeters, 1302000 + swissMapPaddingMeters)
+);
+const map = L.map("map", {
+    crs: crs2056,
+    zoomControl: true,
+    scrollWheelZoom: true,
+    minZoom: 0,
+    maxZoom: 26,
+    maxBounds: swissMapBounds,
+    maxBoundsViscosity: 1.0,
+});
 map.setView(lv95ToLatLng(2697000, 1262000), 20);
 L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.3, attribution: "&copy; swisstopo" }).addTo(map);
 const markersLayer = L.layerGroup().addTo(map);
