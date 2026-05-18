@@ -4,6 +4,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
 {% endblock %}
 
 {% block body_class %}map-body{% endblock %}
@@ -16,7 +17,8 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 .map-toolbar { flex: 0 0 auto; }
 #map { flex: 1 1 auto; min-height: 0; width: 100%; }
 .leaflet-popup-content { margin: 14px 16px; }
-.playground-marker-wrapper { background: transparent; border: 0; }
+.playground-marker-wrapper,
+.playground-cluster-wrapper { background: transparent; border: 0; }
 .playground-marker {
     position: relative;
     width: 36px;
@@ -58,6 +60,42 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
     transform: scale(1.08);
     box-shadow: 0 6px 16px rgba(15, 23, 42, 0.36);
 }
+.playground-cluster {
+    width: 46px;
+    height: 46px;
+    border-radius: 999px;
+    background: #0F766E;
+    border: 3px solid #FFFFFF;
+    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.32);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    font-weight: 800;
+    line-height: 1;
+    transition: transform 140ms ease, box-shadow 140ms ease;
+}
+.playground-cluster svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: #FFFFFF;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.playground-cluster-count {
+    font-size: 0.95rem;
+    letter-spacing: -0.02em;
+}
+.playground-cluster-wrapper:hover .playground-cluster,
+.playground-cluster-wrapper:focus .playground-cluster,
+.playground-cluster-wrapper:focus-visible .playground-cluster {
+    transform: scale(1.08);
+    box-shadow: 0 7px 18px rgba(15, 23, 42, 0.4);
+}
 .popup-title { font-weight: 700; margin-bottom: 0.25rem; }
 .popup-meta { color: #64748B; font-size: 0.9rem; }
 @media (max-width: 767.98px) { .map-page { padding-top: 0.75rem; padding-bottom: 0.75rem; } }
@@ -84,6 +122,7 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 
 {% block scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.10.0/proj4.js"></script>
 <script src="https://unpkg.com/proj4leaflet@1.0.2/src/proj4leaflet.js"></script>
 <script>
@@ -106,7 +145,33 @@ const map = L.map("map", {
 });
 map.setView(lv95ToLatLng(2697000, 1262000), 20);
 L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.3, attribution: "&copy; swisstopo" }).addTo(map);
-const markersLayer = L.layerGroup().addTo(map);
+const markersLayer = L.markerClusterGroup({
+    maxClusterRadius: 52,
+    showCoverageOnHover: false,
+    spiderfyOnMaxZoom: true,
+    disableClusteringAtZoom: 24,
+    iconCreateFunction: (cluster) => {
+        const count = cluster.getChildCount();
+        return L.divIcon({
+            className: "playground-cluster-wrapper",
+            html: `
+                <div class="playground-cluster" aria-label="${count} Spielplätze">
+                    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+                        <path d="M9 7h14" />
+                        <path d="M11 7L7 25" />
+                        <path d="M21 7l4 18" />
+                        <path d="M13 9l1.5 10" />
+                        <path d="M19 9l-1.5 10" />
+                        <path d="M13 20h6" />
+                    </svg>
+                    <span class="playground-cluster-count">${count}</span>
+                </div>
+            `,
+            iconSize: [46, 46],
+            iconAnchor: [23, 23],
+        });
+    },
+}).addTo(map);
 const playgroundIcon = L.divIcon({
     className: "playground-marker-wrapper",
     html: `
@@ -207,7 +272,7 @@ function renderMarkers(features) {
         const markerTitle = safeText((feature.properties || {}).name || "Spielplatz");
         const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
         marker.bindPopup(markerPopupContent(feature));
-        marker.addTo(markersLayer);
+        markersLayer.addLayer(marker);
         bounds.push(latLng);
     }
     if (bounds.length > 0) { map.fitBounds(L.latLngBounds(bounds), { padding: [28, 28], maxZoom: 24 }); }
