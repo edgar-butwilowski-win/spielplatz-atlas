@@ -92,7 +92,7 @@ const crs2056 = new L.Proj.CRS("EPSG:2056", "+proj=somerc +lat_0=46.952405555555
 const map = L.map("map", { crs: crs2056, zoomControl: true, scrollWheelZoom: true, minZoom: 0, maxZoom: 26 });
 function lv95ToLatLng(x, y) { return crs2056.unproject(L.point(Number(x), Number(y))); }
 map.setView(lv95ToLatLng(2697000, 1262000), 20);
-L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.5, attribution: "&copy; swisstopo" }).addTo(map);
+L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.3, attribution: "&copy; swisstopo" }).addTo(map);
 const markersLayer = L.layerGroup().addTo(map);
 const playgroundIcon = L.divIcon({
     className: "playground-marker-wrapper",
