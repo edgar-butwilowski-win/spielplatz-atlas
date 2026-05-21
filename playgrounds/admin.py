@@ -1,15 +1,5 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
-
 from django import forms
-from django.contrib import admin, messages
-from django.shortcuts import redirect, render
-from django.urls import path, reverse
+from django.contrib import admin
 from PIL import Image as PillowImage
 
 from accounts.admin_utils import get_user_organization
@@ -23,7 +13,6 @@ from .models import (
     PlaygroundAccessory,
     PlaygroundSurface,
 )
-from .webservice_sync import PlaygroundSyncError, sync_playgrounds_from_url
 
 
 def create_image_asset_from_upload(uploaded_file, organization):
@@ -52,6 +41,7 @@ def create_image_asset_from_upload(uploaded_file, organization):
         public_visible=True,
     )
 
+
 class PlaygroundAdminForm(forms.ModelForm):
     photo_upload = forms.ImageField(
         label="Neues Foto hochladen",
@@ -64,15 +54,6 @@ class PlaygroundAdminForm(forms.ModelForm):
         fields = "__all__"
 
 
-class PlaygroundSyncForm(forms.Form):
-    service_url = forms.URLField(
-        label="Webservice-URL",
-        required=True,
-        help_text="URL eines GeoJSON-Webservice mit Spielplatz-Objekten.",
-        widget=forms.URLInput(attrs={"class": "vURLField", "size": 100}),
-    )
-
-
 class PlayEquipmentAdminForm(forms.ModelForm):
     photo_upload = forms.ImageField(
         label="Neues Foto hochladen",
@@ -83,10 +64,36 @@ class PlayEquipmentAdminForm(forms.ModelForm):
     class Meta:
         model = PlayEquipment
         fields = "__all__"
+        widgets = {
+            "year_built": forms.DateInput(attrs={"type": "date"}),
+            "build_date": forms.DateInput(attrs={"type": "date"}),
+            "demolition_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+
+class OrganizationScopedAdminMixin:
+    organization_field = "organization"
+
+    def get_user_organization(self, request):
+        if request.user.is_superuser:
+            return None
+
+        return get_user_organization(request.user)
+
+    def scope_queryset_to_organization(self, qs, request):
+        if request.user.is_superuser:
+            return qs
+
+        organization = self.get_user_organization(request)
+
+        if not organization:
+            return qs.none()
+
+        return qs.filter(organization=organization)
+
 
 @admin.register(Playground)
-class PlaygroundAdmin(admin.ModelAdmin):
-
+class PlaygroundAdmin(OrganizationScopedAdminMixin, admin.ModelAdmin):
     form = PlaygroundAdminForm
 
     fieldsets = (
@@ -139,8 +146,6 @@ class PlaygroundAdmin(admin.ModelAdmin):
         "district",
         "public_visible",
         "is_active",
-        "inspection_suspended_from",
-        "inspection_suspended_until",
         "created_at",
     )
     list_filter = ("organization", "public_visible", "is_active", "district")
@@ -148,101 +153,8 @@ class PlaygroundAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ("photo",)
 
-    def get_urls(self):
-        urls = super().get_urls()
-        custom_urls = [
-            path(
-                "sync/",
-                self.admin_site.admin_view(self.sync_playgrounds_view),
-                name="playgrounds_playground_sync",
-            ),
-        ]
-        return custom_urls + urls
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        extra_context["sync_url"] = reverse("admin:playgrounds_playground_sync")
-        return super().changelist_view(request, extra_context=extra_context)
-
-    def sync_playgrounds_view(self, request):
-        organization = None
-
-        if not request.user.is_superuser:
-            organization = get_user_organization(request.user)
-
-            if organization is None:
-                messages.error(request, "Für Ihr Benutzerkonto ist keine Organisation hinterlegt.")
-                return redirect("admin:playgrounds_playground_changelist")
-
-        if request.method == "POST":
-            form = PlaygroundSyncForm(request.POST)
-
-            if form.is_valid():
-                target_organization = organization
-
-                if request.user.is_superuser:
-                    organization_id = request.POST.get("organization")
-
-                    if organization_id:
-                        from tenants.models import Organization
-                        target_organization = Organization.objects.filter(id=organization_id).first()
-
-                if target_organization is None:
-                    messages.error(request, "Bitte eine Organisation für den Abgleich auswählen.")
-                    return redirect("admin:playgrounds_playground_sync")
-
-                try:
-                    result = sync_playgrounds_from_url(
-                        form.cleaned_data["service_url"],
-                        target_organization,
-                    )
-                except PlaygroundSyncError as error:
-                    messages.error(request, str(error))
-                except Exception as error:
-                    messages.error(request, f"Der Abgleich ist fehlgeschlagen: {error}")
-                else:
-                    messages.success(
-                        request,
-                        (
-                            "Spielplätze abgeglichen: "
-                            f"{result['created']} neu, "
-                            f"{result['updated']} aktualisiert, "
-                            f"{result['unchanged']} unverändert, "
-                            f"{result['skipped']} übersprungen."
-                        ),
-                    )
-                    return redirect("admin:playgrounds_playground_changelist")
-        else:
-            form = PlaygroundSyncForm()
-
-        organizations = []
-
-        if request.user.is_superuser:
-            from tenants.models import Organization
-            organizations = Organization.objects.filter(is_active=True).order_by("name")
-
-        context = {
-            **self.admin_site.each_context(request),
-            "title": "Spielplätze abgleichen",
-            "form": form,
-            "organization": organization,
-            "organizations": organizations,
-            "opts": self.model._meta,
-        }
-        return render(request, "admin/playgrounds/playground/sync.html", context)
-
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-
-        if request.user.is_superuser:
-            return qs
-
-        organization = get_user_organization(request.user)
-
-        if organization:
-            return qs.filter(organization=organization)
-
-        return qs.none()
+        return self.scope_queryset_to_organization(super().get_queryset(request), request)
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
@@ -257,13 +169,9 @@ class PlaygroundAdmin(admin.ModelAdmin):
                 field for field in options.get("fields", ())
                 if field not in ("organization", "is_active")
             )
-            filtered_options = {**options, "fields": fields}
-            filtered_fieldsets.append((title, filtered_options))
+            filtered_fieldsets.append((title, {**options, "fields": fields}))
 
         return tuple(filtered_fieldsets)
-
-    def get_readonly_fields(self, request, obj=None):
-        return ()
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if not request.user.is_superuser:
@@ -271,14 +179,9 @@ class PlaygroundAdmin(admin.ModelAdmin):
 
             if organization:
                 if db_field.name == "organization":
-                    kwargs["queryset"] = organization.__class__.objects.filter(
-                        id=organization.id
-                    )
-
-                if db_field.name == "photo":
-                    kwargs["queryset"] = db_field.remote_field.model.objects.filter(
-                        organization=organization
-                    )
+                    kwargs["queryset"] = organization.__class__.objects.filter(id=organization.id)
+                elif db_field.name == "photo":
+                    kwargs["queryset"] = db_field.remote_field.model.objects.filter(organization=organization)
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -292,16 +195,8 @@ class PlaygroundAdmin(admin.ModelAdmin):
         uploaded_photo = form.cleaned_data.get("photo_upload")
 
         if uploaded_photo:
-            organization = obj.organization
-
-            if not organization:
-                organization = get_user_organization(request.user)
-
-            image_asset = create_image_asset_from_upload(
-                uploaded_photo,
-                organization,
-            )
-            obj.photo = image_asset
+            organization = obj.organization or get_user_organization(request.user)
+            obj.photo = create_image_asset_from_upload(uploaded_photo, organization)
 
         super().save_model(request, obj, form, change)
 
@@ -377,15 +272,7 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return ()
 
-        if obj and obj.organization_id is None:
-            return (
-                "name",
-                "code",
-                "norm_reference",
-                "is_active",
-            )
-
-        if obj and obj.is_locked:
+        if obj and (obj.organization_id is None or obj.is_locked):
             return (
                 "name",
                 "code",
@@ -395,56 +282,8 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
 
         return ()
 
-    def has_view_permission(self, request, obj=None):
-        if request.user.is_superuser:
-            return True
-
-        organization = get_user_organization(request.user)
-
-        if obj is None:
-            return organization is not None
-
-        if obj.organization_id is None:
-            return True
-
-        return organization and obj.organization_id == organization.id
-
-    def has_add_permission(self, request):
-        if request.user.is_superuser:
-            return True
-
-        return get_user_organization(request.user) is not None
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser:
-            return True
-
-        organization = get_user_organization(request.user)
-
-        if obj is None:
-            return organization is not None
-
-        if not organization:
-            return False
-
-        if obj.organization_id is None:
-            return True
-
-        return obj.organization_id == organization.id
-
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "organization" and not request.user.is_superuser:
-            organization = get_user_organization(request.user)
-
-            if organization:
-                kwargs["queryset"] = organization.__class__.objects.filter(
-                    id=organization.id
-                )
-
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
@@ -465,9 +304,9 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
 
 @admin.register(EquipmentSupplier)
 class EquipmentSupplierAdmin(admin.ModelAdmin):
-    list_display = ("name", "organization", "is_active", "created_at")
+    list_display = ("name", "organization", "tel_nr", "plz_ort", "e_mail", "is_active", "created_at")
     list_filter = ("organization", "is_active")
-    search_fields = ("name", "organization__name")
+    search_fields = ("name", "tel_nr", "strasse", "plz_ort", "e_mail", "organization__name")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -486,28 +325,21 @@ class EquipmentSupplierAdmin(admin.ModelAdmin):
         return qs.filter(organization__isnull=True)
 
     def get_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return ("organization", "name", "is_active")
+        base_fields = ("name", "tel_nr", "strasse", "plz_ort", "e_mail", "is_active")
 
-        return ("name", "is_active")
+        if request.user.is_superuser:
+            return ("organization", *base_fields)
+
+        return base_fields
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return ()
 
         if obj and obj.organization_id is None:
-            return ("name", "is_active")
+            return ("name", "tel_nr", "strasse", "plz_ort", "e_mail", "is_active")
 
         return ()
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if db_field.name == "organization" and not request.user.is_superuser:
-            organization = get_user_organization(request.user)
-
-            if organization:
-                kwargs["queryset"] = organization.__class__.objects.filter(id=organization.id)
-
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
@@ -527,7 +359,6 @@ class EquipmentSupplierAdmin(admin.ModelAdmin):
 
 @admin.register(PlayEquipment)
 class PlayEquipmentAdmin(admin.ModelAdmin):
-
     form = PlayEquipmentAdminForm
 
     fieldsets = (
@@ -557,11 +388,19 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
                 "demolition_date",
             )
         }),
-        ("Prüfbarkeit", {
+        ("Administrative Prüfausnahme", {
+            "fields": (
+                "not_to_inspect",
+                "not_to_inspect_reason",
+            ),
+            "description": "Diese Einstellung wird durch die Organisation verwaltet und nimmt das Gerät aus neuen Kontrollprotokollen heraus.",
+        }),
+        ("Prüfbarkeit während der Kontrolle", {
             "fields": (
                 "not_inspectable",
                 "not_inspectable_reason",
-            )
+            ),
+            "description": "Diese Felder beschreiben, ob ein grundsätzlich prüfpflichtiges Gerät bei einer Kontrolle nicht geprüft werden konnte.",
         }),
         ("Foto", {
             "fields": (
@@ -585,6 +424,8 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
         "equipment_type",
         "sequence_number",
         "inventory_number",
+        "not_to_inspect",
+        "not_inspectable",
         "recommended_renovation_year",
         "demolition_date",
         "public_visible",
@@ -595,6 +436,7 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
         "equipment_type",
         "supplier",
         "renovation_type",
+        "not_to_inspect",
         "not_inspectable",
         "public_visible",
         "is_active",
@@ -627,45 +469,33 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
 
         if not request.user.is_superuser and organization:
             if db_field.name == "playground":
-                kwargs["queryset"] = Playground.objects.filter(
-                    organization=organization
-                )
-
-            if db_field.name == "equipment_type":
+                kwargs["queryset"] = Playground.objects.filter(organization=organization)
+            elif db_field.name == "equipment_type":
                 kwargs["queryset"] = (
                     EquipmentType.objects.filter(organization__isnull=True)
                     | EquipmentType.objects.filter(organization=organization)
                 ).distinct()
-
-            if db_field.name == "supplier":
+            elif db_field.name == "supplier":
                 kwargs["queryset"] = (
                     EquipmentSupplier.objects.filter(organization__isnull=True)
                     | EquipmentSupplier.objects.filter(organization=organization)
                 ).filter(is_active=True).distinct()
-
-            if db_field.name == "photo":
-                kwargs["queryset"] = db_field.remote_field.model.objects.filter(
-                    organization=organization
-                )
+            elif db_field.name == "photo":
+                kwargs["queryset"] = db_field.remote_field.model.objects.filter(organization=organization)
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
 
     def save_model(self, request, obj, form, change):
         uploaded_photo = form.cleaned_data.get("photo_upload")
     
         if uploaded_photo:
             organization = obj.playground.organization
-    
-            image_asset = create_image_asset_from_upload(
-                uploaded_photo,
-                organization,
-            )
-            obj.photo = image_asset
+            obj.photo = create_image_asset_from_upload(uploaded_photo, organization)
     
         super().save_model(request, obj, form, change)
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 @admin.register(PlaygroundSurface)
@@ -698,17 +528,6 @@ class PlaygroundSurfaceAdmin(admin.ModelAdmin):
             return qs.filter(playground__organization=organization)
 
         return qs.none()
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        organization = get_user_organization(request.user)
-
-        if not request.user.is_superuser and organization:
-            if db_field.name == "playground":
-                kwargs["queryset"] = Playground.objects.filter(
-                    organization=organization
-                )
-
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
@@ -744,17 +563,6 @@ class PlaygroundAccessoryAdmin(admin.ModelAdmin):
             return qs.filter(playground__organization=organization)
 
         return qs.none()
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        organization = get_user_organization(request.user)
-
-        if not request.user.is_superuser and organization:
-            if db_field.name == "playground":
-                kwargs["queryset"] = Playground.objects.filter(
-                    organization=organization
-                )
-
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
