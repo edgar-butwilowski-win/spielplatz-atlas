@@ -1,0 +1,97 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: playsafeswiss\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-21 00:00+0000\n"
+"PO-Revision-Date: 2026-05-21 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Français\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "Deutsch"
+msgstr "Allemand"
+
+msgid "Français"
+msgstr "Français"
+
+msgid "Italiano"
+msgstr "Italien"
+
+msgid "Rumantsch"
+msgstr "Romanche"
+
+msgid "playsafeswiss home page"
+msgstr "Page d’accueil playsafeswiss"
+
+msgid "Map"
+msgstr "Carte"
+
+msgid "About"
+msgstr "À propos"
+
+msgid "Imprint"
+msgstr "Mentions légales"
+
+msgid "Join"
+msgstr "Participer"
+
+msgid "Open menu"
+msgstr "Ouvrir le menu"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Login"
+msgstr "Connexion"
+
+msgid "Messages"
+msgstr "Messages"
+
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+msgid "My inspections"
+msgstr "Mes contrôles"
+
+msgid "Deployment planning"
+msgstr "Planification des interventions"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Logout"
+msgstr "Déconnexion"
+
+msgid "Become a playground pro!"
+msgstr "Deviens un pro des places de jeux !"
+
+msgid "Select a playground on the map and get exciting detailed information."
+msgstr "Choisis une place de jeux sur la carte et obtiens des informations détaillées intéressantes."
+
+msgid "Search playground, address or district"
+msgstr "Rechercher une place de jeux, une adresse ou un quartier"
+
+msgid "playgrounds"
+msgstr "places de jeux"
+
+msgid "Playground"
+msgstr "Place de jeux"
+
+msgid "Preview image of"
+msgstr "Image d’aperçu de"
+
+msgid "Next inspection:"
+msgstr "Prochain contrôle :"
+
+msgid "will be planned"
+msgstr "sera planifié"
+
+msgid "Show details"
+msgstr "Afficher les détails"
