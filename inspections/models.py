@@ -12,6 +12,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 
 class InspectionCriterion(models.Model):
@@ -20,9 +21,9 @@ class InspectionCriterion(models.Model):
     MINIMUM_ANNUAL = "annual"
 
     MINIMUM_INSPECTION_TYPE_CHOICES = [
-        (MINIMUM_VISUAL, "Visuelle Routinekontrolle"),
-        (MINIMUM_OPERATIONAL, "Operative Kontrolle"),
-        (MINIMUM_ANNUAL, "Jährliche Hauptinspektion"),
+        (MINIMUM_VISUAL, _("Visual routine inspection")),
+        (MINIMUM_OPERATIONAL, _("Operational inspection")),
+        (MINIMUM_ANNUAL, _("Annual main inspection")),
     ]
 
     organization = models.ForeignKey(
@@ -129,10 +130,10 @@ class InspectionCriterionApplicability(models.Model):
     SCOPE_ACCESSORY = "accessory"
 
     SCOPE_CHOICES = [
-        (SCOPE_PLAYGROUND, "Allgemeine Spielplatzprüfung"),
-        (SCOPE_EQUIPMENT, "Spielgerät"),
-        (SCOPE_SURFACE, "Fallschutzfläche / Boden"),
-        (SCOPE_ACCESSORY, "Zusatzausstattung"),
+        (SCOPE_PLAYGROUND, _("General playground inspection")),
+        (SCOPE_EQUIPMENT, _("Play equipment")),
+        (SCOPE_SURFACE, _("Impact protection surface / ground")),
+        (SCOPE_ACCESSORY, _("Additional equipment")),
     ]
 
     criterion = models.ForeignKey(
@@ -181,25 +182,25 @@ class Inspection(models.Model):
     TYPE_ANNUAL = "annual"
 
     TYPE_CHOICES = [
-        (TYPE_VISUAL, "Visuelle Routinekontrolle"),
-        (TYPE_OPERATIONAL, "Operative Kontrolle"),
-        (TYPE_ANNUAL, "Jährliche Hauptinspektion"),
+        (TYPE_VISUAL, _("Visual routine inspection")),
+        (TYPE_OPERATIONAL, _("Operational inspection")),
+        (TYPE_ANNUAL, _("Annual main inspection")),
     ]
 
     RESULT_OK = "ok"
     RESULT_DEFECTS = "defects"
 
     RESULT_CHOICES = [
-        (RESULT_OK, "In Ordnung"),
-        (RESULT_DEFECTS, "Mängel festgestellt"),
+        (RESULT_OK, _("OK")),
+        (RESULT_DEFECTS, _("Defects found")),
     ]
 
     STATUS_DRAFT = "draft"
     STATUS_COMPLETED = "completed"
 
     STATUS_CHOICES = [
-        (STATUS_DRAFT, "In Bearbeitung"),
-        (STATUS_COMPLETED, "Abgeschlossen"),
+        (STATUS_DRAFT, _("In progress")),
+        (STATUS_COMPLETED, _("Completed")),
     ]
 
     playground = models.ForeignKey(
@@ -341,20 +342,20 @@ class InspectionTask(models.Model):
     STATUS_CANCELLED = "cancelled"
 
     STATUS_CHOICES = [
-        (STATUS_OPEN, "Offen"),
-        (STATUS_PLANNED, "Geplant"),
-        (STATUS_COMPLETED, "Erledigt"),
-        (STATUS_OVERDUE, "Überfällig"),
-        (STATUS_SUSPENDED, "Ausgesetzt"),
-        (STATUS_CANCELLED, "Storniert"),
+        (STATUS_OPEN, _("Open")),
+        (STATUS_PLANNED, _("Planned")),
+        (STATUS_COMPLETED, _("Done")),
+        (STATUS_OVERDUE, _("Overdue")),
+        (STATUS_SUSPENDED, _("Suspended")),
+        (STATUS_CANCELLED, _("Cancelled")),
     ]
 
     SOURCE_AUTOMATIC = "automatic"
     SOURCE_MANUAL = "manual"
 
     SOURCE_CHOICES = [
-        (SOURCE_AUTOMATIC, "Automatisch"),
-        (SOURCE_MANUAL, "Manuell"),
+        (SOURCE_AUTOMATIC, _("Automatic")),
+        (SOURCE_MANUAL, _("Manual")),
     ]
 
     organization = models.ForeignKey(
@@ -521,10 +522,10 @@ class InspectionScope(models.Model):
     SCOPE_ACCESSORY = "accessory"
 
     SCOPE_CHOICES = [
-        (SCOPE_PLAYGROUND, "Allgemeine Spielplatzprüfung"),
-        (SCOPE_EQUIPMENT, "Spielgerät"),
-        (SCOPE_SURFACE, "Fallschutzfläche / Boden"),
-        (SCOPE_ACCESSORY, "Zusatzausstattung"),
+        (SCOPE_PLAYGROUND, _("General playground inspection")),
+        (SCOPE_EQUIPMENT, _("Play equipment")),
+        (SCOPE_SURFACE, _("Impact protection surface / ground")),
+        (SCOPE_ACCESSORY, _("Additional equipment")),
     ]
 
     inspection = models.ForeignKey(
@@ -593,10 +594,10 @@ class InspectionAnswer(models.Model):
     ANSWER_NOT_APPLICABLE = "not_applicable"
 
     ANSWER_CHOICES = [
-        (ANSWER_PENDING, "Noch nicht geprüft"),
-        (ANSWER_OK, "In Ordnung"),
-        (ANSWER_DEFECT, "Mangel"),
-        (ANSWER_NOT_APPLICABLE, "Nicht anwendbar"),
+        (ANSWER_PENDING, _("Not checked yet")),
+        (ANSWER_OK, _("OK")),
+        (ANSWER_DEFECT, _("Defect")),
+        (ANSWER_NOT_APPLICABLE, _("Not applicable")),
     ]
 
     inspection = models.ForeignKey(
@@ -675,11 +676,11 @@ class Defect(models.Model):
     STATUS_VERIFIED = "verified"
 
     STATUS_CHOICES = [
-        (STATUS_OPEN, "Offen"),
-        (STATUS_IN_PROGRESS, "In Bearbeitung"),
-        (STATUS_PLANNED, "Geplant"),
-        (STATUS_DONE, "Behoben"),
-        (STATUS_VERIFIED, "Geprüft / abgeschlossen"),
+        (STATUS_OPEN, _("Open")),
+        (STATUS_IN_PROGRESS, _("In progress")),
+        (STATUS_PLANNED, _("Planned")),
+        (STATUS_DONE, _("Resolved")),
+        (STATUS_VERIFIED, _("Checked / completed")),
     ]
 
     SOURCE_INSPECTION = "inspection"
@@ -689,19 +690,19 @@ class Defect(models.Model):
     SOURCE_OTHER = "other"
 
     SOURCE_CHOICES = [
-        (SOURCE_INSPECTION, "Kontrolle"),
-        (SOURCE_CITIZEN_REPORT, "Bürgermeldung"),
-        (SOURCE_INTERNAL_REPORT, "Interne Meldung"),
-        (SOURCE_MAINTENANCE, "Unterhalt / Pflege"),
-        (SOURCE_OTHER, "Sonstiges"),
+        (SOURCE_INSPECTION, _("Inspection")),
+        (SOURCE_CITIZEN_REPORT, _("Citizen report")),
+        (SOURCE_INTERNAL_REPORT, _("Internal report")),
+        (SOURCE_MAINTENANCE, _("Maintenance / care")),
+        (SOURCE_OTHER, _("Other")),
     ]
 
     URGENCY_A = "a_immediate"
     URGENCY_B = "b_medium_term"
 
     URGENCY_CHOICES = [
-        (URGENCY_A, "A (sofort)"),
-        (URGENCY_B, "B (mittelfristig)"),
+        (URGENCY_A, _("A (immediate)")),
+        (URGENCY_B, _("B (medium-term)")),
     ]
 
     inspection = models.ForeignKey(
@@ -889,15 +890,15 @@ class Defect(models.Model):
 
     def get_public_message(self):
         if self.has_safety_risk:
-            return (
-                "An diesem Spielgerät ist ein Mangel mit Sicherheitsrisiko bekannt. "
-                "Bitte beachten Sie die Hinweise vor Ort."
+            return _(
+                "A defect with a safety risk is known for this play equipment. "
+                "Please observe the notices on site."
             )
 
-        return (
-            "An diesem Spielgerät ist ein Mangel bekannt. "
-            "Der Mangel stellt kein Sicherheitsrisiko dar. "
-            "Die Instandsetzung ist geplant."
+        return _(
+            "A defect is known for this play equipment. "
+            "The defect does not pose a safety risk. "
+            "Repair is planned."
         )
 
 
@@ -908,10 +909,10 @@ class MaintenanceAction(models.Model):
     STATUS_CANCELLED = "cancelled"
 
     STATUS_CHOICES = [
-        (STATUS_PLANNED, "Geplant"),
-        (STATUS_IN_PROGRESS, "In Bearbeitung"),
-        (STATUS_DONE, "Abgeschlossen"),
-        (STATUS_CANCELLED, "Abgebrochen"),
+        (STATUS_PLANNED, _("Planned")),
+        (STATUS_IN_PROGRESS, _("In progress")),
+        (STATUS_DONE, _("Completed")),
+        (STATUS_CANCELLED, _("Cancelled")),
     ]
 
     defect = models.ForeignKey(
