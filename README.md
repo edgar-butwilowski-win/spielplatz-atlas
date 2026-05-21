@@ -137,12 +137,6 @@ source .venv/bin/activate
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install django pillow django-environ openpyxl
-```
-
-Falls ein `requirements.txt` vorhanden ist:
-
-```bash
 python -m pip install -r requirements.txt
 ```
 
