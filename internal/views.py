@@ -1,11 +1,3 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -685,6 +677,7 @@ def create_default_answers(inspection):
             playground=inspection.playground,
             is_active=True,
             public_visible=True,
+            not_to_inspect=False,
         )
         .select_related("equipment_type")
         .order_by("name")
