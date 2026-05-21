@@ -1,15 +1,18 @@
 {% extends "public/base_public.html" %}
-{% block title %}Organisation registrieren - playsafeswiss{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Register organization" %} - playsafeswiss{% endblock %}
 {% block content %}
 <main class="container py-4 py-lg-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-xl-7">
             <div class="mb-4">
-                <div class="section-label mb-2">Neue Organisation</div>
-                <h1 class="fw-bold mb-2">Organisation registrieren</h1>
+                <div class="section-label mb-2">{% trans "New organization" %}</div>
+                <h1 class="fw-bold mb-2">{% trans "Register organization" %}</h1>
                 <p class="text-secondary fs-5 mb-0">
-                    Beantragen Sie einen eigenen Organisationsbereich in playsafeswiss.
-                    Die Anfrage wird durch einen Super-Admin geprüft.
+                    {% blocktrans trimmed %}
+                        Request your own organization area in playsafeswiss.
+                        The request will be reviewed by a super admin.
+                    {% endblocktrans %}
                 </p>
             </div>
             <div class="content-card p-3 p-lg-4">
@@ -26,11 +29,11 @@
                         <div class="col-md-6"><label class="form-label fw-semibold" for="{{ form.admin_last_name.id_for_label }}">{{ form.admin_last_name.label }}</label>{{ form.admin_last_name }}{% for error in form.admin_last_name.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
                         <div class="col-12"><label class="form-label fw-semibold" for="{{ form.admin_email.id_for_label }}">{{ form.admin_email.label }}</label>{{ form.admin_email }}{% for error in form.admin_email.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
                         <div class="col-12"><label class="form-label fw-semibold" for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>{{ form.message }}{% if form.message.help_text %}<div class="form-text text-secondary">{{ form.message.help_text }}</div>{% endif %}{% for error in form.message.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}</div>
-                        <div class="col-12 d-flex justify-content-between align-items-center gap-2 pt-2"><a href="{% url 'public:index' %}" class="btn btn-outline-secondary">Abbrechen</a><button type="submit" class="btn btn-atlas-primary">Anfrage einreichen</button></div>
+                        <div class="col-12 d-flex justify-content-between align-items-center gap-2 pt-2"><a href="{% url 'public:index' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a><button type="submit" class="btn btn-atlas-primary">{% trans "Submit request" %}</button></div>
                     </div>
                 </form>
             </div>
-            <p class="text-secondary small mt-3">Nach der Prüfung kann die Organisation aktiviert und ein Organisations-Admin eingerichtet werden.</p>
+            <p class="text-secondary small mt-3">{% trans "After review, the organization can be activated and an organization admin can be created." %}</p>
         </div>
     </div>
 </main>
