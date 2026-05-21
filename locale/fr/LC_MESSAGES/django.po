@@ -95,3 +95,51 @@ msgstr "sera planifié"
 
 msgid "Show details"
 msgstr "Afficher les détails"
+
+msgid "Register organization"
+msgstr "Enregistrer une organisation"
+
+msgid "New organization"
+msgstr "Nouvelle organisation"
+
+msgid "Request your own organization area in playsafeswiss. The request will be reviewed by a super admin."
+msgstr "Demandez votre propre espace d’organisation dans playsafeswiss. La demande sera examinée par un super administrateur."
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Submit request"
+msgstr "Envoyer la demande"
+
+msgid "After review, the organization can be activated and an organization admin can be created."
+msgstr "Après vérification, l’organisation peut être activée et un administrateur d’organisation peut être créé."
+
+msgid "Request submitted"
+msgstr "Demande envoyée"
+
+msgid "Thank you. Your organization request has been saved and will be reviewed."
+msgstr "Merci. Votre demande d’organisation a été enregistrée et sera examinée."
+
+msgid "Back to map"
+msgstr "Retour à la carte"
+
+msgid "Internal access"
+msgstr "Accès interne"
+
+msgid "Sign in with your email address and password."
+msgstr "Connectez-vous avec votre adresse e-mail et votre mot de passe."
+
+msgid "Please check your email address and password."
+msgstr "Veuillez vérifier votre adresse e-mail et votre mot de passe."
+
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Log in"
+msgstr "Se connecter"
+
+msgid "Public visitors do not need a user account."
+msgstr "Les visiteurs publics n’ont pas besoin de compte utilisateur."
