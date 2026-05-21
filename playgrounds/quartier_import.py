@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from django.db import transaction
 from django.utils import timezone
 
+from .quartier_lookup import find_quartier_name_for_playground
 from .quartier_models import Quartier
 
 
@@ -131,11 +132,35 @@ def import_quartiere_from_feature_collection(organization, feature_collection, s
             )
             imported += 1
 
+        playgrounds_updated = update_playground_districts_for_organization(organization)
+
     return {
         "imported": imported,
         "skipped": skipped,
+        "playgrounds_updated": playgrounds_updated,
         "errors": errors,
     }
+
+
+def update_playground_districts_for_organization(organization):
+    from .models import Playground
+
+    updated = 0
+    playgrounds = Playground.objects.filter(
+        organization=organization,
+        latitude__isnull=False,
+        longitude__isnull=False,
+    )
+
+    for playground in playgrounds:
+        quartier_name = find_quartier_name_for_playground(playground)
+
+        if quartier_name and playground.district != quartier_name:
+            playground.district = quartier_name
+            playground.save(update_fields=["district"])
+            updated += 1
+
+    return updated
 
 
 def extract_quartier_feature(feature):
