@@ -1,11 +1,3 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
-
 import uuid
 
 from django.core.exceptions import ValidationError
@@ -220,6 +212,10 @@ class EquipmentSupplier(models.Model):
     )
 
     name = models.CharField("Name", max_length=200)
+    tel_nr = models.CharField("Telefonnummer", max_length=80, blank=True)
+    strasse = models.CharField("Strasse", max_length=80, blank=True)
+    plz_ort = models.CharField("PLZ / Ort", max_length=80, blank=True)
+    e_mail = models.EmailField("E-Mail", max_length=80, blank=True)
     is_active = models.BooleanField("Aktiv", default=True)
     created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
 
@@ -273,9 +269,9 @@ class PlayEquipment(models.Model):
         verbose_name="Lieferant",
     )
     norm = models.CharField("Norm", max_length=200, blank=True)
-    year_built = models.PositiveIntegerField("Baujahr", null=True, blank=True)
+    year_built = models.DateField("Baujahr / Baudatum", null=True, blank=True)
     build_date = models.DateField("Baudatum", null=True, blank=True)
-    demolition_date = models.DateField("Abbruchdatum", null=True, blank=True)
+    demolition_date = models.DateField("Abbruchjahr / Abbruchdatum", null=True, blank=True)
 
     renovation_type = models.CharField(
         "Sanierungsart",
@@ -287,15 +283,35 @@ class PlayEquipment(models.Model):
         "Empfohlenes Sanierungsjahr",
         null=True,
         blank=True,
-        help_text="Vierstellige Jahreszahl. Das Jahr darf nicht in der Vergangenheit liegen.",
+        help_text="Vierstellige Jahreszahl. Historische Legacy-Werte sind zulässig.",
     )
     renovation_comment = models.CharField("Kommentar zur Sanierung", max_length=500, blank=True)
 
-    not_inspectable = models.BooleanField("Nicht prüfbar", default=False)
+    not_to_inspect = models.BooleanField(
+        "Nicht zu prüfen",
+        default=False,
+        help_text=(
+            "Administrative Prüfausnahme. Das Spielgerät bleibt im Bestand, wird aber nicht "
+            "in Kontrollprotokollen berücksichtigt. Dieses Feld wird durch die Organisation verwaltet."
+        ),
+    )
+    not_to_inspect_reason = models.CharField(
+        "Grund nicht zu prüfen",
+        max_length=500,
+        blank=True,
+    )
+    not_inspectable = models.BooleanField(
+        "Nicht prüfbar",
+        default=False,
+        help_text=(
+            "Das Spielgerät muss grundsätzlich geprüft werden, konnte aber bei einer Kontrolle "
+            "nicht geprüft werden, z. B. weil es nicht zugänglich war."
+        ),
+    )
     not_inspectable_reason = models.CharField("Grund nicht prüfbar", max_length=500, blank=True)
 
-    latitude = models.DecimalField("Breitengrad", max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField("Längengrad", max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField("LV95 Y", max_digits=16, decimal_places=8, null=True, blank=True)
+    longitude = models.DecimalField("LV95 X", max_digits=16, decimal_places=8, null=True, blank=True)
 
     public_visible = models.BooleanField("Öffentlich sichtbar", default=True)
     is_active = models.BooleanField("Aktiv", default=True)
@@ -324,21 +340,34 @@ class PlayEquipment(models.Model):
         super().clean()
 
         if self.recommended_renovation_year is not None:
-            current_year = timezone.localdate().year
-
-            if self.recommended_renovation_year < current_year:
-                raise ValidationError({
-                    "recommended_renovation_year": "Das empfohlene Sanierungsjahr darf nicht in der Vergangenheit liegen."
-                })
-
             if self.recommended_renovation_year < 1000 or self.recommended_renovation_year > 9999:
                 raise ValidationError({
                     "recommended_renovation_year": "Bitte eine vierstellige Jahreszahl eingeben."
                 })
 
+        if self.not_to_inspect and not self.not_to_inspect_reason:
+            raise ValidationError({
+                "not_to_inspect_reason": "Bitte einen Grund angeben, wenn das Spielgerät nicht zu prüfen ist."
+            })
+
         if self.not_inspectable and not self.not_inspectable_reason:
             raise ValidationError({
                 "not_inspectable_reason": "Bitte einen Grund angeben, wenn das Spielgerät nicht prüfbar ist."
+            })
+
+        if bool(self.longitude) != bool(self.latitude):
+            raise ValidationError(
+                "Bitte immer ein vollständiges LV95-Koordinatenpaar mit X und Y erfassen."
+            )
+
+        if self.longitude and not (2400000 <= self.longitude <= 2900000):
+            raise ValidationError({
+                "longitude": "Bitte einen gültigen LV95-X-Wert erfassen."
+            })
+
+        if self.latitude and not (1000000 <= self.latitude <= 1350000):
+            raise ValidationError({
+                "latitude": "Bitte einen gültigen LV95-Y-Wert erfassen."
             })
 
     @property
@@ -347,7 +376,7 @@ class PlayEquipment(models.Model):
 
     @property
     def is_planned(self):
-        return bool(self.build_date and self.build_date > timezone.localdate())
+        return bool(self.year_built and self.year_built > timezone.localdate())
 
     @property
     def has_future_demolition(self):
