@@ -95,3 +95,51 @@ msgstr "vegn planisà"
 
 msgid "Show details"
 msgstr "Mussar detagls"
+
+msgid "Register organization"
+msgstr "Registrar organisaziun"
+
+msgid "New organization"
+msgstr "Nova organisaziun"
+
+msgid "Request your own organization area in playsafeswiss. The request will be reviewed by a super admin."
+msgstr "Dumonda in agen sectur d’organisaziun en playsafeswiss. La dumonda vegn controllada dad in super-admin."
+
+msgid "Cancel"
+msgstr "Interrumper"
+
+msgid "Submit request"
+msgstr "Trametter dumonda"
+
+msgid "After review, the organization can be activated and an organization admin can be created."
+msgstr "Suenter la controlla po l’organisaziun vegnir activada ed in admin d’organisaziun po vegnir creà."
+
+msgid "Request submitted"
+msgstr "Dumonda tramessa"
+
+msgid "Thank you. Your organization request has been saved and will be reviewed."
+msgstr "Grazia fitg. Tia dumonda d’organisaziun è vegnida memorisada e vegn controllada."
+
+msgid "Back to map"
+msgstr "Enavos tar la charta"
+
+msgid "Internal access"
+msgstr "Access intern"
+
+msgid "Sign in with your email address and password."
+msgstr "S’annunzia cun tia adressa dad e-mail e tes pled-clav."
+
+msgid "Please check your email address and password."
+msgstr "Controllescha per plaschair tia adressa dad e-mail e tes pled-clav."
+
+msgid "Email address"
+msgstr "Adressa dad e-mail"
+
+msgid "Password"
+msgstr "Pled-clav"
+
+msgid "Log in"
+msgstr "S’annunziar"
+
+msgid "Public visitors do not need a user account."
+msgstr "Visitadras e visitaders publics na dovran nagin conto d’utilisader."
