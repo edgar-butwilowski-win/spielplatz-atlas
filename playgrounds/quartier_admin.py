@@ -179,7 +179,8 @@ class QuartierImportAdmin(admin.ModelAdmin):
 
         message = (
             f"Quartier-Import abgeschlossen: {result['imported']} importiert, "
-            f"{result['skipped']} übersprungen."
+            f"{result['skipped']} übersprungen, "
+            f"{result['playgrounds_updated']} Spielplätze aktualisiert."
         )
 
         if result["errors"]:
