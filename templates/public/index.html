@@ -1,4 +1,5 @@
 {% extends "public/base_public.html" %}
+{% load i18n %}
 
 {% block title %}playsafeswiss{% endblock %}
 
@@ -107,11 +108,11 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
         <div class="map-toolbar p-3 p-lg-4 border-bottom">
             <div class="row g-3 align-items-center">
                 <div class="col-lg-8">
-                    <h1 class="h4 fw-bold mb-1">Werde zum Spielplatz-Profi!</h1>
-                    <div class="text-secondary">Wähle einen Spielplatz auf der Karte aus und erhalte spannende Detailinformationen.</div>
+                    <h1 class="h4 fw-bold mb-1">{% trans "Become a playground pro!" %}</h1>
+                    <div class="text-secondary">{% trans "Select a playground on the map and get exciting detailed information." %}</div>
                 </div>
                 <div class="col-lg-4">
-                    <input id="searchInput" type="search" class="form-control" placeholder="Spielplatz, Adresse oder Quartier suchen">
+                    <input id="searchInput" type="search" class="form-control" placeholder="{% trans 'Search playground, address or district' %}">
                 </div>
             </div>
         </div>
@@ -126,6 +127,14 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.10.0/proj4.js"></script>
 <script src="https://unpkg.com/proj4leaflet@1.0.2/src/proj4leaflet.js"></script>
 <script>
+const i18n = {
+    playgrounds: "{% trans 'playgrounds' %}",
+    playgroundFallback: "{% trans 'Playground' %}",
+    previewImageAltPrefix: "{% trans 'Preview image of' %}",
+    nextInspection: "{% trans 'Next inspection:' %}",
+    nextInspectionPlanned: "{% trans 'will be planned' %}",
+    showDetails: "{% trans 'Show details' %}",
+};
 const swissResolutions = [4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250, 1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5];
 const crs2056 = new L.Proj.CRS("EPSG:2056", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs", { origin: [2420000, 1350000], resolutions: swissResolutions, bounds: L.bounds([2420000, 1030000], [2900000, 1350000]) });
 function lv95ToLatLng(x, y) { return crs2056.unproject(L.point(Number(x), Number(y))); }
@@ -155,7 +164,7 @@ const markersLayer = L.markerClusterGroup({
         return L.divIcon({
             className: "playground-cluster-wrapper",
             html: `
-                <div class="playground-cluster" aria-label="${count} Spielplätze">
+                <div class="playground-cluster" aria-label="${count} ${i18n.playgrounds}">
                     <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
                         <path d="M9 7h14" />
                         <path d="M11 7L7 25" />
@@ -213,10 +222,10 @@ function appendTextElement(parent, className, text, tagName) {
 }
 function markerPopupContent(feature) {
     const props = feature.properties || {};
-    const title = safeText(props.name || "Spielplatz");
+    const title = safeText(props.name || i18n.playgroundFallback);
     const detailUrl = safeUrl(props.detail_url, "#");
     const previewPhotoUrl = safeUrl(props.preview_photo_url, "");
-    const nextInspectionLabel = safeText(props.next_inspection_label || "wird geplant");
+    const nextInspectionLabel = safeText(props.next_inspection_label || i18n.nextInspectionPlanned);
 
     const wrapper = document.createElement("div");
     wrapper.style.minWidth = "220px";
@@ -227,7 +236,7 @@ function markerPopupContent(feature) {
 
         const image = document.createElement("img");
         image.src = previewPhotoUrl;
-        image.alt = `Vorschaubild von ${title}`;
+        image.alt = `${i18n.previewImageAltPrefix} ${title}`;
         image.style.width = "220px";
         image.style.height = "120px";
         image.style.objectFit = "cover";
@@ -247,7 +256,7 @@ function markerPopupContent(feature) {
     inspectionMeta.className = "popup-meta mb-2";
 
     const label = document.createElement("strong");
-    label.textContent = "Nächste Kontrolle:";
+    label.textContent = i18n.nextInspection;
     inspectionMeta.appendChild(label);
     inspectionMeta.appendChild(document.createTextNode(` ${nextInspectionLabel}`));
     wrapper.appendChild(inspectionMeta);
@@ -255,7 +264,7 @@ function markerPopupContent(feature) {
     const detailLink = document.createElement("a");
     detailLink.href = detailUrl;
     detailLink.className = "btn btn-sm btn-atlas-primary";
-    detailLink.textContent = "Details anzeigen";
+    detailLink.textContent = i18n.showDetails;
     wrapper.appendChild(detailLink);
 
     return wrapper;
@@ -269,7 +278,7 @@ function renderMarkers(features) {
         const y = coords[1];
         if (!x || !y) { continue; }
         const latLng = lv95ToLatLng(x, y);
-        const markerTitle = safeText((feature.properties || {}).name || "Spielplatz");
+        const markerTitle = safeText((feature.properties || {}).name || i18n.playgroundFallback);
         const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
         marker.bindPopup(markerPopupContent(feature));
         markersLayer.addLayer(marker);
