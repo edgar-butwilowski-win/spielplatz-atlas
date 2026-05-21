@@ -1,17 +1,6 @@
 from django.db import migrations, models
 
 
-def year_integer_to_date(apps, schema_editor):
-    PlayEquipment = apps.get_model("playgrounds", "PlayEquipment")
-
-    for equipment in PlayEquipment.objects.exclude(year_built__isnull=True):
-        value = equipment.year_built
-
-        if isinstance(value, int):
-            equipment.year_built = f"{value:04d}-01-01"
-            equipment.save(update_fields=["year_built"])
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -38,6 +27,16 @@ class Migration(migrations.Migration):
             model_name="equipmentsupplier",
             name="e_mail",
             field=models.EmailField(blank=True, max_length=80, verbose_name="E-Mail"),
+        ),
+        migrations.RunSQL(
+            sql=(
+                "UPDATE playgrounds_playequipment "
+                "SET year_built = printf('%04d-01-01', CAST(year_built AS INTEGER)) "
+                "WHERE year_built IS NOT NULL "
+                "AND length(CAST(year_built AS TEXT)) = 4 "
+                "AND CAST(year_built AS INTEGER) BETWEEN 1000 AND 9999"
+            ),
+            reverse_sql=migrations.RunSQL.noop,
         ),
         migrations.AlterField(
             model_name="playequipment",
