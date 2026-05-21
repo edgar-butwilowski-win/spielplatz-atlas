@@ -10,6 +10,7 @@ import json
 from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Count, Max, Q
 from django.shortcuts import render
 from django.utils import timezone
@@ -22,6 +23,10 @@ from .permissions import get_active_profile_for_organization
 
 
 RECENT_INSPECTION_DAYS = 365
+
+
+def dashboard_json(data):
+    return json.dumps(data, cls=DjangoJSONEncoder)
 
 
 def get_dashboard_scope(user):
@@ -168,11 +173,11 @@ def build_dashboard_context(scope):
         "maintenance_by_status": maintenance_by_status,
         "inspections_by_type": inspections_by_type,
         "inspections_by_status": inspections_by_status,
-        "defects_by_status_json": json.dumps(defects_by_status),
-        "defects_by_source_json": json.dumps(defects_by_source),
-        "maintenance_by_status_json": json.dumps(maintenance_by_status),
-        "inspections_by_type_json": json.dumps(inspections_by_type),
-        "inspections_by_status_json": json.dumps(inspections_by_status),
+        "defects_by_status_json": dashboard_json(defects_by_status),
+        "defects_by_source_json": dashboard_json(defects_by_source),
+        "maintenance_by_status_json": dashboard_json(maintenance_by_status),
+        "inspections_by_type_json": dashboard_json(inspections_by_type),
+        "inspections_by_status_json": dashboard_json(inspections_by_status),
         "latest_inspections": list(
             completed_inspections
             .select_related("playground", "playground__organization", "inspector")
