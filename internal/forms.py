@@ -1,11 +1,3 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
-
 from django import forms
 from django.utils import timezone
 
@@ -163,7 +155,7 @@ class EquipmentRenovationForm(forms.ModelForm):
                 attrs={
                     "class": "form-control form-control-sm",
                     "placeholder": "z. B. 2028",
-                    "min": timezone.localdate().year,
+                    "min": 1000,
                     "max": 9999,
                 }
             ),
@@ -191,11 +183,6 @@ class EquipmentRenovationForm(forms.ModelForm):
 
         if year is None:
             return year
-
-        current_year = timezone.localdate().year
-
-        if year < current_year:
-            raise forms.ValidationError("Das empfohlene Sanierungsjahr darf nicht in der Vergangenheit liegen.")
 
         if year < 1000 or year > 9999:
             raise forms.ValidationError("Bitte eine vierstellige Jahreszahl eingeben.")
