@@ -15,6 +15,7 @@ admin.site.index_title = "Verwaltung und Stammdaten"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("i18n/", include("django.conf.urls.i18n")),
     path("internal/", include("internal.urls")),
     path("internal/", include("notifications.urls")),
     path("media-assets/", include("media_assets.urls")),
