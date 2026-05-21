@@ -1,14 +1,15 @@
 {% extends "public/base_public.html" %}
-{% block title %}Anfrage eingereicht - playsafeswiss{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Request submitted" %} - playsafeswiss{% endblock %}
 {% block content %}
 <main class="container py-5">
     <div class="row justify-content-center">
         <div class="col-lg-7 col-xl-6">
             <div class="content-card p-4 p-lg-5 text-center">
                 <div class="brand-mark mx-auto mb-3" style="width: 48px; height: 48px;">{% include "includes/playsafeswiss_logo_mark.svg" %}</div>
-                <h1 class="fw-bold mb-3">Anfrage eingereicht</h1>
-                <p class="text-secondary fs-5">Vielen Dank. Ihre Organisationsanfrage wurde gespeichert und wird geprüft.</p>
-                <div class="mt-4"><a href="{% url 'public:index' %}" class="btn btn-atlas-primary">Zurück zur Karte</a></div>
+                <h1 class="fw-bold mb-3">{% trans "Request submitted" %}</h1>
+                <p class="text-secondary fs-5">{% trans "Thank you. Your organization request has been saved and will be reviewed." %}</p>
+                <div class="mt-4"><a href="{% url 'public:index' %}" class="btn btn-atlas-primary">{% trans "Back to map" %}</a></div>
             </div>
         </div>
     </div>
