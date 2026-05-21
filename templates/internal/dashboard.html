@@ -1,9 +1,11 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard – playsafeswiss</title>
+    <title>{% trans "Dashboard" %} – playsafeswiss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --atlas-primary:#0F766E; --atlas-secondary:#F59E0B; --atlas-bg:#F8FAFC; --atlas-text:#0F172A; --atlas-navbar-height:58px; }
@@ -30,92 +32,67 @@
     </style>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container-fluid px-3 px-lg-4">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/" aria-label="playsafeswiss Startseite">
-            <span class="brand-mark">{% include "includes/playsafeswiss_logo_mark.svg" %}</span>
-            <span class="fw-bold">playsafeswiss</span>
-        </a>
-        <div class="d-flex align-items-center gap-2 atlas-menu">
-            <a href="/" class="btn btn-sm btn-outline-secondary atlas-direct-link">Karte</a>
-            <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">Über</a>
-            <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">Impressum</a>
-            <button type="button" class="btn btn-sm btn-outline-secondary atlas-menu-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
-            <div class="atlas-menu-panel" id="atlas-menu-panel">
-                <a class="atlas-menu-only-mobile" href="/">Karte</a>
-                <a class="atlas-menu-only-mobile" href="{% url 'public:about' %}">Über</a>
-                <a class="atlas-menu-only-mobile" href="{% url 'public:imprint' %}">Impressum</a>
-                <a href="{% url 'notifications:list' %}">Nachrichten</a>
-                <a href="{% url 'internal:dashboard' %}">Dashboard</a>
-                {% if can_inspect %}<a href="{% url 'internal:my_inspections' %}">Meine Kontrollen</a>{% endif %}
-                {% if can_inspect or can_manage or is_superadmin %}<a href="{% url 'internal:inspection_planning' %}">Einsatzplanung</a>{% endif %}
-                {% if can_manage or is_superadmin %}<a href="/admin/">Admin</a>{% endif %}
-                <a href="/logout/">Logout</a>
-            </div>
-        </div>
-    </div>
-</nav>
+{% include "includes/main_navigation.html" %}
 
 <main class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
     <div class="mb-4">
-        <div class="section-label mb-2">Internes Dashboard</div>
-        <h1 class="fw-bold mb-2">Auswertungen und Kennzahlen</h1>
-        <p class="text-secondary fs-5 mb-0">{% if organization %}Übersicht für {{ organization.name }}.{% else %}Mandantenübergreifende Übersicht für Superadmins.{% endif %}</p>
+        <div class="section-label mb-2">{% trans "Internal dashboard" %}</div>
+        <h1 class="fw-bold mb-2">{% trans "Analytics and key figures" %}</h1>
+        <p class="text-secondary fs-5 mb-0">{% if organization %}{% blocktrans with organization_name=organization.name %}Overview for {{ organization_name }}.{% endblocktrans %}{% else %}{% trans "Cross-tenant overview for super admins." %}{% endif %}</p>
     </div>
 
     <section class="row g-3 mb-4">
-        {% if is_superadmin %}<div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ organizations_count }}</div><div class="metric-label">Organisationen</div></div></div>{% endif %}
-        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ active_playgrounds_count }}</div><div class="metric-label">Aktive Spielplätze</div></div></div>
-        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ open_defects_count }}</div><div class="metric-label">Offene Mängel</div></div></div>
-        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ safety_risk_defects_count }}</div><div class="metric-label">Mängel mit Sicherheitsrisiko</div></div></div>
-        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ planned_maintenance_actions_count }}</div><div class="metric-label">Geplante Instandsetzungen</div></div></div>
+        {% if is_superadmin %}<div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ organizations_count }}</div><div class="metric-label">{% trans "Organizations" %}</div></div></div>{% endif %}
+        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ active_playgrounds_count }}</div><div class="metric-label">{% trans "Active playgrounds" %}</div></div></div>
+        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ open_defects_count }}</div><div class="metric-label">{% trans "Open defects" %}</div></div></div>
+        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ safety_risk_defects_count }}</div><div class="metric-label">{% trans "Defects with safety risk" %}</div></div></div>
+        <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ planned_maintenance_actions_count }}</div><div class="metric-label">{% trans "Planned maintenance actions" %}</div></div></div>
         {% if can_inspect %}
-            <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ draft_inspections_count }}</div><div class="metric-label">Kontrollen in Bearbeitung</div></div></div>
-            <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ completed_inspections_count }}</div><div class="metric-label">Abgeschlossene Kontrollen</div></div></div>
+            <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ draft_inspections_count }}</div><div class="metric-label">{% trans "Inspections in progress" %}</div></div></div>
+            <div class="col-md-6 col-xl-3"><div class="metric-card p-3"><div class="metric-value">{{ completed_inspections_count }}</div><div class="metric-label">{% trans "Completed inspections" %}</div></div></div>
         {% endif %}
     </section>
 
     <section class="row g-4 mb-4">
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Mängel nach Status</h2><div class="chart-container"><canvas id="defectsByStatusChart"></canvas></div></div></div>
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Mängel nach Quelle</h2><div class="chart-container"><canvas id="defectsBySourceChart"></canvas></div></div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Defects by status" %}</h2><div class="chart-container"><canvas id="defectsByStatusChart"></canvas></div></div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Defects by source" %}</h2><div class="chart-container"><canvas id="defectsBySourceChart"></canvas></div></div></div>
     </section>
 
     {% if can_inspect %}
     <section class="row g-4 mb-4">
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Kontrollen nach Art</h2><div class="chart-container"><canvas id="inspectionsByTypeChart"></canvas></div></div></div>
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Kontrollen nach Status</h2><div class="chart-container"><canvas id="inspectionsByStatusChart"></canvas></div></div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Inspections by type" %}</h2><div class="chart-container"><canvas id="inspectionsByTypeChart"></canvas></div></div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Inspections by status" %}</h2><div class="chart-container"><canvas id="inspectionsByStatusChart"></canvas></div></div></div>
     </section>
     {% endif %}
 
     {% if can_maintain %}
     <section class="row g-4 mb-4">
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Instandhaltung nach Status</h2><div class="chart-container"><canvas id="maintenanceByStatusChart"></canvas></div></div></div>
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Geplante Instandsetzungen</h2>{% if planned_maintenance_actions %}<div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>Datum</th><th>Titel</th><th>Spielplatz</th><th>Status</th></tr></thead><tbody>{% for action in planned_maintenance_actions %}<tr><td>{{ action.planned_date|date:"d.m.Y"|default:"–" }}</td><td>{{ action.title }}</td><td>{{ action.defect.playground.name }}</td><td>{{ action.get_status_display }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">Keine geplanten Instandsetzungen vorhanden.</div>{% endif %}</div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Maintenance by status" %}</h2><div class="chart-container"><canvas id="maintenanceByStatusChart"></canvas></div></div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Planned maintenance actions" %}</h2>{% if planned_maintenance_actions %}<div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>{% trans "Date" %}</th><th>{% trans "Title" %}</th><th>{% trans "Playground" %}</th><th>{% trans "Status" %}</th></tr></thead><tbody>{% for action in planned_maintenance_actions %}<tr><td>{{ action.planned_date|date:"d.m.Y"|default:"–" }}</td><td>{{ action.title }}</td><td>{{ action.defect.playground.name }}</td><td>{{ action.get_status_display }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">{% trans "No planned maintenance actions available." %}</div>{% endif %}</div></div>
     </section>
     {% endif %}
 
     <section class="row g-4 mb-4">
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Offene Mängel nach Spielplatz</h2>{% if defects_by_playground %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Spielplatz</th>{% if is_superadmin %}<th>Organisation</th>{% endif %}<th class="text-end">Mängel</th></tr></thead><tbody>{% for item in defects_by_playground %}<tr><td>{{ item.playground__name|default:"Ohne Spielplatz" }}</td>{% if is_superadmin %}<td>{{ item.playground__organization__name|default:"–" }}</td>{% endif %}<td class="text-end fw-semibold">{{ item.count }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">Keine offenen Mängel vorhanden.</div>{% endif %}</div></div>
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Spielplätze ohne aktuelle abgeschlossene Kontrolle</h2><p class="text-secondary small">Berücksichtigt werden die letzten {{ recent_inspection_days }} Tage.</p>{% if playgrounds_without_recent_completed_inspection %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Spielplatz</th>{% if is_superadmin %}<th>Organisation</th>{% endif %}<th>Letzte Kontrolle</th></tr></thead><tbody>{% for playground in playgrounds_without_recent_completed_inspection %}<tr><td>{{ playground.name }}</td>{% if is_superadmin %}<td>{{ playground.organization.name }}</td>{% endif %}<td>{{ playground.latest_completed_inspection|date:"d.m.Y"|default:"Keine" }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">Alle angezeigten Spielplätze haben eine aktuelle abgeschlossene Kontrolle.</div>{% endif %}</div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Open defects by playground" %}</h2>{% if defects_by_playground %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>{% trans "Playground" %}</th>{% if is_superadmin %}<th>{% trans "Organization" %}</th>{% endif %}<th class="text-end">{% trans "Defects" %}</th></tr></thead><tbody>{% for item in defects_by_playground %}<tr><td>{{ item.playground__name|default:_('Without playground') }}</td>{% if is_superadmin %}<td>{{ item.playground__organization__name|default:"–" }}</td>{% endif %}<td class="text-end fw-semibold">{{ item.count }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">{% trans "No open defects available." %}</div>{% endif %}</div></div>
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Playgrounds without a recent completed inspection" %}</h2><p class="text-secondary small">{% blocktrans with days=recent_inspection_days %}The last {{ days }} days are considered.{% endblocktrans %}</p>{% if playgrounds_without_recent_completed_inspection %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>{% trans "Playground" %}</th>{% if is_superadmin %}<th>{% trans "Organization" %}</th>{% endif %}<th>{% trans "Last inspection" %}</th></tr></thead><tbody>{% for playground in playgrounds_without_recent_completed_inspection %}<tr><td>{{ playground.name }}</td>{% if is_superadmin %}<td>{{ playground.organization.name }}</td>{% endif %}<td>{{ playground.latest_completed_inspection|date:"d.m.Y"|default:_('None') }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">{% trans "All shown playgrounds have a recent completed inspection." %}</div>{% endif %}</div></div>
     </section>
 
     <section class="row g-4">
-        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Mängel mit Sicherheitsrisiko</h2>{% if open_safety_risk_defects %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Mangel</th><th>Spielplatz</th><th>Status</th><th>Geplant</th></tr></thead><tbody>{% for defect in open_safety_risk_defects %}<tr><td><a href="{% url 'internal:edit_defect' defect.id %}">#{{ defect.id }}</a></td><td>{{ defect.playground.name }}</td><td>{{ defect.get_status_display }}</td><td>{{ defect.planned_resolution_date|date:"d.m.Y"|default:"–" }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">Keine offenen Mängel mit Sicherheitsrisiko vorhanden.</div>{% endif %}</div></div>
-        {% if can_inspect %}<div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">Letzte abgeschlossene Kontrollen</h2>{% if latest_inspections %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>Datum</th><th>Spielplatz</th><th>Art</th><th>Ergebnis</th></tr></thead><tbody>{% for inspection in latest_inspections %}<tr><td>{{ inspection.inspected_at|date:"d.m.Y" }}</td><td>{{ inspection.playground.name }}</td><td>{{ inspection.get_inspection_type_display }}</td><td>{{ inspection.get_result_display }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">Noch keine abgeschlossenen Kontrollen vorhanden.</div>{% endif %}</div></div>{% endif %}
+        <div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Defects with safety risk" %}</h2>{% if open_safety_risk_defects %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>{% trans "Defect" %}</th><th>{% trans "Playground" %}</th><th>{% trans "Status" %}</th><th>{% trans "Planned" %}</th></tr></thead><tbody>{% for defect in open_safety_risk_defects %}<tr><td><a href="{% url 'internal:edit_defect' defect.id %}">#{{ defect.id }}</a></td><td>{{ defect.playground.name }}</td><td>{{ defect.get_status_display }}</td><td>{{ defect.planned_resolution_date|date:"d.m.Y"|default:"–" }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">{% trans "No open defects with safety risk available." %}</div>{% endif %}</div></div>
+        {% if can_inspect %}<div class="col-xl-6"><div class="content-card p-3 p-lg-4"><h2 class="h5 fw-bold mb-3">{% trans "Latest completed inspections" %}</h2>{% if latest_inspections %}<div class="table-responsive"><table class="table table-sm mb-0"><thead><tr><th>{% trans "Date" %}</th><th>{% trans "Playground" %}</th><th>{% trans "Type" %}</th><th>{% trans "Result" %}</th></tr></thead><tbody>{% for inspection in latest_inspections %}<tr><td>{{ inspection.inspected_at|date:"d.m.Y" }}</td><td>{{ inspection.playground.name }}</td><td>{{ inspection.get_inspection_type_display }}</td><td>{{ inspection.get_result_display }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">{% trans "No completed inspections yet." %}</div>{% endif %}</div></div>{% endif %}
     </section>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
-    function closeMenu(){const panel=document.getElementById('atlas-menu-panel');const button=document.querySelector('.atlas-menu-toggle');if(panel){panel.classList.remove('show');}if(button){button.setAttribute('aria-expanded','false');}}
-    document.addEventListener('click',function(event){const button=event.target.closest('.atlas-menu-toggle');const panel=document.getElementById('atlas-menu-panel');if(button&&panel){const isOpen=panel.classList.contains('show');panel.classList.toggle('show',!isOpen);button.setAttribute('aria-expanded',String(!isOpen));event.preventDefault();return;}if(!event.target.closest('.atlas-menu')){closeMenu();}});
     function labelsFrom(items){return items.map(item=>item.label);} function countsFrom(items){return items.map(item=>item.count);}
-    function renderBarChart(id,items){const element=document.getElementById(id);if(!element){return;}new Chart(element,{type:"bar",data:{labels:labelsFrom(items),datasets:[{label:"Anzahl",data:countsFrom(items)}]},options:{responsive:true,maintainAspectRatio:false,resizeDelay:100,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});}
+    function renderBarChart(id,items){const element=document.getElementById(id);if(!element){return;}new Chart(element,{type:"bar",data:{labels:labelsFrom(items),datasets:[{label:"{% trans 'Count' %}",data:countsFrom(items)}]},options:{responsive:true,maintainAspectRatio:false,resizeDelay:100,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});}
     renderBarChart("defectsByStatusChart", {{ defects_by_status_json|safe }});
     renderBarChart("defectsBySourceChart", {{ defects_by_source_json|safe }});
     renderBarChart("inspectionsByTypeChart", {{ inspections_by_type_json|safe }});
     renderBarChart("inspectionsByStatusChart", {{ inspections_by_status_json|safe }});
     renderBarChart("maintenanceByStatusChart", {{ maintenance_by_status_json|safe }});
 </script>
+{% include "includes/main_navigation_script.html" %}
 </body>
 </html>
