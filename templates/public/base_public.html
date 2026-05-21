@@ -1,5 +1,7 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 
 <head>
     <meta charset="utf-8">
@@ -102,6 +104,10 @@
 
         .atlas-menu-panel a:hover {
             background: #F1F5F9;
+        }
+
+        .atlas-language-form {
+            min-width: 220px;
         }
 
         @media (max-width: 991.98px) {
