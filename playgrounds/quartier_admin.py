@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.urls import path, reverse
 from django.utils.html import format_html
 
-from accounts.admin_utils import get_user_organization
+from accounts.admin_utils import OrganizationAdminPermissionMixin, get_user_organization
 
 from .quartier_import import QuartierImportError, import_quartiere_from_import_config
 from .quartier_models import Quartier, QuartierImport
@@ -40,19 +40,19 @@ class QuartierImportAdminForm(forms.ModelForm):
 
 
 @admin.register(Quartier)
-class QuartierAdmin(admin.ModelAdmin):
+class QuartierAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     list_display = ("name", "organization", "is_active", "source", "imported_at")
     list_filter = ("organization", "is_active")
     search_fields = ("name", "source", "organization__name")
-    readonly_fields = ("imported_at",)
+    readonly_fields = ("geometry", "imported_at")
 
     fieldsets = (
         ("Grunddaten", {
             "fields": ("organization", "name", "is_active"),
         }),
         ("Geometrie", {
-            "fields": ("geom",),
-            "description": "GeoJSON-Geometrie des Quartiers.",
+            "fields": ("geom", "geometry"),
+            "description": "GeoJSON-Geometrie und daraus abgeleitete SpatiaLite-Geometrie des Quartiers.",
         }),
         ("Import", {
             "fields": ("source", "imported_at"),
@@ -95,12 +95,9 @@ class QuartierAdmin(admin.ModelAdmin):
 
         super().save_model(request, obj, form, change)
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
 
 @admin.register(QuartierImport)
-class QuartierImportAdmin(admin.ModelAdmin):
+class QuartierImportAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     form = QuartierImportAdminForm
     list_display = ("organization", "source_display", "replace_existing", "updated_at", "import_button")
     list_filter = ("organization", "replace_existing")
@@ -228,6 +225,3 @@ class QuartierImportAdmin(admin.ModelAdmin):
             filtered_fieldsets.append((title, {**options, "fields": fields}))
 
         return tuple(filtered_fieldsets)
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
