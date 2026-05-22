@@ -3,9 +3,11 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
+from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Polygon
 from django.db import transaction
 from django.utils import timezone
 
+from .models import LV95_SRID
 from .quartier_lookup import find_quartier_name_for_playground
 from .quartier_models import Quartier
 
@@ -114,7 +116,7 @@ def import_quartiere_from_feature_collection(organization, feature_collection, s
 
         for index, feature in enumerate(features, start=1):
             try:
-                name, geometry = extract_quartier_feature(feature)
+                name, geojson_geometry, spatial_geometry = extract_quartier_feature(feature)
             except QuartierImportError as exc:
                 skipped += 1
                 errors.append(f"Feature {index}: {exc}")
@@ -124,7 +126,8 @@ def import_quartiere_from_feature_collection(organization, feature_collection, s
                 organization=organization,
                 name=name,
                 defaults={
-                    "geom": geometry,
+                    "geom": geojson_geometry,
+                    "geometry": spatial_geometry,
                     "source": source,
                     "is_active": True,
                     "imported_at": timezone.now(),
@@ -179,7 +182,22 @@ def extract_quartier_feature(feature):
     if not is_supported_geometry(geometry):
         raise QuartierImportError(f"Attribut {GEOMETRY_ATTRIBUTE!r} enthält keine Polygon- oder MultiPolygon-Geometrie.")
 
-    return name, geometry
+    spatial_geometry = build_spatial_geometry(geometry)
+
+    return name, geometry, spatial_geometry
+
+
+def build_spatial_geometry(geometry):
+    geos_geometry = GEOSGeometry(json.dumps(geometry), srid=LV95_SRID)
+
+    if isinstance(geos_geometry, Polygon):
+        return MultiPolygon(geos_geometry, srid=LV95_SRID)
+
+    if isinstance(geos_geometry, MultiPolygon):
+        geos_geometry.srid = LV95_SRID
+        return geos_geometry
+
+    raise QuartierImportError("Die Geometrie muss ein Polygon oder MultiPolygon sein.")
 
 
 def is_supported_geometry(geometry):
