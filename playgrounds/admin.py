@@ -1,9 +1,9 @@
 from django import forms
 from django.contrib import admin
-from django.db import models
+from PIL import Image as PillowImage
 
 from accounts.admin_utils import get_user_organization
-from media_assets.image_import import create_image_asset_from_upload
+from media_assets.models import ImageAsset
 
 from .models import (
     EquipmentSupplier,
@@ -13,6 +13,33 @@ from .models import (
     PlaygroundAccessory,
     PlaygroundSurface,
 )
+
+
+def create_image_asset_from_upload(uploaded_file, organization):
+    binary_data = uploaded_file.read()
+
+    width = None
+    height = None
+
+    try:
+        uploaded_file.seek(0)
+        image = PillowImage.open(uploaded_file)
+        width, height = image.size
+    except Exception:
+        width = None
+        height = None
+
+    return ImageAsset.objects.create(
+        organization=organization,
+        original_filename=uploaded_file.name,
+        mime_type=uploaded_file.content_type or "application/octet-stream",
+        size_bytes=len(binary_data),
+        width=width,
+        height=height,
+        sha256=ImageAsset.calculate_sha256(binary_data),
+        data=binary_data,
+        public_visible=True,
+    )
 
 
 class PlaygroundAdminForm(forms.ModelForm):
