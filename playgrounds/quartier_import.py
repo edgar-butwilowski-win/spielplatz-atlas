@@ -214,7 +214,16 @@ def extract_quartier_feature(feature):
 
 
 def build_spatial_geometry(geometry):
-    geos_geometry = GEOSGeometry(json.dumps(geometry), srid=LV95_SRID)
+    geos_geometry = GEOSGeometry(json.dumps(geometry))
+
+    if geos_geometry.srid and geos_geometry.srid != LV95_SRID:
+        # Der Winterthurer WFS liefert teils GML mit srsName=EPSG:4326,
+        # die Koordinaten der Geometrien sind für diesen Import aber fachlich
+        # als LV95 zu verwenden. Darum normalisieren wir den SRID auf 2056,
+        # statt eine Koordinatentransformation auszulösen.
+        geos_geometry.srid = LV95_SRID
+    elif not geos_geometry.srid:
+        geos_geometry.srid = LV95_SRID
 
     if isinstance(geos_geometry, Polygon):
         return MultiPolygon(geos_geometry, srid=LV95_SRID)
