@@ -1,4 +1,7 @@
+from django.contrib.gis.db import models as gis_models
 from django.db import models
+
+from .models import LV95_SRID
 
 
 class Quartier(models.Model):
@@ -10,8 +13,15 @@ class Quartier(models.Model):
     )
     name = models.CharField("Quartiername", max_length=200)
     geom = models.JSONField(
+        "GeoJSON-Geometrie",
+        help_text="Importierte GeoJSON-Geometrie des Quartiers. Erwartet Polygon oder MultiPolygon in LV95-Koordinaten.",
+    )
+    geometry = gis_models.MultiPolygonField(
         "Geometrie",
-        help_text="GeoJSON-Geometrie des Quartiers. Erwartet Polygon oder MultiPolygon in LV95-Koordinaten.",
+        srid=LV95_SRID,
+        null=True,
+        blank=True,
+        help_text="Aus GeoJSON abgeleitete MultiPolygon-Geometrie für räumliche Abfragen mit SpatiaLite.",
     )
     source = models.CharField("Quelle", max_length=500, blank=True)
     is_active = models.BooleanField("Aktiv", default=True)
