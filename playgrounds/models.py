@@ -1,8 +1,13 @@
 import uuid
 
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+
+
+LV95_SRID = 2056
 
 
 class Playground(models.Model):
@@ -31,6 +36,13 @@ class Playground(models.Model):
 
     latitude = models.DecimalField("LV95 Y", max_digits=16, decimal_places=8, null=True, blank=True)
     longitude = models.DecimalField("LV95 X", max_digits=16, decimal_places=8, null=True, blank=True)
+    location = gis_models.PointField(
+        "Lagegeometrie",
+        srid=LV95_SRID,
+        null=True,
+        blank=True,
+        help_text="Aus LV95 X/Y abgeleiteter Punkt für räumliche Abfragen mit SpatiaLite.",
+    )
 
     description = models.TextField("Beschrieb", blank=True)
     construction_costs = models.FloatField("Erstellungskosten", null=True, blank=True)
@@ -96,6 +108,16 @@ class Playground(models.Model):
             raise ValidationError({
                 "latitude": "Bitte einen gültigen LV95-Y-Wert erfassen."
             })
+
+    def sync_location_from_lv95(self):
+        if self.longitude is not None and self.latitude is not None:
+            self.location = Point(float(self.longitude), float(self.latitude), srid=LV95_SRID)
+        else:
+            self.location = None
+
+    def save(self, *args, **kwargs):
+        self.sync_location_from_lv95()
+        super().save(*args, **kwargs)
 
     @property
     def is_inspection_suspended(self):
@@ -312,6 +334,13 @@ class PlayEquipment(models.Model):
 
     latitude = models.DecimalField("LV95 Y", max_digits=16, decimal_places=8, null=True, blank=True)
     longitude = models.DecimalField("LV95 X", max_digits=16, decimal_places=8, null=True, blank=True)
+    location = gis_models.PointField(
+        "Lagegeometrie",
+        srid=LV95_SRID,
+        null=True,
+        blank=True,
+        help_text="Aus LV95 X/Y abgeleiteter Punkt für räumliche Abfragen mit SpatiaLite.",
+    )
 
     public_visible = models.BooleanField("Öffentlich sichtbar", default=True)
     is_active = models.BooleanField("Aktiv", default=True)
@@ -369,6 +398,16 @@ class PlayEquipment(models.Model):
             raise ValidationError({
                 "latitude": "Bitte einen gültigen LV95-Y-Wert erfassen."
             })
+
+    def sync_location_from_lv95(self):
+        if self.longitude is not None and self.latitude is not None:
+            self.location = Point(float(self.longitude), float(self.latitude), srid=LV95_SRID)
+        else:
+            self.location = None
+
+    def save(self, *args, **kwargs):
+        self.sync_location_from_lv95()
+        super().save(*args, **kwargs)
 
     @property
     def has_pending_renovation(self):
