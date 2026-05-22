@@ -3,17 +3,31 @@ import xml.etree.ElementTree as ET
 from .quartier_import import NAME_ATTRIBUTE, GEOMETRY_ATTRIBUTE, QuartierImportError
 
 
+GEOMETRY_ATTRIBUTE_ALIASES = (
+    GEOMETRY_ATTRIBUTE,
+    "the_geom",
+    "msGeometry",
+    "geometry",
+    "Geometry",
+    "shape",
+)
+
+
 def parse_gml_feature_collection(gml_text):
     try:
         root = ET.fromstring(gml_text)
     except ET.ParseError as exc:
         raise QuartierImportError("Der WFS hat weder gültiges GeoJSON noch gültiges Simple-GML/XML geliefert.") from exc
 
+    exception_text = get_service_exception_text(root)
+    if exception_text:
+        raise QuartierImportError(f"Der WFS hat eine Fehlermeldung geliefert: {exception_text}")
+
     features = []
 
     for feature_element in iter_candidate_feature_elements(root):
-        name_element = find_direct_child_by_local_name(feature_element, NAME_ATTRIBUTE)
-        geom_element = find_direct_child_by_local_name(feature_element, GEOMETRY_ATTRIBUTE)
+        name_element = find_child_or_descendant_by_local_name(feature_element, NAME_ATTRIBUTE)
+        geom_element = find_child_or_descendant_by_local_names(feature_element, GEOMETRY_ATTRIBUTE_ALIASES)
 
         if name_element is None or geom_element is None:
             continue
@@ -36,17 +50,30 @@ def parse_gml_feature_collection(gml_text):
             "Im Simple-GML des WFS wurden keine Features mit Quartiername und geom gefunden."
         )
 
-    return {
-        "type": "FeatureCollection",
-        "features": features,
-    }
+    return {"type": "FeatureCollection", "features": features}
+
+
+def get_service_exception_text(root):
+    root_name = normalized_local_name(root.tag)
+    if root_name in {"serviceexceptionreport", "exceptionreport"}:
+        text = " ".join(root.itertext()).strip()
+        return " ".join(text.split())[:500]
+    return ""
 
 
 def iter_candidate_feature_elements(root):
     for element in root.iter():
+        if get_local_name(element.tag) in {
+            "FeatureCollection",
+            "featureMember",
+            "member",
+            "boundedBy",
+        }:
+            continue
+
         if (
-            find_direct_child_by_local_name(element, NAME_ATTRIBUTE) is not None
-            and find_direct_child_by_local_name(element, GEOMETRY_ATTRIBUTE) is not None
+            find_child_or_descendant_by_local_name(element, NAME_ATTRIBUTE) is not None
+            and find_child_or_descendant_by_local_names(element, GEOMETRY_ATTRIBUTE_ALIASES) is not None
         ):
             yield element
 
@@ -57,30 +84,53 @@ def get_local_name(tag):
     return tag
 
 
+def normalized_local_name(tag):
+    return get_local_name(tag).replace("_", "").replace("-", "").lower()
+
+
+def local_name_matches(tag, local_name):
+    return normalized_local_name(tag) == normalized_local_name(local_name)
+
+
 def text_content(element):
     return "".join(element.itertext()) if element is not None else ""
 
 
 def find_direct_child_by_local_name(element, local_name):
     for child in list(element):
-        if get_local_name(child.tag) == local_name:
+        if local_name_matches(child.tag, local_name):
             return child
     return None
 
 
+def find_child_or_descendant_by_local_name(element, local_name):
+    direct_child = find_direct_child_by_local_name(element, local_name)
+    if direct_child is not None:
+        return direct_child
+
+    return find_first_descendant_by_local_names(element, (local_name,))
+
+
+def find_child_or_descendant_by_local_names(element, local_names):
+    for local_name in local_names:
+        direct_child = find_direct_child_by_local_name(element, local_name)
+        if direct_child is not None:
+            return direct_child
+
+    return find_first_descendant_by_local_names(element, local_names)
+
+
 def find_first_descendant_by_local_names(element, local_names):
-    local_name_set = set(local_names)
     for descendant in element.iter():
-        if get_local_name(descendant.tag) in local_name_set:
+        if any(local_name_matches(descendant.tag, local_name) for local_name in local_names):
             return descendant
     return None
 
 
 def find_descendants_by_local_names(element, local_names):
-    local_name_set = set(local_names)
     return [
         descendant for descendant in element.iter()
-        if get_local_name(descendant.tag) in local_name_set
+        if any(local_name_matches(descendant.tag, local_name) for local_name in local_names)
     ]
 
 
