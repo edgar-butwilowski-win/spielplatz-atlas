@@ -6,8 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-
-LV95_SRID = 2056
+from .geo_constants import LV95_SRID
 
 
 class Playground(models.Model):
@@ -145,7 +144,7 @@ class Playground(models.Model):
     def get_preview_photo(self):
         if self.photo_id:
             return self.photo
-    
+
         equipment_with_photo = (
             self.equipment
             .filter(
@@ -157,10 +156,10 @@ class Playground(models.Model):
             .order_by("name")
             .first()
         )
-    
+
         if equipment_with_photo:
             return equipment_with_photo.photo
-    
+
         return None
 
 
@@ -420,7 +419,8 @@ class PlayEquipment(models.Model):
     @property
     def has_future_demolition(self):
         return bool(self.demolition_date and self.demolition_date > timezone.localdate())
-    
+
+
 class PlaygroundSurface(models.Model):
     SURFACE_TYPE_CHOICES = [
         ("sand", "Sand"),
