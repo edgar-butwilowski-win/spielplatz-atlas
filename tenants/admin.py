@@ -10,58 +10,11 @@ from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
-
-from playgrounds.models import (
-    EquipmentType,
-    PlayEquipment,
-    Playground,
-    PlaygroundAccessory,
-    PlaygroundSurface,
-)
-from inspections.models import Defect, Inspection, InspectionCriterion, MaintenanceAction
 
 from accounts.models import UserProfile
-from accounts.admin_utils import get_user_organization
-from media_assets.models import ImageAsset
+from accounts.permissions import get_user_organization, user_may_manage_organization
 
 from .models import Organization, OrganizationRegistrationRequest
-
-
-def ensure_org_admin_group():
-    group, _ = Group.objects.get_or_create(name="Organisations-Admins")
-
-    permission_config = {
-        Organization: ["view", "change"],
-        Playground: ["view", "add", "change"],
-        EquipmentType: ["view", "add", "change"],
-        PlayEquipment: ["view", "add", "change"],
-        PlaygroundSurface: ["view", "add", "change"],
-        PlaygroundAccessory: ["view", "add", "change"],
-        InspectionCriterion: ["view", "add", "change"],
-        Inspection: ["view", "add", "change"],
-        Defect: ["view", "add", "change"],
-        MaintenanceAction: ["view", "add", "change"],
-        ImageAsset: ["view", "add", "change"],
-    }
-
-    permissions = []
-
-    for model, actions in permission_config.items():
-        content_type = ContentType.objects.get_for_model(model)
-
-        for action in actions:
-            codename = f"{action}_{model._meta.model_name}"
-            permission = Permission.objects.get(
-                content_type=content_type,
-                codename=codename,
-            )
-            permissions.append(permission)
-
-    group.permissions.set(permissions)
-
-    return group
 
 
 @admin.register(Organization)
@@ -116,6 +69,15 @@ class OrganizationAdmin(admin.ModelAdmin):
             return ()
 
         return ("name",)
+
+    def has_module_permission(self, request):
+        return user_may_manage_organization(request.user)
+
+    def has_view_permission(self, request, obj=None):
+        return user_may_manage_organization(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        return user_may_manage_organization(request.user)
 
     def has_add_permission(self, request):
         return request.user.is_superuser
@@ -197,9 +159,6 @@ def approve_registration_requests(modeladmin, request, queryset):
             can_maintain=True,
         )
 
-        org_admin_group = ensure_org_admin_group()
-        user.groups.add(org_admin_group)
-
         registration_request.status = OrganizationRegistrationRequest.STATUS_APPROVED
         registration_request.reviewed_at = timezone.now()
         registration_request.review_note = (
@@ -277,3 +236,18 @@ class OrganizationRegistrationRequestAdmin(admin.ModelAdmin):
         approve_registration_requests,
         reject_registration_requests,
     )
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
