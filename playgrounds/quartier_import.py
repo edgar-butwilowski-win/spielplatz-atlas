@@ -51,15 +51,15 @@ def fetch_wfs_feature_collection(endpoint):
     if not feature_type_name:
         raise QuartierImportError("Im WFS-Capabilities-Dokument wurde kein FeatureType gefunden.")
 
-    feature_url = build_wfs_getfeature_url(endpoint, feature_type_name)
-    feature_text = fetch_url_text(feature_url)
+    json_url = build_wfs_getfeature_url(endpoint, feature_type_name, output_format="application/json")
 
     try:
-        return json.loads(feature_text)
-    except json.JSONDecodeError as exc:
-        raise QuartierImportError(
-            "Der WFS hat kein gültiges GeoJSON geliefert. Bitte prüfen, ob outputFormat=application/json unterstützt wird."
-        ) from exc
+        return json.loads(fetch_url_text(json_url))
+    except Exception:
+        from .gml_import import parse_gml_feature_collection
+
+        gml_url = build_wfs_getfeature_url(endpoint, feature_type_name)
+        return parse_gml_feature_collection(fetch_url_text(gml_url))
 
 
 def fetch_url_text(url):
@@ -85,7 +85,7 @@ def get_first_feature_type_name(capabilities_xml):
     return ""
 
 
-def build_wfs_getfeature_url(endpoint, feature_type_name):
+def build_wfs_getfeature_url(endpoint, feature_type_name, output_format=None):
     parsed = urllib.parse.urlparse(endpoint)
     query = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=True))
     service = query.get("service") or query.get("Service") or "WFS"
@@ -94,8 +94,13 @@ def build_wfs_getfeature_url(endpoint, feature_type_name):
         "service": service,
         "request": "GetFeature",
         "typeName": feature_type_name,
-        "outputFormat": "application/json",
     })
+
+    if output_format:
+        query["outputFormat"] = output_format
+    else:
+        for key in ("outputFormat", "OUTPUTFORMAT", "outputformat"):
+            query.pop(key, None)
 
     return urllib.parse.urlunparse(parsed._replace(query=urllib.parse.urlencode(query)))
 
