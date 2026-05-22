@@ -16,6 +16,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 
+from accounts.permissions import (
+    get_active_profile,
+    user_may_inspect,
+    user_may_maintain,
+    user_may_view_internal,
+)
 from inspections.models import Defect, Inspection
 from inspections.planning import get_next_public_task_for_playground
 from playgrounds.document_models import PlaygroundDocument
@@ -130,20 +136,7 @@ def public_equipment_queryset():
 
 
 def user_can_view_private_playground(user, playground):
-    if not user.is_authenticated:
-        return False
-
-    if user.is_superuser:
-        return True
-
-    profile = getattr(user, "profile", None)
-
-    return bool(
-        profile
-        and profile.is_active_for_organization
-        and profile.organization_id == playground.organization_id
-        and profile.may_view_internal
-    )
+    return user_may_view_internal(user, playground.organization)
 
 
 def playground_base_queryset_for_user(user):
@@ -159,9 +152,9 @@ def playground_base_queryset_for_user(user):
     if user.is_superuser:
         return qs
 
-    profile = getattr(user, "profile", None)
+    profile = get_active_profile(user)
 
-    if profile and profile.is_active_for_organization and profile.may_view_internal:
+    if profile and profile.may_view_internal:
         return qs.filter(
             Q(public_visible=True)
             | Q(organization_id=profile.organization_id)
@@ -185,42 +178,17 @@ def get_playground_detail_permissions(user, playground):
     if user.is_superuser:
         return {key: True for key in permissions}
 
-    profile = getattr(user, "profile", None)
+    organization = playground.organization
 
-    if not profile:
-        return permissions
-
-    if not profile.is_active_for_organization:
-        return permissions
-
-    if profile.organization_id != playground.organization_id:
-        return permissions
-
-    is_org_admin = bool(profile.is_org_admin or user.is_staff)
-    can_view_internal = bool(
-        is_org_admin
-        or profile.may_view_internal
-        or profile.can_view_internal
-        or profile.can_inspect
-        or profile.can_maintain
-    )
-    can_inspect = bool(is_org_admin or profile.may_inspect or profile.can_inspect)
-    can_edit_defects = bool(
-        is_org_admin
-        or profile.can_maintain
-        or profile.can_inspect
-        or profile.may_maintain
-    )
+    can_view_internal = user_may_view_internal(user, organization)
+    can_inspect = user_may_inspect(user, organization)
+    can_maintain = user_may_maintain(user, organization)
 
     permissions["can_create_inspection"] = can_inspect
-    permissions["can_create_defect"] = can_edit_defects
+    permissions["can_create_defect"] = can_maintain
     permissions["can_open_defect"] = can_view_internal
     permissions["can_view_equipment_renovation"] = can_view_internal
-    permissions["can_edit_equipment_renovation"] = bool(
-        is_org_admin
-        or profile.can_maintain
-        or profile.may_maintain
-    )
+    permissions["can_edit_equipment_renovation"] = can_maintain
 
     return permissions
 
