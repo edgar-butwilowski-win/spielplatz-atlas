@@ -17,3 +17,4 @@ class PlaygroundsConfig(AppConfig):
         # Ergänzende Admin-Registrierungen in separaten Dateien laden.
         from . import admin_documents  # noqa: F401
         from . import quartier_admin  # noqa: F401
+        from . import admin_org_permissions  # noqa: F401
