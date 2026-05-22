@@ -1,7 +1,7 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 
-from .models import LV95_SRID
+from .geo_constants import LV95_SRID
 
 
 class Quartier(models.Model):
