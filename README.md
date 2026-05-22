@@ -48,6 +48,7 @@ Eingeloggte Mitarbeitende sehen dieselbe Grundsicht wie die Öffentlichkeit, erh
 - automatische Erzeugung von Prüfbereichen und Prüfpunkten
 - Mängelerfassung mit Sicherheitsrisiko-Kennzeichnung
 - öffentliche Freigabe ausgewählter Mängelinformationen
+- Import von Quartieren über GeoJSON oder WFS und räumliche Zuordnung per SpatiaLite
 
 ---
 
@@ -108,7 +109,8 @@ Organisationen können zusätzlich lokale Ergänzungen erfassen. Globale Standar
 
 * Python
 * Django
-* SQLite für lokale Entwicklung
+* SQLite mit SpatiaLite für lokale Entwicklung und räumliche Abfragen
+* GeoDjango für Geometriefelder und Spatial Queries
 * vorbereitet für späteren Wechsel auf PostgreSQL / PostGIS
 * Leaflet für die öffentliche Kartenansicht
 * Bootstrap für einfache responsive Oberflächen
@@ -126,39 +128,57 @@ git clone <repo-url>
 cd spielplatz-atlas
 ```
 
-### 2. Virtuelle Umgebung erstellen
+### 2. Systemabhängigkeiten für SpatiaLite installieren
+
+Auf Debian/Ubuntu wird für GeoDjango mit SQLite die SpatiaLite-Erweiterung benötigt:
+
+```bash
+sudo apt install libsqlite3-mod-spatialite
+```
+
+Falls die Erweiterung nicht automatisch unter `mod_spatialite` gefunden wird, kann der Pfad über eine Umgebungsvariable gesetzt werden:
+
+```bash
+export SPATIALITE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/mod_spatialite.so
+```
+
+Auf anderen Systemen muss `SPATIALITE_LIBRARY_PATH` entsprechend auf die installierte SpatiaLite-Bibliothek zeigen.
+
+### 3. Virtuelle Umgebung erstellen
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Abhängigkeiten installieren
+### 4. Python-Abhängigkeiten installieren
 
 ```bash
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-### 4. Datenbank migrieren
+### 5. Datenbank migrieren
 
 ```bash
 python manage.py migrate
 ```
 
-### 5. Superuser erstellen
+Beim Migrieren wird die bestehende SQLite-Datenbank durch das GeoDjango-SpatiaLite-Backend verwendet. Die Migrationen legen räumliche Geometriespalten an und befüllen sie aus den bestehenden LV95-Koordinaten sowie aus importierten Quartier-GeoJSON-Geometrien.
+
+### 6. Superuser erstellen
 
 ```bash
 python manage.py createsuperuser
 ```
 
-### 6. Standardkatalog importieren
+### 7. Standardkatalog importieren
 
 ```bash
 python manage.py seed_standard_catalogs_from_json
 ```
 
-### 7. Entwicklungsserver starten
+### 8. Entwicklungsserver starten
 
 ```bash
 python manage.py runserver
@@ -175,6 +195,40 @@ Der Admin-Bereich ist erreichbar unter:
 ```text
 http://127.0.0.1:8000/admin/
 ```
+
+---
+
+## SpatiaLite und räumliche Daten
+
+SpielplatzAtlas verwendet GeoDjango mit SpatiaLite. Die fachlichen LV95-Koordinatenfelder bleiben aus Kompatibilitätsgründen erhalten:
+
+```text
+longitude = LV95 X
+latitude  = LV95 Y
+```
+
+Zusätzlich werden daraus räumliche Punktgeometrien mit SRID 2056 erzeugt:
+
+```text
+Playground.location
+PlayEquipment.location
+```
+
+Quartiere werden weiterhin mit der importierten GeoJSON-Geometrie gespeichert, erhalten zusätzlich aber eine echte SpatiaLite-Geometrie:
+
+```text
+Quartier.geom      = importierte GeoJSON-Geometrie
+Quartier.geometry  = MultiPolygonField, SRID 2056
+```
+
+Der Quartierimport erwartet weiterhin:
+
+```text
+Name      im Attribut Quartiername
+Geometrie im Attribut geom
+```
+
+Bei GeoJSON wird zusätzlich das Standardfeld `geometry` akzeptiert. Nach dem Import werden Spielplätze über eine echte SpatiaLite-Punkt-in-Polygon-Abfrage dem passenden Quartier zugeordnet und das bestehende `district`-Feld wird aktualisiert.
 
 ---
 
@@ -253,6 +307,7 @@ Ein Organisations-Admin kann:
 * Spielgeräte erfassen
 * Fallschutzflächen / Böden erfassen
 * Zusatzausstattung erfassen
+* Quartiere über GeoJSON oder WFS importieren
 * Bilder hochladen
 * Kontrollen erfassen
 * lokale Ergänzungen zum Standardkatalog anlegen
@@ -309,7 +364,7 @@ So können Betreiber transparent informieren, ohne interne Kontrollnotizen volls
 * globale Anbieter-Standards statt beliebiger Tenant-Imports
 * lokale Ergänzungen pro Organisation möglich
 * responsives, ressourcenschonendes Webdesign
-* SQLite-fähig für den Einstieg
+* SQLite-/SpatiaLite-fähig für den Einstieg
 * spätere PostgreSQL-/PostGIS-Fähigkeit berücksichtigen
 * Standardkataloge versionieren und reproduzierbar importieren
 
