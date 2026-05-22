@@ -469,3 +469,4 @@ class PlaygroundAccessory(models.Model):
 
 
 from .document_models import PlaygroundDocument
+from .quartier_models import Quartier, QuartierImport
