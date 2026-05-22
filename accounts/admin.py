@@ -15,8 +15,8 @@ from django.core.exceptions import PermissionDenied, ValidationError
 
 from tenants.models import Organization
 
-from .admin_utils import get_user_organization
 from .models import UserProfile
+from .permissions import get_user_organization, user_may_manage_users
 
 
 User = get_user_model()
@@ -38,14 +38,6 @@ ROLE_CHOICES_FOR_ORG_ADMIN = (
     (ROLE_INSPECTOR, "Kontrolleur/in"),
     (ROLE_READER, "Lesender interner User"),
 )
-
-
-def user_may_manage_users(user):
-    if user.is_superuser:
-        return True
-
-    profile = getattr(user, "profile", None)
-    return bool(profile and profile.may_manage_organization)
 
 
 def organization_for_user(user):
@@ -75,6 +67,22 @@ def profile_values_for_role(role):
         "can_inspect": False,
         "can_maintain": False,
     }
+
+
+def user_should_have_django_admin_access(user):
+    if user.is_superuser:
+        return True
+
+    profile = getattr(user, "profile", None)
+    return bool(profile and profile.is_active_for_organization and profile.may_manage_organization)
+
+
+def sync_django_admin_access(user):
+    should_have_access = user_should_have_django_admin_access(user)
+
+    if user.is_staff != should_have_access:
+        user.is_staff = should_have_access
+        user.save(update_fields=["is_staff"])
 
 
 class SpielplatzAtlasUserCreationForm(forms.ModelForm):
@@ -204,6 +212,8 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
                     },
                 )
 
+            sync_django_admin_access(user)
+
         return user
 
 
@@ -233,11 +243,10 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
         "display_organization",
         "display_role",
         "is_active",
-        "is_staff",
+        "display_is_django_admin",
     )
     list_filter = (
         "is_active",
-        "is_staff",
         "is_superuser",
         "profile__organization",
         "profile__is_org_admin",
@@ -252,6 +261,11 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
         "profile__organization__name",
     )
     ordering = ("email",)
+    readonly_fields = (
+        "display_is_django_admin",
+        "last_login",
+        "date_joined",
+    )
 
     class Media:
         js = ("accounts/admin_user_password_generator.js",)
@@ -281,6 +295,36 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
             return "Lesender interner User"
 
         return "Keine interne Rolle"
+
+    @admin.display(boolean=True, description="Django-Admin-Zugang")
+    def display_is_django_admin(self, obj):
+        return obj.is_staff
+
+    def get_fieldsets(self, request, obj=None):
+        if obj is None:
+            return self.add_fieldsets
+
+        if request.user.is_superuser:
+            return (
+                ("Login", {"fields": ("username", "email", "password")}),
+                ("Name", {"fields": ("first_name", "last_name")}),
+                ("Status", {"fields": ("is_active", "display_is_django_admin", "is_superuser")}),
+                ("Zeitstempel", {"fields": ("last_login", "date_joined")}),
+            )
+
+        return (
+            ("Login", {"fields": ("username", "email", "password")}),
+            ("Name", {"fields": ("first_name", "last_name")}),
+            ("Status", {"fields": ("is_active", "display_is_django_admin")}),
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = list(super().get_readonly_fields(request, obj))
+
+        if not request.user.is_superuser:
+            readonly.extend(["username", "email"])
+
+        return tuple(dict.fromkeys(readonly))
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -354,6 +398,7 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
             raise PermissionDenied("Organisations-Admins dürfen keine Superadmins bearbeiten.")
 
         super().save_model(request, obj, form, change)
+        sync_django_admin_access(obj)
 
 
 @admin.register(UserProfile)
@@ -366,6 +411,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "can_view_internal",
         "can_inspect",
         "can_maintain",
+        "display_is_django_admin",
     )
     list_filter = (
         "organization",
@@ -386,6 +432,11 @@ class UserProfileAdmin(admin.ModelAdmin):
         "user",
         "organization",
     )
+    readonly_fields = ("display_is_django_admin",)
+
+    @admin.display(boolean=True, description="Django-Admin-Zugang")
+    def display_is_django_admin(self, obj):
+        return obj.user.is_staff
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -423,6 +474,10 @@ class UserProfileAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        sync_django_admin_access(obj.user)
 
 
 try:
