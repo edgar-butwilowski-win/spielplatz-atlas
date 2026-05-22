@@ -7,7 +7,7 @@ from django.contrib.gis.geos import GEOSGeometry, MultiPolygon, Polygon
 from django.db import transaction
 from django.utils import timezone
 
-from .models import LV95_SRID
+from .geo_constants import LV95_SRID
 from .quartier_lookup import find_quartier_name_for_playground
 from .quartier_models import Quartier
 
