@@ -1,4 +1,15 @@
 # Generated manually to normalize legacy image bytea values that contain data URLs.
+#
+# Purpose
+# -------
+# This migration fixes ImageAsset rows where ImageAsset.data does not contain raw
+# JPEG/PNG/GIF bytes, but a textual legacy representation such as:
+#
+#   data:image/jpeg;base64,/9j/4AAQ...
+#
+# or a textual hex representation of such a value.
+#
+# It is intentionally self-contained and does not import reusable app code.
 
 import base64
 import binascii
@@ -14,12 +25,12 @@ DATA_URL_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
-
 SIGNATURES = (
     (b"\xff\xd8\xff", "image/jpeg", ".jpg"),
     (b"\x89PNG\r\n\x1a\n", "image/png", ".png"),
     (b"GIF87a", "image/gif", ".gif"),
     (b"GIF89a", "image/gif", ".gif"),
+    (b"RIFF", "image/webp", ".webp"),
 )
 
 
@@ -69,8 +80,6 @@ def decode_legacy_value(raw_data):
     if data_url_match:
         return base64.b64decode(data_url_match.group("data"), validate=False)
 
-    # Defensive fallback for rows where a textual hex representation was stored
-    # in the binary field instead of the original bytea value.
     try:
         text = stripped.decode("ascii")
     except UnicodeDecodeError:
@@ -82,6 +91,14 @@ def decode_legacy_value(raw_data):
     if is_hex_string(text):
         return decode_legacy_value(binascii.unhexlify(text))
 
+    if looks_like_base64(text):
+        try:
+            decoded = base64.b64decode(text, validate=False)
+            if detect_image_type(decoded, "")[1]:
+                return decoded
+        except binascii.Error:
+            pass
+
     return stripped
 
 
@@ -89,9 +106,20 @@ def is_hex_string(text):
     return len(text) >= 2 and len(text) % 2 == 0 and bool(re.fullmatch(r"[0-9a-fA-F]+", text))
 
 
+def looks_like_base64(text):
+    compact = "".join(text.split())
+    if len(compact) < 16:
+        return False
+    if len(compact) % 4 not in {0, 2, 3}:
+        return False
+    return bool(re.fullmatch(r"[A-Za-z0-9+/=_-]+", compact))
+
+
 def detect_image_type(data, fallback_mime_type):
     for signature, mime_type, extension in SIGNATURES:
         if data.startswith(signature):
+            if mime_type == "image/webp" and data[8:12] != b"WEBP":
+                continue
             return mime_type, extension
 
     return fallback_mime_type or "application/octet-stream", ""
