@@ -87,8 +87,29 @@ def get_first_feature_type_name(capabilities_xml):
 
 def build_wfs_getfeature_url(endpoint, feature_type_name, output_format=None):
     parsed = urllib.parse.urlparse(endpoint)
-    query = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=True))
-    service = query.get("service") or query.get("Service") or "WFS"
+    raw_query = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=True))
+
+    service = "WFS"
+    version = None
+
+    for key, value in raw_query.items():
+        key_lower = key.lower()
+        if key_lower == "service" and value:
+            service = value
+        elif key_lower == "version" and value:
+            version = value
+
+    query = {
+        key: value
+        for key, value in raw_query.items()
+        if key.lower() not in {
+            "service",
+            "request",
+            "typename",
+            "typenames",
+            "outputformat",
+        }
+    }
 
     query.update({
         "service": service,
@@ -96,11 +117,11 @@ def build_wfs_getfeature_url(endpoint, feature_type_name, output_format=None):
         "typeName": feature_type_name,
     })
 
+    if version:
+        query["version"] = version
+
     if output_format:
         query["outputFormat"] = output_format
-    else:
-        for key in ("outputFormat", "OUTPUTFORMAT", "outputformat"):
-            query.pop(key, None)
 
     return urllib.parse.urlunparse(parsed._replace(query=urllib.parse.urlencode(query)))
 
