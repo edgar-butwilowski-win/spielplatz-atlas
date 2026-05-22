@@ -15,6 +15,7 @@ from .quartier_models import Quartier
 NAME_ATTRIBUTE = "Quartiername"
 GEOMETRY_ATTRIBUTE = "geom"
 WFS_TIMEOUT_SECONDS = 30
+DEFAULT_WFS_VERSION = "1.0.0"
 
 
 class QuartierImportError(ValueError):
@@ -90,7 +91,7 @@ def build_wfs_getfeature_url(endpoint, feature_type_name, output_format=None):
     raw_query = dict(urllib.parse.parse_qsl(parsed.query, keep_blank_values=True))
 
     service = "WFS"
-    version = None
+    version = DEFAULT_WFS_VERSION
 
     for key, value in raw_query.items():
         key_lower = key.lower()
@@ -105,6 +106,7 @@ def build_wfs_getfeature_url(endpoint, feature_type_name, output_format=None):
         if key.lower() not in {
             "service",
             "request",
+            "version",
             "typename",
             "typenames",
             "outputformat",
@@ -113,12 +115,10 @@ def build_wfs_getfeature_url(endpoint, feature_type_name, output_format=None):
 
     query.update({
         "service": service,
+        "version": version,
         "request": "GetFeature",
         "typeName": feature_type_name,
     })
-
-    if version:
-        query["version"] = version
 
     if output_format:
         query["outputFormat"] = output_format
