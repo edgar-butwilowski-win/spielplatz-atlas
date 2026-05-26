@@ -1,11 +1,3 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
-
 from django.urls import path
 
 from . import views
@@ -17,6 +9,7 @@ urlpatterns = [
     path("about/", views.about, name="about"),
     path("impressum/", views.imprint, name="imprint"),
     path("api/playgrounds/", views.public_playgrounds_api, name="playgrounds_api"),
+    path("api/playgrounds/<int:playground_id>/popup/", views.public_playground_popup_api, name="playground_popup_api"),
     path(
         "playground-documents/<int:document_id>/download/",
         views.playground_document_download,
