@@ -10,6 +10,7 @@ from django.contrib import admin
 from django.db import models
 
 from accounts.admin_utils import get_user_organization
+from accounts.permissions import user_may_manage_organization
 from playgrounds.models import (
     PlayEquipment,
     Playground,
@@ -27,6 +28,53 @@ from .models import (
     InspectionScope,
     MaintenanceAction,
 )
+
+
+def user_can_admin_organization(user):
+    return bool(user and user.is_authenticated and user_may_manage_organization(user))
+
+
+def object_belongs_to_user_organization(user, obj):
+    if user.is_superuser:
+        return True
+
+    organization = get_user_organization(user)
+    if not organization:
+        return False
+
+    if obj is None:
+        return True
+
+    playground = getattr(obj, "playground", None)
+    if not playground:
+        return False
+
+    return playground.organization_id == organization.id
+
+
+class OrganizationCapabilityAdminMixin:
+    """Use the single SpielplatzAtlas profile capability model in Django admin."""
+
+    def has_module_permission(self, request):
+        return request.user.is_superuser or user_can_admin_organization(request.user)
+
+    def has_view_permission(self, request, obj=None):
+        if not (request.user.is_superuser or user_can_admin_organization(request.user)):
+            return False
+
+        return object_belongs_to_user_organization(request.user, obj)
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser or user_can_admin_organization(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        if not (request.user.is_superuser or user_can_admin_organization(request.user)):
+            return False
+
+        return object_belongs_to_user_organization(request.user, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 class InspectionAnswerInline(admin.TabularInline):
@@ -322,7 +370,7 @@ def get_allowed_minimum_inspection_types(inspection_type):
     ]
 
 @admin.register(Inspection)
-class InspectionAdmin(admin.ModelAdmin):
+class InspectionAdmin(OrganizationCapabilityAdminMixin, admin.ModelAdmin):
     list_display = (
         "playground",
         "inspection_type",
@@ -383,9 +431,6 @@ class InspectionAdmin(admin.ModelAdmin):
 
         if is_new:
             self.create_default_answers(obj)
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
 
     def create_default_answers(self, inspection):
         organization = inspection.playground.organization
@@ -576,7 +621,7 @@ class MaintenanceActionInline(admin.TabularInline):
 
 
 @admin.register(Defect)
-class DefectAdmin(admin.ModelAdmin):
+class DefectAdmin(OrganizationCapabilityAdminMixin, admin.ModelAdmin):
     list_display = (
         "id",
         "playground",
@@ -678,9 +723,6 @@ class DefectAdmin(admin.ModelAdmin):
                 return
 
         super().save_model(request, obj, form, change)
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
 
 
 @admin.register(MaintenanceAction)
