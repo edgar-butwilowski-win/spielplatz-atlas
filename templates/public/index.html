@@ -235,8 +235,10 @@ function markerPopupContent(feature) {
         photoWrapper.className = "mb-2";
 
         const image = document.createElement("img");
-        image.src = previewPhotoUrl;
+        image.dataset.previewSrc = previewPhotoUrl;
         image.alt = `${i18n.previewImageAltPrefix} ${title}`;
+        image.loading = "lazy";
+        image.decoding = "async";
         image.style.width = "220px";
         image.style.height = "120px";
         image.style.objectFit = "cover";
@@ -269,6 +271,16 @@ function markerPopupContent(feature) {
 
     return wrapper;
 }
+function loadPopupPreviewImages(popupElement) {
+    if (!popupElement) { return; }
+
+    popupElement.querySelectorAll("img[data-preview-src]").forEach((image) => {
+        if (image.src) { return; }
+
+        image.src = image.dataset.previewSrc;
+        delete image.dataset.previewSrc;
+    });
+}
 function renderMarkers(features) {
     markersLayer.clearLayers();
     const bounds = [];
@@ -281,6 +293,7 @@ function renderMarkers(features) {
         const markerTitle = safeText((feature.properties || {}).name || i18n.playgroundFallback);
         const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
         marker.bindPopup(markerPopupContent(feature));
+        marker.on("popupopen", (event) => loadPopupPreviewImages(event.popup.getElement()));
         markersLayer.addLayer(marker);
         bounds.push(latLng);
     }
