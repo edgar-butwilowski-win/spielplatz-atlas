@@ -9,11 +9,23 @@
 from django.contrib import admin
 from django.urls import include, path
 
+from internal import admin_csv_views
+
 admin.site.site_header = "playsafeswiss"
 admin.site.site_title = "playsafeswiss"
 admin.site.index_title = "Verwaltung und Stammdaten"
 
 urlpatterns = [
+    path(
+        "admin/exports/inspections.csv/",
+        admin.site.admin_view(admin_csv_views.inspections_admin_csv_export),
+        name="admin_inspections_csv_export",
+    ),
+    path(
+        "admin/exports/defects.csv/",
+        admin.site.admin_view(admin_csv_views.defects_admin_csv_export),
+        name="admin_defects_csv_export",
+    ),
     path("admin/", admin.site.urls),
     path("i18n/", include("django.conf.urls.i18n")),
     path("internal/", include("internal.urls")),
