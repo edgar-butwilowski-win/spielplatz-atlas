@@ -103,14 +103,4 @@ urlpatterns = [
         views.complete_inspection,
         name="complete_inspection",
     ),
-    path(
-        "exports/inspections.csv",
-        export_views.inspections_csv,
-        name="inspections_csv",
-    ),
-    path(
-        "exports/defects.csv",
-        export_views.defects_csv,
-        name="defects_csv",
-    ),
 ]
