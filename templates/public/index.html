@@ -99,6 +99,7 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 }
 .popup-title { font-weight: 700; margin-bottom: 0.25rem; }
 .popup-meta { color: #64748B; font-size: 0.9rem; }
+.popup-photo-placeholder { width: 220px; height: 120px; border-radius: 0.75rem; background: #F1F5F9; display: none; }
 @media (max-width: 767.98px) { .map-page { padding-top: 0.75rem; padding-bottom: 0.75rem; } }
 {% endblock %}
 
@@ -159,6 +160,9 @@ const markersLayer = L.markerClusterGroup({
     showCoverageOnHover: false,
     spiderfyOnMaxZoom: true,
     disableClusteringAtZoom: 24,
+    chunkedLoading: true,
+    chunkInterval: 80,
+    chunkDelay: 20,
     iconCreateFunction: (cluster) => {
         const count = cluster.getChildCount();
         return L.divIcon({
@@ -200,17 +204,14 @@ const playgroundIcon = L.divIcon({
     popupAnchor: [0, -38],
 });
 let allFeatures = [];
-function safeText(value) {
-    return (value || "").toString();
-}
+let renderVersion = 0;
+const popupDetailsCache = new Map();
+function safeText(value) { return (value || "").toString(); }
 function safeUrl(value, fallback) {
     const fallbackValue = fallback === undefined ? "#" : fallback;
     const url = safeText(value).trim();
-
     if (!url) { return fallbackValue; }
-
     if (url.startsWith("/") && !url.startsWith("//")) { return url; }
-
     return fallbackValue;
 }
 function appendTextElement(parent, className, text, tagName) {
@@ -220,84 +221,137 @@ function appendTextElement(parent, className, text, tagName) {
     parent.appendChild(element);
     return element;
 }
+function createPopupImage(previewPhotoUrl, title) {
+    const photoWrapper = document.createElement("div");
+    photoWrapper.className = "mb-2";
+    const image = document.createElement("img");
+    image.dataset.previewSrc = previewPhotoUrl;
+    image.alt = `${i18n.previewImageAltPrefix} ${title}`;
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.style.width = "220px";
+    image.style.height = "120px";
+    image.style.objectFit = "cover";
+    image.style.borderRadius = "0.75rem";
+    image.style.display = "block";
+    photoWrapper.appendChild(image);
+    return photoWrapper;
+}
+function loadPopupPreviewImages(popupElement) {
+    if (!popupElement) { return; }
+    popupElement.querySelectorAll("img[data-preview-src]").forEach((image) => {
+        if (image.src) { return; }
+        image.src = image.dataset.previewSrc;
+        delete image.dataset.previewSrc;
+    });
+}
 function markerPopupContent(feature) {
     const props = feature.properties || {};
     const title = safeText(props.name || i18n.playgroundFallback);
     const detailUrl = safeUrl(props.detail_url, "#");
-    const previewPhotoUrl = safeUrl(props.preview_photo_url, "");
-    const nextInspectionLabel = safeText(props.next_inspection_label || i18n.nextInspectionPlanned);
-
     const wrapper = document.createElement("div");
     wrapper.style.minWidth = "220px";
-
-    if (previewPhotoUrl) {
-        const photoWrapper = document.createElement("div");
-        photoWrapper.className = "mb-2";
-
-        const image = document.createElement("img");
-        image.dataset.previewSrc = previewPhotoUrl;
-        image.alt = `${i18n.previewImageAltPrefix} ${title}`;
-        image.loading = "lazy";
-        image.decoding = "async";
-        image.style.width = "220px";
-        image.style.height = "120px";
-        image.style.objectFit = "cover";
-        image.style.borderRadius = "0.75rem";
-        image.style.display = "block";
-
-        photoWrapper.appendChild(image);
-        wrapper.appendChild(photoWrapper);
-    }
-
+    const photoSlot = document.createElement("div");
+    photoSlot.className = "popup-photo-slot";
+    wrapper.appendChild(photoSlot);
     appendTextElement(wrapper, "popup-title", title);
     appendTextElement(wrapper, "popup-meta", props.address);
     appendTextElement(wrapper, "popup-meta", props.district);
     appendTextElement(wrapper, "popup-meta mb-2", props.organization);
-
     const inspectionMeta = document.createElement("div");
     inspectionMeta.className = "popup-meta mb-2";
-
     const label = document.createElement("strong");
     label.textContent = i18n.nextInspection;
     inspectionMeta.appendChild(label);
-    inspectionMeta.appendChild(document.createTextNode(` ${nextInspectionLabel}`));
+    inspectionMeta.appendChild(document.createTextNode(` ${i18n.nextInspectionPlanned}`));
     wrapper.appendChild(inspectionMeta);
-
     const detailLink = document.createElement("a");
     detailLink.href = detailUrl;
     detailLink.className = "btn btn-sm btn-atlas-primary";
     detailLink.textContent = i18n.showDetails;
     wrapper.appendChild(detailLink);
-
+    wrapper.dataset.popupLoaded = "false";
     return wrapper;
 }
-function loadPopupPreviewImages(popupElement) {
-    if (!popupElement) { return; }
-
-    popupElement.querySelectorAll("img[data-preview-src]").forEach((image) => {
-        if (image.src) { return; }
-
-        image.src = image.dataset.previewSrc;
-        delete image.dataset.previewSrc;
-    });
+function applyPopupDetails(contentElement, feature, details) {
+    const props = feature.properties || {};
+    const title = safeText(props.name || i18n.playgroundFallback);
+    const photoSlot = contentElement.querySelector(".popup-photo-slot");
+    const inspectionMeta = contentElement.querySelector(".popup-meta.mb-2");
+    if (photoSlot && details.preview_photo_url && !photoSlot.hasChildNodes()) {
+        photoSlot.appendChild(createPopupImage(safeUrl(details.preview_photo_url, ""), title));
+    }
+    if (inspectionMeta) {
+        const label = document.createElement("strong");
+        label.textContent = i18n.nextInspection;
+        inspectionMeta.replaceChildren(label, document.createTextNode(` ${safeText(details.next_inspection_label || i18n.nextInspectionPlanned)}`));
+    }
+    contentElement.dataset.popupLoaded = "true";
+    loadPopupPreviewImages(contentElement);
+}
+function loadPopupDetails(marker, feature) {
+    const props = feature.properties || {};
+    const popup = marker.getPopup();
+    const contentElement = popup ? popup.getContent() : null;
+    if (!contentElement || contentElement.dataset.popupLoaded === "true") { return; }
+    if (!props.popup_url) {
+        contentElement.dataset.popupLoaded = "true";
+        return;
+    }
+    if (popupDetailsCache.has(props.id)) {
+        applyPopupDetails(contentElement, feature, popupDetailsCache.get(props.id));
+        return;
+    }
+    fetch(props.popup_url)
+        .then((response) => response.ok ? response.json() : Promise.reject(response))
+        .then((details) => {
+            popupDetailsCache.set(props.id, details);
+            applyPopupDetails(contentElement, feature, details);
+        })
+        .catch(() => {
+            contentElement.dataset.popupLoaded = "true";
+        });
+}
+function createMarker(feature, bounds) {
+    const coords = feature.geometry.coordinates;
+    const x = coords[0];
+    const y = coords[1];
+    if (!x || !y) { return null; }
+    const latLng = lv95ToLatLng(x, y);
+    const markerTitle = safeText((feature.properties || {}).name || i18n.playgroundFallback);
+    const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
+    marker.bindPopup(markerPopupContent(feature));
+    marker.on("popupopen", () => loadPopupDetails(marker, feature));
+    bounds.push(latLng);
+    return marker;
 }
 function renderMarkers(features) {
+    renderVersion += 1;
+    const currentVersion = renderVersion;
     markersLayer.clearLayers();
     const bounds = [];
-    for (const feature of features) {
-        const coords = feature.geometry.coordinates;
-        const x = coords[0];
-        const y = coords[1];
-        if (!x || !y) { continue; }
-        const latLng = lv95ToLatLng(x, y);
-        const markerTitle = safeText((feature.properties || {}).name || i18n.playgroundFallback);
-        const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
-        marker.bindPopup(markerPopupContent(feature));
-        marker.on("popupopen", (event) => loadPopupPreviewImages(event.popup.getElement()));
-        markersLayer.addLayer(marker);
-        bounds.push(latLng);
+    const markerBatch = [];
+    let index = 0;
+    function renderBatch() {
+        if (currentVersion !== renderVersion) { return; }
+        const batchEnd = Math.min(index + 75, features.length);
+        for (; index < batchEnd; index += 1) {
+            const marker = createMarker(features[index], bounds);
+            if (marker) { markerBatch.push(marker); }
+        }
+        if (markerBatch.length) {
+            markersLayer.addLayers(markerBatch);
+            markerBatch.length = 0;
+        }
+        if (index < features.length) {
+            window.requestAnimationFrame(renderBatch);
+            return;
+        }
+        if (bounds.length > 0) {
+            map.fitBounds(L.latLngBounds(bounds), { padding: [28, 28], maxZoom: 24 });
+        }
     }
-    if (bounds.length > 0) { map.fitBounds(L.latLngBounds(bounds), { padding: [28, 28], maxZoom: 24 }); }
+    window.requestAnimationFrame(renderBatch);
 }
 function normalizeText(value) { return (value || "").toString().toLowerCase().trim(); }
 function filterFeatures(query) {
@@ -309,7 +363,13 @@ function filterFeatures(query) {
         return haystack.includes(q);
     });
 }
-fetch("{% url 'public:playgrounds_api' %}").then(response => response.json()).then(data => { allFeatures = data.features || []; renderMarkers(allFeatures); setTimeout(() => map.invalidateSize(), 0); });
+fetch("{% url 'public:playgrounds_api' %}")
+    .then(response => response.json())
+    .then(data => {
+        allFeatures = data.features || [];
+        renderMarkers(allFeatures);
+        setTimeout(() => map.invalidateSize(), 0);
+    });
 document.getElementById("searchInput").addEventListener("input", (event) => { renderMarkers(filterFeatures(event.target.value)); });
 window.addEventListener("resize", () => { map.invalidateSize(); });
 </script>
