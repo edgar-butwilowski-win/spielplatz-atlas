@@ -7,7 +7,6 @@
 # unless expressly permitted in writing.
 
 from django.urls import path
-from django.views.generic import RedirectView
 
 from . import control_status, dashboard, export_views, planning_views, views
 
@@ -103,15 +102,5 @@ urlpatterns = [
         "inspections/<int:inspection_id>/complete/",
         views.complete_inspection,
         name="complete_inspection",
-    ),
-    path(
-        "exports/inspections.csv",
-        RedirectView.as_view(pattern_name="admin_inspections_csv_export", permanent=False),
-        name="inspections_csv",
-    ),
-    path(
-        "exports/defects.csv",
-        RedirectView.as_view(pattern_name="admin_defects_csv_export", permanent=False),
-        name="defects_csv",
     ),
 ]
