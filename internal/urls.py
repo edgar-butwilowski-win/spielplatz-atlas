@@ -8,7 +8,7 @@
 
 from django.urls import path
 
-from . import control_status, dashboard, planning_views, views
+from . import control_status, dashboard, export_views, planning_views, views
 
 app_name = "internal"
 
@@ -74,6 +74,11 @@ urlpatterns = [
         name="edit_defect",
     ),
     path(
+        "defects/<int:defect_id>/pdf/",
+        export_views.defect_pdf,
+        name="defect_pdf",
+    ),
+    path(
         "inspection-answers/<int:answer_id>/defects/new/",
         views.create_defect_from_inspection_answer,
         name="create_defect_from_inspection_answer",
@@ -84,6 +89,11 @@ urlpatterns = [
         name="inspection_detail",
     ),
     path(
+        "inspections/<int:inspection_id>/pdf/",
+        export_views.inspection_pdf,
+        name="inspection_pdf",
+    ),
+    path(
         "inspections/<int:inspection_id>/answers/save/",
         views.save_inspection_answers,
         name="save_inspection_answers",
@@ -92,5 +102,15 @@ urlpatterns = [
         "inspections/<int:inspection_id>/complete/",
         views.complete_inspection,
         name="complete_inspection",
+    ),
+    path(
+        "exports/inspections.csv",
+        export_views.inspections_csv,
+        name="inspections_csv",
+    ),
+    path(
+        "exports/defects.csv",
+        export_views.defects_csv,
+        name="defects_csv",
     ),
 ]
