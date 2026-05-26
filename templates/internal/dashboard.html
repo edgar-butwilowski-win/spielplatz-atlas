@@ -85,13 +85,73 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
-    function labelsFrom(items){return items.map(item=>item.label);} function countsFrom(items){return items.map(item=>item.count);}
-    function renderBarChart(id,items){const element=document.getElementById(id);if(!element){return;}new Chart(element,{type:"bar",data:{labels:labelsFrom(items),datasets:[{label:"{% trans 'Count' %}",data:countsFrom(items)}]},options:{responsive:true,maintainAspectRatio:false,resizeDelay:100,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});}
+    const dashboardLanguage = "{{ LANGUAGE_CODE|default:'en' }}";
+    const dashboardDeTranslations = {
+        "Internal dashboard":"Internes Dashboard",
+        "Analytics and key figures":"Analysen und Kennzahlen",
+        "Overview for {{ organization.name|escapejs }}.":"Übersicht für {{ organization.name|escapejs }}.",
+        "Cross-tenant overview for super admins.":"Mandantenübergreifende Übersicht für Superadmins.",
+        "Organizations":"Organisationen",
+        "Active playgrounds":"Aktive Spielplätze",
+        "Open defects":"Offene Mängel",
+        "Defects with safety risk":"Mängel mit Sicherheitsrisiko",
+        "Planned maintenance actions":"Geplante Unterhaltsmassnahmen",
+        "Inspections in progress":"Kontrollen in Bearbeitung",
+        "Completed inspections":"Abgeschlossene Kontrollen",
+        "Defects by status":"Mängel nach Status",
+        "Defects by source":"Mängel nach Quelle",
+        "Inspections by type":"Kontrollen nach Typ",
+        "Inspections by status":"Kontrollen nach Status",
+        "Maintenance by status":"Unterhalt nach Status",
+        "Date":"Datum",
+        "Title":"Titel",
+        "Playground":"Spielplatz",
+        "Status":"Status",
+        "No planned maintenance actions available.":"Keine geplanten Unterhaltsmassnahmen vorhanden.",
+        "Open defects by playground":"Offene Mängel nach Spielplatz",
+        "Organization":"Organisation",
+        "Defects":"Mängel",
+        "Without playground":"Ohne Spielplatz",
+        "No open defects available.":"Keine offenen Mängel vorhanden.",
+        "Playgrounds without a recent completed inspection":"Spielplätze ohne kürzlich abgeschlossene Kontrolle",
+        "The last {{ recent_inspection_days }} days are considered.":"Berücksichtigt werden die letzten {{ recent_inspection_days }} Tage.",
+        "Last inspection":"Letzte Kontrolle",
+        "None":"Keine",
+        "All shown playgrounds have a recent completed inspection.":"Alle angezeigten Spielplätze haben eine kürzlich abgeschlossene Kontrolle.",
+        "Defect":"Mangel",
+        "Planned":"Geplant",
+        "No open defects with safety risk available.":"Keine offenen Mängel mit Sicherheitsrisiko vorhanden.",
+        "Latest completed inspections":"Zuletzt abgeschlossene Kontrollen",
+        "Type":"Typ",
+        "Result":"Ergebnis",
+        "No completed inspections yet.":"Noch keine abgeschlossenen Kontrollen vorhanden.",
+        "Count":"Anzahl",
+        "Visual routine inspection":"Visuelle Routinekontrolle",
+        "Operational inspection":"Operative Kontrolle",
+        "Annual main inspection":"Jährliche Hauptkontrolle",
+        "Open":"Offen",
+        "In progress":"In Bearbeitung",
+        "Resolved":"Behoben",
+        "Checked / completed":"Geprüft / abgeschlossen",
+        "Completed":"Abgeschlossen",
+        "Inspection":"Kontrolle",
+        "Citizen report":"Meldung aus der Bevölkerung",
+        "Internal report":"Interne Meldung",
+        "Maintenance / care":"Unterhalt / Pflege",
+        "Other":"Sonstiges",
+        "OK":"OK",
+        "Defects found":"Mängel festgestellt"
+    };
+    function translateDashboard(value){if(!dashboardLanguage.startsWith("de")){return value;}return dashboardDeTranslations[value] || value;}
+    function translateDashboardTextNodes(){if(!dashboardLanguage.startsWith("de")){return;}const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode(node){return node.nodeValue.trim()?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;}});const nodes=[];while(walker.nextNode()){nodes.push(walker.currentNode);}nodes.forEach(node=>{const original=node.nodeValue;const trimmed=original.trim();const translated=dashboardDeTranslations[trimmed];if(translated){node.nodeValue=original.replace(trimmed,translated);}});}
+    function labelsFrom(items){return items.map(item=>translateDashboard(item.label));} function countsFrom(items){return items.map(item=>item.count);}
+    function renderBarChart(id,items){const element=document.getElementById(id);if(!element){return;}new Chart(element,{type:"bar",data:{labels:labelsFrom(items),datasets:[{label:translateDashboard("Count"),data:countsFrom(items)}]},options:{responsive:true,maintainAspectRatio:false,resizeDelay:100,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});}
     renderBarChart("defectsByStatusChart", {{ defects_by_status_json|safe }});
     renderBarChart("defectsBySourceChart", {{ defects_by_source_json|safe }});
     renderBarChart("inspectionsByTypeChart", {{ inspections_by_type_json|safe }});
     renderBarChart("inspectionsByStatusChart", {{ inspections_by_status_json|safe }});
     renderBarChart("maintenanceByStatusChart", {{ maintenance_by_status_json|safe }});
+    translateDashboardTextNodes();
 </script>
 {% include "includes/main_navigation_script.html" %}
 </body>
