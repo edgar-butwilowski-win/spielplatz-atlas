@@ -7,337 +7,772 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "English"
-msgstr "Anglais"
-msgid "Deutsch"
-msgstr "Allemand"
-msgid "Français"
-msgstr "Français"
-msgid "Italiano"
-msgstr "Italien"
-msgid "Rumantsch"
-msgstr "Romanche"
-msgid "Map"
-msgstr "Carte"
-msgid "About"
-msgstr "À propos"
-msgid "Imprint"
-msgstr "Mentions légales"
-msgid "Join"
-msgstr "Participer"
-msgid "Open menu"
-msgstr "Ouvrir le menu"
-msgid "Login"
-msgstr "Connexion"
-msgid "Logout"
-msgstr "Déconnexion"
-msgid "Admin"
-msgstr "Admin"
-msgid "Dashboard"
-msgstr "Tableau de bord"
-msgid "Language"
-msgstr "Langue"
-msgid "Messages"
-msgstr "Messages"
-msgid "My inspections"
-msgstr "Mes contrôles"
-msgid "Deployment planning"
-msgstr "Planification des interventions"
-msgid "Cancel"
-msgstr "Annuler"
-msgid "Save"
-msgstr "Enregistrer"
-msgid "Filter"
-msgstr "Filtrer"
-msgid "Reset"
-msgstr "Réinitialiser"
-msgid "Open"
-msgstr "Ouvert"
-msgid "Completed"
-msgstr "Terminé"
-msgid "In progress"
-msgstr "En cours"
-msgid "Planned"
-msgstr "Planifié"
-msgid "Done"
-msgstr "Fait"
-msgid "Overdue"
-msgstr "En retard"
-msgid "Suspended"
-msgstr "Suspendu"
-msgid "Cancelled"
-msgstr "Annulé"
-msgid "Resolved"
-msgstr "Résolu"
-msgid "Checked / completed"
-msgstr "Contrôlé / terminé"
-msgid "OK"
-msgstr "OK"
-msgid "Defects found"
-msgstr "Défauts constatés"
-msgid "Defect"
-msgstr "Défaut"
-msgid "Defects"
-msgstr "Défauts"
-msgid "Safety defects"
-msgstr "Défauts de sécurité"
-msgid "Inspection"
-msgstr "Contrôle"
-msgid "Inspection type"
-msgstr "Type de contrôle"
-msgid "Visual routine inspection"
-msgstr "Contrôle visuel de routine"
-msgid "Operational inspection"
-msgstr "Contrôle opérationnel"
-msgid "Annual main inspection"
-msgstr "Inspection principale annuelle"
-msgid "General playground inspection"
-msgstr "Contrôle général de la place de jeux"
-msgid "Play equipment"
-msgstr "Équipements de jeu"
-msgid "Impact protection surface / ground"
-msgstr "Surface amortissante / sol"
-msgid "Additional equipment"
-msgstr "Équipement complémentaire"
-msgid "Not checked yet"
-msgstr "Pas encore contrôlé"
-msgid "Not applicable"
-msgstr "Non applicable"
-msgid "Citizen report"
-msgstr "Signalement citoyen"
-msgid "Internal report"
-msgstr "Signalement interne"
-msgid "Maintenance / care"
-msgstr "Maintenance / entretien"
-msgid "Other"
-msgstr "Autre"
 msgid "A (immediate)"
 msgstr "A (immédiat)"
-msgid "B (medium-term)"
-msgstr "B (à moyen terme)"
+
+msgid "A user account already exists for this email address."
+msgstr "Un compte utilisateur existe déjà pour cette adresse e-mail."
+
+msgid "About"
+msgstr "À propos"
+
+msgid "Accept"
+msgstr "Accepter"
+
+msgid "Acceptance documents"
+msgstr "Documents de réception"
+
+msgid "Action"
+msgstr "Action"
+
+msgid "Active inspection tasks"
+msgstr "Tâches de contrôle actives"
+
+msgid "Active playgrounds"
+msgstr "Places de jeux actives"
+
+msgid "Additional equipment"
+msgstr "Équipement complémentaire"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Affected object"
+msgstr "Objet concerné"
+
+msgid "All assignments"
+msgstr "Toutes les attributions"
+
+msgid "All inspection types"
+msgstr "Tous les types de contrôle"
+
+msgid "All organizations"
+msgstr "Toutes les organisations"
+
+msgid "An entry already exists for this organization."
+msgstr "Une entrée existe déjà pour cette organisation."
+
+msgid "Analytics and key figures"
+msgstr "Analyses et chiffres clés"
+
+msgid "Annual main inspection"
+msgstr "Inspection principale annuelle"
+
+msgid "April"
+msgstr "avril"
+
+msgid "As soon as publicly visible play equipment has been recorded, it will be shown here."
+msgstr "Dès que des équipements de jeu visibles publiquement seront saisis, ils seront affichés ici."
+
+msgid "Assigned"
+msgstr "Attribué"
+
+msgid "Assignment and system message"
+msgstr "Attribution et message système"
+
+msgid "August"
+msgstr "août"
+
 msgid "Automatic"
 msgstr "Automatique"
+
+msgid "B (medium-term)"
+msgstr "B (à moyen terme)"
+
+msgid "Back to playground"
+msgstr "Retour à la place de jeux"
+
+msgid "Become a playground pro!"
+msgstr "Deviens pro des places de jeux !"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Cancelled"
+msgstr "Annulé"
+
+msgid "Care status"
+msgstr "État d’entretien"
+
+msgid "Certificate documents"
+msgstr "Documents de certificat"
+
+msgid "Checked / completed"
+msgstr "Contrôlé / terminé"
+
+msgid "Citizen report"
+msgstr "Signalement citoyen"
+
+msgid "Comment from inspection"
+msgstr "Commentaire du contrôle"
+
+msgid "Completed"
+msgstr "Terminé"
+
+msgid "Completed inspections"
+msgstr "Contrôles terminés"
+
+msgid "Count"
+msgstr "Nombre"
+
+msgid "Created from inspection item"
+msgstr "Créé à partir du point de contrôle"
+
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+msgid "Date"
+msgstr "Date"
+
+msgid "December"
+msgstr "décembre"
+
+msgid "Defect"
+msgstr "Défaut"
+
+msgid "Defect details"
+msgstr "Détails du défaut"
+
+msgid "Defect photo %(number)s"
+msgstr "Photo du défaut %(number)s"
+
+msgid "Defect with safety risk"
+msgstr "Défaut avec risque de sécurité"
+
+msgid "Defect without safety risk"
+msgstr "Défaut sans risque de sécurité"
+
+msgid "Defects"
+msgstr "Défauts"
+
+msgid "Defects found"
+msgstr "Défauts constatés"
+
+msgid "Defects with safety risk"
+msgstr "Défauts avec risque de sécurité"
+
+msgid "Delete photo"
+msgstr "Supprimer la photo"
+
+msgid "Deployment planning"
+msgstr "Planification des interventions"
+
+msgid "Deutsch"
+msgstr "Allemand"
+
+msgid "Die Anfrage konnte nicht verarbeitet werden."
+msgstr "La demande n’a pas pu être traitée."
+
+msgid "Diese URL-Kennung wird bereits verwendet."
+msgstr "Cet identifiant URL est déjà utilisé."
+
+msgid "District"
+msgstr "Quartier"
+
+msgid "Document not found."
+msgstr "Document introuvable."
+
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Done"
+msgstr "Fait"
+
+msgid "Due"
+msgstr "Échéance"
+
+msgid "Due soon"
+msgstr "Bientôt échu"
+
+msgid "E-Mail-Adresse"
+msgstr "Adresse e-mail"
+
+msgid "e.g. City of Winterthur"
+msgstr "p. ex. Ville de Winterthour"
+
+msgid "e.g. city-winterthur"
+msgstr "p. ex. ville-winterthour"
+
+msgid "Edit defect"
+msgstr "Modifier le défaut"
+
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "Equipment on this playground."
+msgstr "Équipements présents sur cette place de jeux."
+
+msgid "Existing defects for this inspection item"
+msgstr "Défauts déjà saisis pour ce point de contrôle"
+
+msgid "February"
+msgstr "février"
+
+msgid "Filter"
+msgstr "Filtrer"
+
+msgid "First name"
+msgstr "Prénom"
+
+msgid "For example: city-winterthur or municipality-example."
+msgstr "Par exemple : ville-winterthour ou commune-exemple."
+
+msgid "Français"
+msgstr "Français"
+
+msgid "Für diese E-Mail-Adresse besteht bereits ein Benutzerkonto."
+msgstr "Un compte utilisateur existe déjà pour cette adresse e-mail."
+
+msgid "Für diese E-Mail-Adresse liegt bereits eine offene Anfrage vor."
+msgstr "Une demande ouverte existe déjà pour cette adresse e-mail."
+
+msgid "Für diese Organisation besteht bereits ein Eintrag."
+msgstr "Une entrée existe déjà pour cette organisation."
+
+msgid "Für diese Organisation liegt bereits eine offene Anfrage vor."
+msgstr "Une demande ouverte existe déjà pour cette organisation."
+
+msgid "Für diese URL-Kennung liegt bereits eine offene Anfrage vor."
+msgstr "Une demande ouverte existe déjà pour cet identifiant URL."
+
+msgid "General playground defect"
+msgstr "Défaut général de la place de jeux"
+
+msgid "General playground inspection"
+msgstr "Contrôle général de la place de jeux"
+
+msgid "Impact protection surface / ground"
+msgstr "Surface amortissante / sol"
+
+msgid "Imprint"
+msgstr "Mentions légales"
+
+msgid "In operation"
+msgstr "En service"
+
+msgid "In progress"
+msgstr "En cours"
+
+msgid "Inspection"
+msgstr "Contrôle"
+
+msgid "Inspection area"
+msgstr "Zone de contrôle"
+
+msgid "Inspection criterion"
+msgstr "Critère de contrôle"
+
+msgid "Inspection is currently suspended."
+msgstr "L’inspection est actuellement suspendue."
+
+msgid "Inspection note"
+msgstr "Note de contrôle"
+
+msgid "Inspection tasks"
+msgstr "Tâches de contrôle"
+
+msgid "Inspection type"
+msgstr "Type de contrôle"
+
+msgid "Inspections in progress"
+msgstr "Contrôles en cours"
+
+msgid "Internal"
+msgstr "Interne"
+
+msgid "Internal access"
+msgstr "Accès interne"
+
+msgid "Internal dashboard"
+msgstr "Tableau de bord interne"
+
+msgid "Internal deployment planning"
+msgstr "Planification interne des interventions"
+
+msgid "Internal report"
+msgstr "Signalement interne"
+
+msgid "Internally visible"
+msgstr "Visible en interne"
+
+msgid "Inventory no."
+msgstr "N° d’inventaire"
+
+msgid "is being planned"
+msgstr "est en cours de planification"
+
+msgid "Italiano"
+msgstr "Italien"
+
+msgid "January"
+msgstr "janvier"
+
+msgid "Join"
+msgstr "Participer"
+
+msgid "July"
+msgstr "juillet"
+
+msgid "June"
+msgstr "juin"
+
+msgid "Key figures"
+msgstr "Chiffres clés"
+
+msgid "Known defects and planned repairs."
+msgstr "Défauts connus et remises en état planifiées."
+
+msgid "Kurzname / URL-Kennung"
+msgstr "Nom court / identifiant URL"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Last inspection"
+msgstr "Dernier contrôle"
+
+msgid "Last name"
+msgstr "Nom"
+
+msgid "Log in"
+msgstr "Se connecter"
+
+msgid "Login"
+msgstr "Connexion"
+
+msgid "Logout"
+msgstr "Déconnexion"
+
+msgid "Maintenance / care"
+msgstr "Maintenance / entretien"
+
 msgid "Manual"
 msgstr "Manuel"
 
-msgid "Your playground. Your information."
-msgstr "Ta place de jeux. Tes informations."
-msgid "Address"
-msgstr "Adresse"
-msgid "No address stored"
-msgstr "Aucune adresse enregistrée"
-msgid "District"
-msgstr "Quartier"
-msgid "Status"
-msgstr "Statut"
-msgid "Publicly visible"
-msgstr "Visible publiquement"
-msgid "Internally visible"
-msgstr "Visible en interne"
-msgid "Swiss coordinates"
-msgstr "Coordonnées suisses"
-msgid "Show specialist map"
-msgstr "Afficher la carte métier"
-msgid "Documents"
-msgstr "Documents"
-msgid "Certificate documents"
-msgstr "Documents de certificat"
-msgid "Acceptance documents"
-msgstr "Documents de réception"
-msgid "Care status"
-msgstr "État d’entretien"
-msgid "Known defects and planned repairs."
-msgstr "Défauts connus et remises en état planifiées."
-msgid "Record new inspection"
-msgstr "Saisir un nouveau contrôle"
-msgid "Record defect"
-msgstr "Saisir un défaut"
-msgid "Record new defect"
-msgstr "Saisir un nouveau défaut"
-msgid "Save defect"
-msgstr "Enregistrer le défaut"
-msgid "Open defect"
-msgstr "Ouvrir le défaut"
-msgid "Edit defect"
-msgstr "Modifier le défaut"
-msgid "Defect details"
-msgstr "Détails du défaut"
-msgid "Inspection is currently suspended."
-msgstr "L’inspection est actuellement suspendue."
-msgid "Last inspection"
-msgstr "Dernier contrôle"
-msgid "No completed inspection yet"
-msgstr "Aucun contrôle terminé pour l’instant"
+msgid "Map"
+msgstr "Carte"
+
+msgid "March"
+msgstr "mars"
+
+msgid "Maximum 100 entries"
+msgstr "Maximum 100 entrées"
+
+msgid "May"
+msgstr "mai"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Messages"
+msgstr "Messages"
+
+msgid "My inspections"
+msgstr "Mes contrôles"
+
+msgid "Nachname"
+msgstr "Nom"
+
+msgid "Nachricht"
+msgstr "Message"
+
+msgid "Name der Organisation"
+msgstr "Nom de l’organisation"
+
+msgid "Next 30 days"
+msgstr "Prochains 30 jours"
+
+msgid "Next inspection:"
+msgstr "Prochain contrôle :"
+
 msgid "Next planned inspection"
 msgstr "Prochain contrôle planifié"
-msgid "is being planned"
-msgstr "est en cours de planification"
-msgid "General playground defect"
-msgstr "Défaut général de la place de jeux"
-msgid "Safety risk"
-msgstr "Risque de sécurité"
+
+msgid "No address stored"
+msgstr "Aucune adresse enregistrée"
+
+msgid "No completed inspection yet"
+msgstr "Aucun contrôle terminé pour l’instant"
+
+msgid "No defects known"
+msgstr "Aucun défaut connu"
+
+msgid "No further assigned inspections in the next 30 days."
+msgstr "Aucun autre contrôle attribué dans les 30 prochains jours."
+
+msgid "No inspection tasks available for the current selection."
+msgstr "Aucune tâche de contrôle disponible pour la sélection actuelle."
+
+msgid "No inspections are assigned for today."
+msgstr "Aucun contrôle n’est attribué pour aujourd’hui."
+
+msgid "No open unassigned inspection tasks available."
+msgstr "Aucune tâche de contrôle ouverte non attribuée disponible."
+
+msgid "No permission for control status."
+msgstr "Aucune autorisation pour le statut des contrôles."
+
+msgid "No play equipment recorded yet"
+msgstr "Aucun équipement de jeu saisi pour l’instant"
+
+msgid "No renovation planned"
+msgstr "Aucune rénovation planifiée"
+
 msgid "No safety risk"
 msgstr "Aucun risque de sécurité"
-msgid "Internal"
-msgstr "Interne"
-msgid "Source"
-msgstr "Source"
-msgid "Reported on"
-msgstr "Signalé le"
-msgid "reported on"
-msgstr "signalé le"
-msgid "Affected object"
-msgstr "Objet concerné"
-msgid "Responsible person"
-msgstr "Personne responsable"
-msgid "Not assigned yet"
-msgstr "Pas encore attribué"
+
+msgid "Not applicable"
+msgstr "Non applicable"
+
 msgid "Not assigned"
 msgstr "Non attribué"
+
+msgid "Not assigned yet"
+msgstr "Pas encore attribué"
+
+msgid "Not checked yet"
+msgstr "Pas encore contrôlé"
+
 msgid "Not planned"
 msgstr "Non planifié"
-msgid "Created from inspection item"
-msgstr "Créé à partir du point de contrôle"
-msgid "Assignment and system message"
-msgstr "Attribution et message système"
-msgid "Save assignment"
-msgstr "Enregistrer l’attribution"
-msgid "Back to playground"
-msgstr "Retour à la place de jeux"
-msgid "Record defect from inspection item"
-msgstr "Saisir un défaut à partir du point de contrôle"
-msgid "Inspection area"
-msgstr "Zone de contrôle"
-msgid "Without inspection area"
-msgstr "Sans zone de contrôle"
-msgid "Inspection criterion"
-msgstr "Critère de contrôle"
-msgid "Inspection note"
-msgstr "Note de contrôle"
-msgid "Comment from inspection"
-msgstr "Commentaire du contrôle"
-msgid "Existing defects for this inspection item"
-msgstr "Défauts déjà saisis pour ce point de contrôle"
-msgid "Optional."
-msgstr "Facultatif."
-msgid "Photos of the defect"
-msgstr "Photos du défaut"
-msgid "Up to three photos per defect."
-msgstr "Jusqu’à trois photos par défaut."
-msgid "Delete photo"
-msgstr "Supprimer la photo"
-msgid "Optional free text, for example citizen hotline, depot or caretaker."
-msgstr "Texte libre facultatif, par exemple hotline citoyenne, dépôt ou conciergerie."
+
+msgid "November"
+msgstr "novembre"
+
+msgid "October"
+msgstr "octobre"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "On time"
+msgstr "Dans les délais"
+
 msgid "Only activate this if the notice should appear in the public care status."
 msgstr "N’activer que si l’avis doit apparaître dans l’état d’entretien public."
-msgid "This text may be publicly visible. Do not enter internal details."
-msgstr "Ce texte peut être visible publiquement. Ne pas saisir de détails internes."
+
+msgid "Open"
+msgstr "Ouvert"
+
+msgid "Open defect"
+msgstr "Ouvrir le défaut"
+
+msgid "Open defects"
+msgstr "Défauts ouverts"
+
+msgid "Open inspections without assignment"
+msgstr "Contrôles ouverts sans attribution"
+
+msgid "Open menu"
+msgstr "Ouvrir le menu"
+
+msgid "Operational inspection"
+msgstr "Contrôle opérationnel"
+
+msgid "Operational lists"
+msgstr "Listes opérationnelles"
+
+msgid "Optional free text, for example citizen hotline, depot or caretaker."
+msgstr "Texte libre facultatif, par exemple hotline citoyenne, dépôt ou conciergerie."
+
+msgid "Optional."
+msgstr "Facultatif."
+
+msgid "Optional: kurzer Hinweis zur Organisation oder zum geplanten Einsatz."
+msgstr "Facultatif : brève indication sur l’organisation ou l’utilisation prévue."
+
+msgid "Optional: short note about the organization or the planned use."
+msgstr "Facultatif : brève indication sur l’organisation ou l’utilisation prévue."
+
+msgid "Organization"
+msgstr "Organisation"
+
+msgid "Organization name"
+msgstr "Nom de l’organisation"
+
+msgid "Organizations"
+msgstr "Organisations"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Overdue"
+msgstr "En retard"
+
+msgid "Password"
+msgstr "Mot de passe"
 
 msgid "Personal inspection list"
 msgstr "Liste personnelle des contrôles"
-msgid "Your inspections for today, overdue inspections and upcoming inspection tasks."
-msgstr "Vos contrôles d’aujourd’hui, les contrôles en retard et les tâches à venir."
-msgid "Today"
-msgstr "Aujourd’hui"
-msgid "No inspections are assigned for today."
-msgstr "Aucun contrôle n’est attribué pour aujourd’hui."
-msgid "Next 30 days"
-msgstr "Prochains 30 jours"
-msgid "No further assigned inspections in the next 30 days."
-msgstr "Aucun autre contrôle attribué dans les 30 prochains jours."
-msgid "Open inspections without assignment"
-msgstr "Contrôles ouverts sans attribution"
-msgid "These tasks can be accepted by authorized inspectors."
-msgstr "Ces tâches peuvent être reprises par des contrôleurs autorisés."
-msgid "No open unassigned inspection tasks available."
-msgstr "Aucune tâche de contrôle ouverte non attribuée disponible."
-msgid "Due"
-msgstr "Échéance"
-msgid "Accept"
-msgstr "Accepter"
-msgid "Start inspection"
-msgstr "Démarrer le contrôle"
-msgid "Select the inspection type. A new inspection with all active inspection criteria will then be created."
-msgstr "Sélectionnez le type de contrôle. Un nouveau contrôle avec tous les critères actifs sera ensuite créé."
-msgid "The inspection is based on the active inspection catalogue according to SN EN 1176/1177 and any local additions made by the organization."
-msgstr "Le contrôle se base sur le catalogue actif selon SN EN 1176/1177 ainsi que sur d’éventuels compléments locaux de l’organisation."
-msgid "Internal deployment planning"
-msgstr "Planification interne des interventions"
+
+msgid "Photo of %(name)s"
+msgstr "Photo de %(name)s"
+
+msgid "Photos of the defect"
+msgstr "Photos du défaut"
+
 msgid "Plan inspection tasks"
 msgstr "Planifier les tâches de contrôle"
-msgid "Please select an organization to edit its planning."
-msgstr "Veuillez sélectionner une organisation pour modifier sa planification."
-msgid "Organization"
-msgstr "Organisation"
-msgid "All organizations"
-msgstr "Toutes les organisations"
-msgid "All inspection types"
-msgstr "Tous les types de contrôle"
-msgid "Recalculate inspection planning"
-msgstr "Recalculer la planification des contrôles"
-msgid "Inspection tasks"
-msgstr "Tâches de contrôle"
-msgid "Maximum 100 entries"
-msgstr "Maximum 100 entrées"
-msgid "Action"
-msgstr "Action"
-msgid "No inspection tasks available for the current selection."
-msgstr "Aucune tâche de contrôle disponible pour la sélection actuelle."
-msgid "Internal dashboard"
-msgstr "Tableau de bord interne"
-msgid "Analytics and key figures"
-msgstr "Analyses et chiffres clés"
-msgid "Key figures"
-msgstr "Chiffres clés"
-msgid "Trends"
-msgstr "Évolutions"
-msgid "Planning"
-msgstr "Planification"
-msgid "Operational lists"
-msgstr "Listes opérationnelles"
-msgid "Organizations"
-msgstr "Organisations"
-msgid "Active playgrounds"
-msgstr "Places de jeux actives"
-msgid "Open defects"
-msgstr "Défauts ouverts"
-msgid "Defects with safety risk"
-msgstr "Défauts avec risque de sécurité"
+
+msgid "Planned"
+msgstr "Planifié"
+
 msgid "Planned maintenance actions"
 msgstr "Mesures de maintenance planifiées"
-msgid "Inspections in progress"
-msgstr "Contrôles en cours"
-msgid "Completed inspections"
-msgstr "Contrôles terminés"
-msgid "Count"
-msgstr "Nombre"
-msgid "Date"
-msgstr "Date"
-msgid "Title"
-msgstr "Titre"
+
+msgid "Planning"
+msgstr "Planification"
+
+msgid "Play equipment"
+msgstr "Équipements de jeu"
+
 msgid "Playground"
 msgstr "Place de jeux"
-msgid "January"
-msgstr "janvier"
-msgid "February"
-msgstr "février"
-msgid "March"
-msgstr "mars"
-msgid "April"
-msgstr "avril"
-msgid "May"
-msgstr "mai"
-msgid "June"
-msgstr "juin"
-msgid "July"
-msgstr "juillet"
-msgid "August"
-msgstr "août"
+
+msgid "playgrounds"
+msgstr "places de jeux"
+
+msgid "playsafeswiss home page"
+msgstr "Page d’accueil playsafeswiss"
+
+msgid "Please check your email address and password."
+msgstr "Veuillez vérifier votre adresse e-mail et votre mot de passe."
+
+msgid "Please select an organization to edit its planning."
+msgstr "Veuillez sélectionner une organisation pour modifier sa planification."
+
+msgid "Preview image of"
+msgstr "Image d’aperçu de"
+
+msgid "Preview image of %(name)s"
+msgstr "Image d’aperçu de %(name)s"
+
+msgid "Public visitors do not need a user account."
+msgstr "Les visiteurs publics n’ont pas besoin de compte utilisateur."
+
+msgid "Publicly visible"
+msgstr "Visible publiquement"
+
+msgid "Recalculate inspection planning"
+msgstr "Recalculer la planification des contrôles"
+
+msgid "Recommended renovation year"
+msgstr "Année de rénovation recommandée"
+
+msgid "Record defect"
+msgstr "Saisir un défaut"
+
+msgid "Record defect from inspection item"
+msgstr "Saisir un défaut à partir du point de contrôle"
+
+msgid "Record new defect"
+msgstr "Saisir un nouveau défaut"
+
+msgid "Record new inspection"
+msgstr "Saisir un nouveau contrôle"
+
+msgid "Renovation comment"
+msgstr "Commentaire sur la rénovation"
+
+msgid "Renovation details"
+msgstr "Détails de la rénovation"
+
+msgid "Renovation pending"
+msgstr "Rénovation en attente"
+
+msgid "Renovation type"
+msgstr "Type de rénovation"
+
+msgid "Replace image"
+msgstr "Remplacer l’image"
+
+msgid "Replace playground image"
+msgstr "Remplacer l’image de la place de jeux"
+
+msgid "Reported on"
+msgstr "Signalé le"
+
+msgid "reported on"
+msgstr "signalé le"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
+msgid "Resolved"
+msgstr "Résolu"
+
+msgid "Responsible person"
+msgstr "Personne responsable"
+
+msgid "Rotate image by 90°"
+msgstr "Faire pivoter l’image de 90°"
+
+msgid "Rumantsch"
+msgstr "Romanche"
+
+msgid "Safety defects"
+msgstr "Défauts de sécurité"
+
+msgid "Safety risk"
+msgstr "Risque de sécurité"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Save assignment"
+msgstr "Enregistrer l’attribution"
+
+msgid "Save defect"
+msgstr "Enregistrer le défaut"
+
+msgid "Search playground, address or district"
+msgstr "Rechercher une place de jeux, une adresse ou un quartier"
+
+msgid "Select a playground on the map and get exciting detailed information."
+msgstr "Sélectionne une place de jeux sur la carte et obtiens des informations détaillées intéressantes."
+
+msgid "Select the inspection type. A new inspection with all active inspection criteria will then be created."
+msgstr "Sélectionnez le type de contrôle. Un nouveau contrôle avec tous les critères actifs sera ensuite créé."
+
 msgid "September"
 msgstr "septembre"
-msgid "October"
-msgstr "octobre"
-msgid "November"
-msgstr "novembre"
-msgid "December"
-msgstr "décembre"
+
+msgid "Show details"
+msgstr "Afficher les détails"
+
+msgid "Show specialist map"
+msgstr "Afficher la carte métier"
+
+msgid "Sign in with your email address and password."
+msgstr "Connectez-vous avec votre adresse e-mail et votre mot de passe."
+
+msgid "Slug / URL key"
+msgstr "Nom court / identifiant URL"
+
+msgid "Source"
+msgstr "Source"
+
+msgid "Standard"
+msgstr "Norme"
+
+msgid "Start inspection"
+msgstr "Démarrer le contrôle"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Supplier"
+msgstr "Fournisseur"
+
+msgid "Suspended"
+msgstr "Suspendu"
+
+msgid "Swiss coordinates"
+msgstr "Coordonnées suisses"
+
+msgid "Thank you. Your organization request has been submitted and will be reviewed."
+msgstr "Merci. Votre demande d’organisation a été soumise et sera examinée."
+
+msgid "The current preview image comes from a play equipment item. It can be rotated there."
+msgstr "L’image d’aperçu actuelle provient d’un équipement de jeu. Elle peut y être pivotée."
+
+msgid "The inspection is based on the active inspection catalogue according to SN EN 1176/1177 and any local additions made by the organization."
+msgstr "Le contrôle se base sur le catalogue actif selon SN EN 1176/1177 ainsi que sur d’éventuels compléments locaux de l’organisation."
+
+msgid "The request could not be processed."
+msgstr "La demande n’a pas pu être traitée."
+
+msgid "There is already an open request for this email address."
+msgstr "Une demande ouverte existe déjà pour cette adresse e-mail."
+
+msgid "There is already an open request for this organization."
+msgstr "Une demande ouverte existe déjà pour cette organisation."
+
+msgid "There is already an open request for this URL key."
+msgstr "Une demande ouverte existe déjà pour cet identifiant URL."
+
+msgid "There were too many login attempts. Please try again in a few minutes."
+msgstr "Il y a eu trop de tentatives de connexion. Veuillez réessayer dans quelques minutes."
+
+msgid "There were too many requests. Please try again later."
+msgstr "Il y a eu trop de demandes. Veuillez réessayer plus tard."
+
+msgid "These tasks can be accepted by authorized inspectors."
+msgstr "Ces tâches peuvent être reprises par des contrôleurs autorisés."
+
+msgid "This text may be publicly visible. Do not enter internal details."
+msgstr "Ce texte peut être visible publiquement. Ne pas saisir de détails internes."
+
+msgid "This URL key is already in use."
+msgstr "Cet identifiant URL est déjà utilisé."
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "Today"
+msgstr "Aujourd’hui"
+
+msgid "Trends"
+msgstr "Évolutions"
+
+msgid "Up to three photos per defect."
+msgstr "Jusqu’à trois photos par défaut."
+
+msgid "Upload image"
+msgstr "Téléverser l’image"
+
+msgid "Visual routine inspection"
+msgstr "Contrôle visuel de routine"
+
+msgid "Vorname"
+msgstr "Prénom"
+
+msgid "Website"
+msgstr "Site web"
+
+msgid "will be planned"
+msgstr "sera planifié"
+
+msgid "Will be removed on %(date)s"
+msgstr "Sera retiré le %(date)s"
+
+msgid "Without assignment"
+msgstr "Sans attribution"
+
+msgid "Without inspection area"
+msgstr "Sans zone de contrôle"
+
+msgid "Year built"
+msgstr "Année de construction"
+
+msgid "Your inspections for today, overdue inspections and upcoming inspection tasks."
+msgstr "Vos contrôles d’aujourd’hui, les contrôles en retard et les tâches à venir."
+
+msgid "Your playground. Your information."
+msgstr "Ta place de jeux. Tes informations."
+
+msgid "z. B. Stadt Winterthur"
+msgstr "p. ex. Ville de Winterthour"
+
+msgid "z. B. stadt-winterthur"
+msgstr "p. ex. ville-winterthour"
+
+msgid "Zum Beispiel: stadt-winterthur oder gemeinde-beispiel."
+msgstr "Par exemple : ville-winterthour ou commune-exemple."
+
+msgid "%(counter)s defect"
+msgid_plural "%(counter)s defects"
+msgstr[0] "%(counter)s défaut"
+msgstr[1] "%(counter)s défauts"
+
+msgid "%(counter)s entry"
+msgid_plural "%(counter)s entries"
+msgstr[0] "%(counter)s entrée"
+msgstr[1] "%(counter)s entrées"
+

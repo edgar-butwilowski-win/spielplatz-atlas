@@ -7,281 +7,772 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Map"
-msgstr "Charta"
+msgid "A (immediate)"
+msgstr "A (immediat)"
+
+msgid "A user account already exists for this email address."
+msgstr "Per questa adressa dad e-mail exista gia in conto d’utilisader."
+
 msgid "About"
 msgstr "Davart"
-msgid "Imprint"
-msgstr "Impressum"
-msgid "Open menu"
-msgstr "Avrir il menu"
-msgid "Login"
-msgstr "Login"
-msgid "Logout"
-msgstr "Logout"
-msgid "Dashboard"
-msgstr "Dashboard"
-msgid "Language"
-msgstr "Lingua"
-msgid "Messages"
-msgstr "Messadis"
-msgid "My inspections"
-msgstr "Mias controllas"
-msgid "Deployment planning"
-msgstr "Planisaziun dals engaschaments"
-msgid "Cancel"
-msgstr "Annullar"
-msgid "Save"
-msgstr "Memorisar"
-msgid "Filter"
-msgstr "Filtrar"
-msgid "Reset"
-msgstr "Restabilir"
-msgid "Open"
-msgstr "Avert"
-msgid "Completed"
-msgstr "Terminà"
-msgid "In progress"
-msgstr "En elavuraziun"
-msgid "Planned"
-msgstr "Planisà"
-msgid "Done"
-msgstr "Fatg"
-msgid "Overdue"
-msgstr "Surpassà"
-msgid "Suspended"
-msgstr "Suspendì"
-msgid "Cancelled"
-msgstr "Annullà"
-msgid "Resolved"
-msgstr "Schlià"
-msgid "Checked / completed"
-msgstr "Controllà / terminà"
-msgid "OK"
-msgstr "OK"
-msgid "Defects found"
-msgstr "Mancanzas constatadas"
-msgid "Defect"
-msgstr "Mancanza"
-msgid "Defects"
-msgstr "Mancanzas"
-msgid "Safety defects"
-msgstr "Mancanzas da segirezza"
-msgid "Inspection"
-msgstr "Controlla"
-msgid "Inspection type"
-msgstr "Tip da controlla"
-msgid "Visual routine inspection"
-msgstr "Controlla visuala da rutina"
-msgid "Operational inspection"
-msgstr "Controlla operaziunala"
-msgid "Annual main inspection"
-msgstr "Inspecziun principala annuala"
-msgid "Play equipment"
-msgstr "Indrizs da gieu"
-msgid "Impact protection surface / ground"
-msgstr "Surfatscha da protecziun / terren"
-msgid "Additional equipment"
-msgstr "Equipament supplementar"
-msgid "Not checked yet"
-msgstr "Anc betg controllà"
-msgid "Not applicable"
-msgstr "Betg applitgabel"
-msgid "Citizen report"
-msgstr "Annunzia da la populaziun"
-msgid "Internal report"
-msgstr "Annunzia interna"
-msgid "Maintenance / care"
-msgstr "Mantegniment / tgira"
-msgid "Other"
-msgstr "Auter"
-msgid "Automatic"
-msgstr "Automatic"
-msgid "Manual"
-msgstr "Manual"
-msgid "Your playground. Your information."
-msgstr "Tes plazzal da gieu. Tias infurmaziuns."
-msgid "Address"
-msgstr "Adressa"
-msgid "No address stored"
-msgstr "Nagina adressa registrada"
-msgid "District"
-msgstr "Quartier"
-msgid "Status"
-msgstr "Status"
-msgid "Publicly visible"
-msgstr "Visibel publicamain"
-msgid "Internally visible"
-msgstr "Visibel internamain"
-msgid "Swiss coordinates"
-msgstr "Coordinatas svizras"
-msgid "Show specialist map"
-msgstr "Mussar la charta professiunala"
-msgid "Documents"
-msgstr "Documents"
-msgid "Certificate documents"
-msgstr "Documents da certificat"
-msgid "Acceptance documents"
-msgstr "Documents d’approvaziun"
-msgid "Care status"
-msgstr "Stadi da tgira"
-msgid "Known defects and planned repairs."
-msgstr "Mancanzas enconuschentas e reparaturas planisadas."
-msgid "Record new inspection"
-msgstr "Registrar ina nova controlla"
-msgid "Record defect"
-msgstr "Registrar ina mancanza"
-msgid "Record new defect"
-msgstr "Registrar ina nova mancanza"
-msgid "Save defect"
-msgstr "Memorisar la mancanza"
-msgid "Open defect"
-msgstr "Avrir la mancanza"
-msgid "Edit defect"
-msgstr "Modifitgar la mancanza"
-msgid "Defect details"
-msgstr "Detagls da la mancanza"
-msgid "Last inspection"
-msgstr "Ultima controlla"
-msgid "Next planned inspection"
-msgstr "Proxima controlla planisada"
-msgid "is being planned"
-msgstr "vegn planisà"
-msgid "General playground defect"
-msgstr "Mancanza generala dal plazzal da gieu"
-msgid "Safety risk"
-msgstr "Risic da segirezza"
-msgid "No safety risk"
-msgstr "Nagin risic da segirezza"
-msgid "Internal"
-msgstr "Intern"
-msgid "Source"
-msgstr "Funtauna"
-msgid "Reported on"
-msgstr "Annunzià ils"
-msgid "Affected object"
-msgstr "Object pertutgà"
-msgid "Responsible person"
-msgstr "Persuna responsabla"
-msgid "Not assigned yet"
-msgstr "Anc betg attribuì"
-msgid "Not assigned"
-msgstr "Betg attribuì"
-msgid "Not planned"
-msgstr "Betg planisà"
-msgid "Created from inspection item"
-msgstr "Creà ord in punct da controlla"
-msgid "Assignment and system message"
-msgstr "Attribuziun e messadi dal sistem"
-msgid "Save assignment"
-msgstr "Memorisar l’attribuziun"
-msgid "Back to playground"
-msgstr "Enavos al plazzal da gieu"
-msgid "Record defect from inspection item"
-msgstr "Registrar ina mancanza ord in punct da controlla"
-msgid "Inspection area"
-msgstr "Sectur da controlla"
-msgid "Without inspection area"
-msgstr "Senza sectur da controlla"
-msgid "Inspection criterion"
-msgstr "Criteri da controlla"
-msgid "Inspection note"
-msgstr "Remartga da controlla"
-msgid "Comment from inspection"
-msgstr "Commentari da la controlla"
-msgid "Existing defects for this inspection item"
-msgstr "Mancanzas gia registradas per quest punct da controlla"
-msgid "Optional."
-msgstr "Opziunal."
-msgid "Photos of the defect"
-msgstr "Fotos da la mancanza"
-msgid "Up to three photos per defect."
-msgstr "Fin trais fotos per mancanza."
-msgid "Delete photo"
-msgstr "Stizzar la foto"
-msgid "Personal inspection list"
-msgstr "Glista persunala da controllas"
-msgid "Today"
-msgstr "Oz"
-msgid "Next 30 days"
-msgstr "Proxims 30 dis"
-msgid "Open inspections without assignment"
-msgstr "Controllas avertas senza attribuziun"
-msgid "Due"
-msgstr "Scadenza"
+
 msgid "Accept"
 msgstr "Surpigliar"
-msgid "Start inspection"
-msgstr "Cumenzar la controlla"
-msgid "Organization"
-msgstr "Organisaziun"
-msgid "All organizations"
-msgstr "Tut las organisaziuns"
-msgid "All inspection types"
-msgstr "Tut ils tips da controlla"
-msgid "Recalculate inspection planning"
-msgstr "Recalcular la planisaziun da controllas"
-msgid "Inspection tasks"
-msgstr "Incumbensas da controlla"
-msgid "Maximum 100 entries"
-msgstr "Maximalmain 100 endataziuns"
+
+msgid "Acceptance documents"
+msgstr "Documents d’approvaziun"
+
 msgid "Action"
 msgstr "Acziun"
-msgid "Internal dashboard"
-msgstr "Survista interna"
-msgid "Analytics and key figures"
-msgstr "Analisis e cifras-clav"
-msgid "Key figures"
-msgstr "Cifras-clav"
-msgid "Trends"
-msgstr "Svilups"
-msgid "Planning"
-msgstr "Planisaziun"
-msgid "Operational lists"
-msgstr "Glistas operativas"
-msgid "Organizations"
-msgstr "Organisaziuns"
+
+msgid "Active inspection tasks"
+msgstr "Incumbensas da controlla activas"
+
 msgid "Active playgrounds"
 msgstr "Plazzals da gieu activs"
-msgid "Open defects"
-msgstr "Mancanzas avertas"
-msgid "Defects with safety risk"
-msgstr "Mancanzas cun risic da segirezza"
-msgid "Planned maintenance actions"
-msgstr "Mesiras da mantegniment planisadas"
-msgid "Inspections in progress"
-msgstr "Controllas en elavuraziun"
-msgid "Completed inspections"
-msgstr "Controllas terminadas"
-msgid "Count"
-msgstr "Dumber"
-msgid "Date"
-msgstr "Data"
-msgid "Title"
-msgstr "Titel"
-msgid "Playground"
-msgstr "Plazzal da gieu"
-msgid "January"
-msgstr "schaner"
-msgid "February"
-msgstr "favrer"
-msgid "March"
-msgstr "mars"
+
+msgid "Additional equipment"
+msgstr "Equipament supplementar"
+
+msgid "Address"
+msgstr "Adressa"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Affected object"
+msgstr "Object pertutgà"
+
+msgid "All assignments"
+msgstr "Tut las attribuziuns"
+
+msgid "All inspection types"
+msgstr "Tut ils tips da controlla"
+
+msgid "All organizations"
+msgstr "Tut las organisaziuns"
+
+msgid "An entry already exists for this organization."
+msgstr "Per questa organisaziun exista gia in’entrada."
+
+msgid "Analytics and key figures"
+msgstr "Analisis e cifras-clav"
+
+msgid "Annual main inspection"
+msgstr "Inspecziun principala annuala"
+
 msgid "April"
 msgstr "avrigl"
-msgid "May"
-msgstr "matg"
-msgid "June"
-msgstr "zercladur"
-msgid "July"
-msgstr "fanadur"
+
+msgid "As soon as publicly visible play equipment has been recorded, it will be shown here."
+msgstr "Uschespert che indrizs da gieu visibels publicamain èn registrads, vegnan els mussads qua."
+
+msgid "Assigned"
+msgstr "Attribuì"
+
+msgid "Assignment and system message"
+msgstr "Attribuziun e messadi dal sistem"
+
 msgid "August"
 msgstr "avust"
-msgid "September"
-msgstr "settember"
-msgid "October"
-msgstr "october"
-msgid "November"
-msgstr "november"
+
+msgid "Automatic"
+msgstr "Automatic"
+
+msgid "B (medium-term)"
+msgstr "B (a termin mesaun)"
+
+msgid "Back to playground"
+msgstr "Enavos al plazzal da gieu"
+
+msgid "Become a playground pro!"
+msgstr "Daventa profi dals plazzals da gieu!"
+
+msgid "Cancel"
+msgstr "Annullar"
+
+msgid "Cancelled"
+msgstr "Annullà"
+
+msgid "Care status"
+msgstr "Stadi da tgira"
+
+msgid "Certificate documents"
+msgstr "Documents da certificat"
+
+msgid "Checked / completed"
+msgstr "Controllà / terminà"
+
+msgid "Citizen report"
+msgstr "Annunzia da la populaziun"
+
+msgid "Comment from inspection"
+msgstr "Commentari da la controlla"
+
+msgid "Completed"
+msgstr "Terminà"
+
+msgid "Completed inspections"
+msgstr "Controllas terminadas"
+
+msgid "Count"
+msgstr "Dumber"
+
+msgid "Created from inspection item"
+msgstr "Creà ord in punct da controlla"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Date"
+msgstr "Data"
+
 msgid "December"
 msgstr "december"
+
+msgid "Defect"
+msgstr "Mancanza"
+
+msgid "Defect details"
+msgstr "Detagls da la mancanza"
+
+msgid "Defect photo %(number)s"
+msgstr "Foto da la mancanza %(number)s"
+
+msgid "Defect with safety risk"
+msgstr "Mancanza cun risic da segirezza"
+
+msgid "Defect without safety risk"
+msgstr "Mancanza senza risic da segirezza"
+
+msgid "Defects"
+msgstr "Mancanzas"
+
+msgid "Defects found"
+msgstr "Mancanzas constatadas"
+
+msgid "Defects with safety risk"
+msgstr "Mancanzas cun risic da segirezza"
+
+msgid "Delete photo"
+msgstr "Stizzar la foto"
+
+msgid "Deployment planning"
+msgstr "Planisaziun dals engaschaments"
+
+msgid "Deutsch"
+msgstr "Tudestg"
+
+msgid "Die Anfrage konnte nicht verarbeitet werden."
+msgstr "La dumonda n’ha betg pudì vegnir elavurada."
+
+msgid "Diese URL-Kennung wird bereits verwendet."
+msgstr "Questa clav URL vegn gia duvrada."
+
+msgid "District"
+msgstr "Quartier"
+
+msgid "Document not found."
+msgstr "Document betg chattà."
+
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Done"
+msgstr "Fatg"
+
+msgid "Due"
+msgstr "Scadenza"
+
+msgid "Due soon"
+msgstr "Scroda bainprest"
+
+msgid "E-Mail-Adresse"
+msgstr "Adressa dad e-mail"
+
+msgid "e.g. City of Winterthur"
+msgstr "p.ex. Citad da Winterthur"
+
+msgid "e.g. city-winterthur"
+msgstr "p.ex. citad-winterthur"
+
+msgid "Edit defect"
+msgstr "Modifitgar la mancanza"
+
+msgid "Email address"
+msgstr "Adressa dad e-mail"
+
+msgid "English"
+msgstr "Englais"
+
+msgid "Equipment on this playground."
+msgstr "Indrizs da gieu sin quest plazzal da gieu."
+
+msgid "Existing defects for this inspection item"
+msgstr "Mancanzas gia registradas per quest punct da controlla"
+
+msgid "February"
+msgstr "favrer"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "First name"
+msgstr "Prenum"
+
+msgid "For example: city-winterthur or municipality-example."
+msgstr "Per exempel: citad-winterthur u vischnanca-exempel."
+
+msgid "Français"
+msgstr "Franzos"
+
+msgid "Für diese E-Mail-Adresse besteht bereits ein Benutzerkonto."
+msgstr "Per questa adressa dad e-mail exista gia in conto d’utilisader."
+
+msgid "Für diese E-Mail-Adresse liegt bereits eine offene Anfrage vor."
+msgstr "Per questa adressa dad e-mail exista gia ina dumonda averta."
+
+msgid "Für diese Organisation besteht bereits ein Eintrag."
+msgstr "Per questa organisaziun exista gia in’entrada."
+
+msgid "Für diese Organisation liegt bereits eine offene Anfrage vor."
+msgstr "Per questa organisaziun exista gia ina dumonda averta."
+
+msgid "Für diese URL-Kennung liegt bereits eine offene Anfrage vor."
+msgstr "Per questa clav URL exista gia ina dumonda averta."
+
+msgid "General playground defect"
+msgstr "Mancanza generala dal plazzal da gieu"
+
+msgid "General playground inspection"
+msgstr "Controlla generala dal plazzal da gieu"
+
+msgid "Impact protection surface / ground"
+msgstr "Surfatscha da protecziun / terren"
+
+msgid "Imprint"
+msgstr "Impressum"
+
+msgid "In operation"
+msgstr "En funcziun"
+
+msgid "In progress"
+msgstr "En elavuraziun"
+
+msgid "Inspection"
+msgstr "Controlla"
+
+msgid "Inspection area"
+msgstr "Sectur da controlla"
+
+msgid "Inspection criterion"
+msgstr "Criteri da controlla"
+
+msgid "Inspection is currently suspended."
+msgstr "La controlla è actualmain suspendida."
+
+msgid "Inspection note"
+msgstr "Remartga da controlla"
+
+msgid "Inspection tasks"
+msgstr "Incumbensas da controlla"
+
+msgid "Inspection type"
+msgstr "Tip da controlla"
+
+msgid "Inspections in progress"
+msgstr "Controllas en elavuraziun"
+
+msgid "Internal"
+msgstr "Intern"
+
+msgid "Internal access"
+msgstr "Access intern"
+
+msgid "Internal dashboard"
+msgstr "Survista interna"
+
+msgid "Internal deployment planning"
+msgstr "Planisaziun interna dals engaschaments"
+
+msgid "Internal report"
+msgstr "Annunzia interna"
+
+msgid "Internally visible"
+msgstr "Visibel internamain"
+
+msgid "Inventory no."
+msgstr "Nr. d’inventari"
+
+msgid "is being planned"
+msgstr "vegn planisà"
+
+msgid "Italiano"
+msgstr "Talian"
+
+msgid "January"
+msgstr "schaner"
+
+msgid "Join"
+msgstr "Sa participar"
+
+msgid "July"
+msgstr "fanadur"
+
+msgid "June"
+msgstr "zercladur"
+
+msgid "Key figures"
+msgstr "Cifras-clav"
+
+msgid "Known defects and planned repairs."
+msgstr "Mancanzas enconuschentas e reparaturas planisadas."
+
+msgid "Kurzname / URL-Kennung"
+msgstr "Num curt / clav URL"
+
+msgid "Language"
+msgstr "Lingua"
+
+msgid "Last inspection"
+msgstr "Ultima controlla"
+
+msgid "Last name"
+msgstr "Num"
+
+msgid "Log in"
+msgstr "S’annunziar"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Maintenance / care"
+msgstr "Mantegniment / tgira"
+
+msgid "Manual"
+msgstr "Manual"
+
+msgid "Map"
+msgstr "Charta"
+
+msgid "March"
+msgstr "mars"
+
+msgid "Maximum 100 entries"
+msgstr "Maximalmain 100 endataziuns"
+
+msgid "May"
+msgstr "matg"
+
+msgid "Message"
+msgstr "Messadi"
+
+msgid "Messages"
+msgstr "Messadis"
+
+msgid "My inspections"
+msgstr "Mias controllas"
+
+msgid "Nachname"
+msgstr "Num"
+
+msgid "Nachricht"
+msgstr "Messadi"
+
+msgid "Name der Organisation"
+msgstr "Num da l’organisaziun"
+
+msgid "Next 30 days"
+msgstr "Proxims 30 dis"
+
+msgid "Next inspection:"
+msgstr "Proxima controlla:"
+
+msgid "Next planned inspection"
+msgstr "Proxima controlla planisada"
+
+msgid "No address stored"
+msgstr "Nagina adressa registrada"
+
+msgid "No completed inspection yet"
+msgstr "Anc nagina controlla terminada"
+
+msgid "No defects known"
+msgstr "Naginas mancanzas enconuschentas"
+
+msgid "No further assigned inspections in the next 30 days."
+msgstr "Naginas ulteriuras controllas attribuidas ils proxims 30 dis."
+
+msgid "No inspection tasks available for the current selection."
+msgstr "Naginas incumbensas da controlla avant maun per la selecziun actuala."
+
+msgid "No inspections are assigned for today."
+msgstr "Per oz n’èn attribuidas naginas controllas."
+
+msgid "No open unassigned inspection tasks available."
+msgstr "Naginas incumbensas da controlla avertas senza attribuziun avant maun."
+
+msgid "No permission for control status."
+msgstr "Nagins dretgs per il status da controlla."
+
+msgid "No play equipment recorded yet"
+msgstr "Anc nagins indrizs da gieu registrads"
+
+msgid "No renovation planned"
+msgstr "Nagina sanaziun planisada"
+
+msgid "No safety risk"
+msgstr "Nagin risic da segirezza"
+
+msgid "Not applicable"
+msgstr "Betg applitgabel"
+
+msgid "Not assigned"
+msgstr "Betg attribuì"
+
+msgid "Not assigned yet"
+msgstr "Anc betg attribuì"
+
+msgid "Not checked yet"
+msgstr "Anc betg controllà"
+
+msgid "Not planned"
+msgstr "Betg planisà"
+
+msgid "November"
+msgstr "november"
+
+msgid "October"
+msgstr "october"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "On time"
+msgstr "Entaifer il termin"
+
+msgid "Only activate this if the notice should appear in the public care status."
+msgstr "Activar mo sche l’avis duai cumparair en il stadi public da tgira."
+
+msgid "Open"
+msgstr "Avert"
+
+msgid "Open defect"
+msgstr "Avrir la mancanza"
+
+msgid "Open defects"
+msgstr "Mancanzas avertas"
+
+msgid "Open inspections without assignment"
+msgstr "Controllas avertas senza attribuziun"
+
+msgid "Open menu"
+msgstr "Avrir il menu"
+
+msgid "Operational inspection"
+msgstr "Controlla operaziunala"
+
+msgid "Operational lists"
+msgstr "Glistas operativas"
+
+msgid "Optional free text, for example citizen hotline, depot or caretaker."
+msgstr "Text liber opziunal, p.ex. telefon da burgais, deposit u pedel."
+
+msgid "Optional."
+msgstr "Opziunal."
+
+msgid "Optional: kurzer Hinweis zur Organisation oder zum geplanten Einsatz."
+msgstr "Opziunal: curta infurmaziun davart l’organisaziun u l’utilisaziun planisada."
+
+msgid "Optional: short note about the organization or the planned use."
+msgstr "Opziunal: curta infurmaziun davart l’organisaziun u l’utilisaziun planisada."
+
+msgid "Organization"
+msgstr "Organisaziun"
+
+msgid "Organization name"
+msgstr "Num da l’organisaziun"
+
+msgid "Organizations"
+msgstr "Organisaziuns"
+
+msgid "Other"
+msgstr "Auter"
+
+msgid "Overdue"
+msgstr "Surpassà"
+
+msgid "Password"
+msgstr "Pled-clav"
+
+msgid "Personal inspection list"
+msgstr "Glista persunala da controllas"
+
+msgid "Photo of %(name)s"
+msgstr "Fotografia da %(name)s"
+
+msgid "Photos of the defect"
+msgstr "Fotos da la mancanza"
+
+msgid "Plan inspection tasks"
+msgstr "Planisar incumbensas da controlla"
+
+msgid "Planned"
+msgstr "Planisà"
+
+msgid "Planned maintenance actions"
+msgstr "Mesiras da mantegniment planisadas"
+
+msgid "Planning"
+msgstr "Planisaziun"
+
+msgid "Play equipment"
+msgstr "Indrizs da gieu"
+
+msgid "Playground"
+msgstr "Plazzal da gieu"
+
+msgid "playgrounds"
+msgstr "plazzals da gieu"
+
+msgid "playsafeswiss home page"
+msgstr "Pagina iniziala da playsafeswiss"
+
+msgid "Please check your email address and password."
+msgstr "Controllescha per plaschair tia adressa dad e-mail e tes pled-clav."
+
+msgid "Please select an organization to edit its planning."
+msgstr "Tscherna per plaschair ina organisaziun per modifitgar sia planisaziun."
+
+msgid "Preview image of"
+msgstr "Maletg da prevista da"
+
+msgid "Preview image of %(name)s"
+msgstr "Maletg da prevista da %(name)s"
+
+msgid "Public visitors do not need a user account."
+msgstr "Visitadras e visitaders publics na dovran nagin conto d’utilisader."
+
+msgid "Publicly visible"
+msgstr "Visibel publicamain"
+
+msgid "Recalculate inspection planning"
+msgstr "Recalcular la planisaziun da controllas"
+
+msgid "Recommended renovation year"
+msgstr "Onn da sanaziun recumandà"
+
+msgid "Record defect"
+msgstr "Registrar ina mancanza"
+
+msgid "Record defect from inspection item"
+msgstr "Registrar ina mancanza ord in punct da controlla"
+
+msgid "Record new defect"
+msgstr "Registrar ina nova mancanza"
+
+msgid "Record new inspection"
+msgstr "Registrar ina nova controlla"
+
+msgid "Renovation comment"
+msgstr "Commentari da sanaziun"
+
+msgid "Renovation details"
+msgstr "Detagls da la sanaziun"
+
+msgid "Renovation pending"
+msgstr "Sanaziun pendenta"
+
+msgid "Renovation type"
+msgstr "Tip da sanaziun"
+
+msgid "Replace image"
+msgstr "Remplazzar il maletg"
+
+msgid "Replace playground image"
+msgstr "Remplazzar il maletg dal plazzal da gieu"
+
+msgid "Reported on"
+msgstr "Annunzià ils"
+
+msgid "reported on"
+msgstr "annunzià ils"
+
+msgid "Reset"
+msgstr "Restabilir"
+
+msgid "Resolved"
+msgstr "Schlià"
+
+msgid "Responsible person"
+msgstr "Persuna responsabla"
+
+msgid "Rotate image by 90°"
+msgstr "Girar il maletg per 90°"
+
+msgid "Rumantsch"
+msgstr "Rumantsch"
+
+msgid "Safety defects"
+msgstr "Mancanzas da segirezza"
+
+msgid "Safety risk"
+msgstr "Risic da segirezza"
+
+msgid "Save"
+msgstr "Memorisar"
+
+msgid "Save assignment"
+msgstr "Memorisar l’attribuziun"
+
+msgid "Save defect"
+msgstr "Memorisar la mancanza"
+
+msgid "Search playground, address or district"
+msgstr "Tschertgar plazzal da gieu, adressa u quartier"
+
+msgid "Select a playground on the map and get exciting detailed information."
+msgstr "Tscherna in plazzal da gieu sin la charta e survegn infurmaziuns detagliadas interessantas."
+
+msgid "Select the inspection type. A new inspection with all active inspection criteria will then be created."
+msgstr "Tscherna il tip da controlla. Suenter vegn creada ina nova controlla cun tut ils criteris activs."
+
+msgid "September"
+msgstr "settember"
+
+msgid "Show details"
+msgstr "Mussar detagls"
+
+msgid "Show specialist map"
+msgstr "Mussar la charta professiunala"
+
+msgid "Sign in with your email address and password."
+msgstr "T’annunzia cun tia adressa dad e-mail e tes pled-clav."
+
+msgid "Slug / URL key"
+msgstr "Num curt / clav URL"
+
+msgid "Source"
+msgstr "Funtauna"
+
+msgid "Standard"
+msgstr "Norma"
+
+msgid "Start inspection"
+msgstr "Cumenzar la controlla"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Supplier"
+msgstr "Furnitur"
+
+msgid "Suspended"
+msgstr "Suspendì"
+
+msgid "Swiss coordinates"
+msgstr "Coordinatas svizras"
+
+msgid "Thank you. Your organization request has been submitted and will be reviewed."
+msgstr "Grazia fitg. Tia dumonda d’organisaziun è vegnida inoltrada e vegn examinada."
+
+msgid "The current preview image comes from a play equipment item. It can be rotated there."
+msgstr "Il maletg da prevista actual deriva d’in indriz da gieu. El po vegnir girà là."
+
+msgid "The inspection is based on the active inspection catalogue according to SN EN 1176/1177 and any local additions made by the organization."
+msgstr "La controlla sa basa sin il catalog activ tenor SN EN 1176/1177 e sin eventualas cumplettaziuns localas da l’organisaziun."
+
+msgid "The request could not be processed."
+msgstr "La dumonda n’ha betg pudì vegnir elavurada."
+
+msgid "There is already an open request for this email address."
+msgstr "Per questa adressa dad e-mail exista gia ina dumonda averta."
+
+msgid "There is already an open request for this organization."
+msgstr "Per questa organisaziun exista gia ina dumonda averta."
+
+msgid "There is already an open request for this URL key."
+msgstr "Per questa clav URL exista gia ina dumonda averta."
+
+msgid "There were too many login attempts. Please try again in a few minutes."
+msgstr "Igl ha dà memia bleras emprovas d’annunzia. Emprova en paucs minuts anc ina giada."
+
+msgid "There were too many requests. Please try again later."
+msgstr "Igl ha dà memia bleras dumondas. Emprova pli tard anc ina giada."
+
+msgid "These tasks can be accepted by authorized inspectors."
+msgstr "Questas incumbensas pon vegnir surpigliadas da controlladers autorisads."
+
+msgid "This text may be publicly visible. Do not enter internal details."
+msgstr "Quest text po esser visibel publicamain. Na registrar nagins detagls interns."
+
+msgid "This URL key is already in use."
+msgstr "Questa clav URL vegn gia duvrada."
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Today"
+msgstr "Oz"
+
+msgid "Trends"
+msgstr "Svilups"
+
+msgid "Up to three photos per defect."
+msgstr "Fin trais fotos per mancanza."
+
+msgid "Upload image"
+msgstr "Chargiar si il maletg"
+
+msgid "Visual routine inspection"
+msgstr "Controlla visuala da rutina"
+
+msgid "Vorname"
+msgstr "Prenum"
+
+msgid "Website"
+msgstr "Website"
+
+msgid "will be planned"
+msgstr "vegn planisà"
+
+msgid "Will be removed on %(date)s"
+msgstr "Vegn allontanà ils %(date)s"
+
+msgid "Without assignment"
+msgstr "Senza attribuziun"
+
+msgid "Without inspection area"
+msgstr "Senza sectur da controlla"
+
+msgid "Year built"
+msgstr "Onn da construcziun"
+
+msgid "Your inspections for today, overdue inspections and upcoming inspection tasks."
+msgstr "Tias controllas dad oz, controllas retardadas ed incumbensas proximas."
+
+msgid "Your playground. Your information."
+msgstr "Tes plazzal da gieu. Tias infurmaziuns."
+
+msgid "z. B. Stadt Winterthur"
+msgstr "p.ex. Citad da Winterthur"
+
+msgid "z. B. stadt-winterthur"
+msgstr "p.ex. citad-winterthur"
+
+msgid "Zum Beispiel: stadt-winterthur oder gemeinde-beispiel."
+msgstr "Per exempel: citad-winterthur u vischnanca-exempel."
+
+msgid "%(counter)s defect"
+msgid_plural "%(counter)s defects"
+msgstr[0] "%(counter)s mancanza"
+msgstr[1] "%(counter)s mancanzas"
+
+msgid "%(counter)s entry"
+msgid_plural "%(counter)s entries"
+msgstr[0] "%(counter)s endataziun"
+msgstr[1] "%(counter)s endataziuns"
+
