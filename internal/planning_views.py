@@ -39,6 +39,8 @@ ACTIVE_TASK_STATUSES = [
     InspectionTask.STATUS_SUSPENDED,
 ]
 
+HTML_DATE_FORMAT = "%Y-%m-%d"
+
 
 class InspectionTaskPlanningForm(forms.ModelForm):
     class Meta:
@@ -49,7 +51,7 @@ class InspectionTaskPlanningForm(forms.ModelForm):
             "note",
         )
         widgets = {
-            "planned_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "planned_date": forms.DateInput(format=HTML_DATE_FORMAT, attrs={"type": "date", "class": "form-control"}),
             "assigned_to": forms.Select(attrs={"class": "form-select"}),
             "note": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
         }
@@ -58,6 +60,8 @@ class InspectionTaskPlanningForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.organization = organization
         self.fields["planned_date"].required = False
+        self.fields["planned_date"].input_formats = [HTML_DATE_FORMAT]
+        self.fields["planned_date"].widget.format = HTML_DATE_FORMAT
         self.fields["assigned_to"].required = False
         self.fields["note"].required = False
         self.fields["assigned_to"].queryset = self.get_assignable_users()
