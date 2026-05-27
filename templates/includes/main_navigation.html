@@ -58,9 +58,12 @@
             {% endif %}
             <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">{% trans "About" %}</a>
             <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">{% trans "Imprint" %}</a>
+            {% comment %}
+            Organisation registrieren bleibt im Code erhalten, ist aber bis auf Weiteres ausgeblendet.
             {% if not request.user.is_authenticated %}
                 <a href="{% url 'public:register_organization' %}" class="btn btn-sm btn-atlas-primary atlas-direct-link">{% trans "Join" %}</a>
             {% endif %}
+            {% endcomment %}
 
             <button
                 type="button"
@@ -94,7 +97,10 @@
                 <a class="atlas-menu-only-mobile" href="{% url 'public:imprint' %}">{% trans "Imprint" %}</a>
 
                 {% if not request.user.is_authenticated %}
+                    {% comment %}
+                    Organisation registrieren bleibt im Code erhalten, ist aber bis auf Weiteres ausgeblendet.
                     <a class="atlas-menu-only-mobile" href="{% url 'public:register_organization' %}">{% trans "Join" %}</a>
+                    {% endcomment %}
                     <a href="{% url 'accounts:login' %}">{% trans "Login" %}</a>
                 {% else %}
                     <a href="{% url 'notifications:list' %}">{% trans "Messages" %}</a>
