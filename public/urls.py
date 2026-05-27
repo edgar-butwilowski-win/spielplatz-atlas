@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import map_views, views
+from . import map_views, photo_views, views
 
 app_name = "public"
 
@@ -17,22 +17,22 @@ urlpatterns = [
     ),
     path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/photo/upload/",
-        views.upload_playground_photo,
+        photo_views.upload_playground_photo,
         name="upload_playground_photo",
     ),
     path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/photo/rotate/",
-        views.rotate_playground_photo,
+        photo_views.rotate_playground_photo,
         name="rotate_playground_photo",
     ),
     path(
         "equipment/<int:equipment_id>/photo/upload/",
-        views.upload_equipment_photo,
+        photo_views.upload_equipment_photo,
         name="upload_equipment_photo",
     ),
     path(
         "equipment/<int:equipment_id>/photo/rotate/",
-        views.rotate_equipment_photo,
+        photo_views.rotate_equipment_photo,
         name="rotate_equipment_photo",
     ),
     path(
