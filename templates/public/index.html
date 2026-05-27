@@ -20,86 +20,17 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 .leaflet-popup-content { margin: 14px 16px; }
 .playground-marker-wrapper,
 .playground-cluster-wrapper { background: transparent; border: 0; }
-.playground-marker {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    border-radius: 999px;
-    background: #14B8A6;
-    border: 3px solid #FFFFFF;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.28);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 140ms ease, box-shadow 140ms ease;
-}
-.playground-marker::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -7px;
-    width: 11px;
-    height: 11px;
-    background: #14B8A6;
-    border-right: 3px solid #FFFFFF;
-    border-bottom: 3px solid #FFFFFF;
-    border-radius: 2px;
-    transform: translateX(-50%) rotate(45deg);
-}
-.playground-marker svg {
-    width: 23px;
-    height: 23px;
-    fill: none;
-    stroke: #FFFFFF;
-    stroke-width: 2.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
+.playground-marker { position: relative; width: 36px; height: 36px; border-radius: 999px; background: #14B8A6; border: 3px solid #FFFFFF; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.28); display: flex; align-items: center; justify-content: center; transition: transform 140ms ease, box-shadow 140ms ease; }
+.playground-marker::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 11px; height: 11px; background: #14B8A6; border-right: 3px solid #FFFFFF; border-bottom: 3px solid #FFFFFF; border-radius: 2px; transform: translateX(-50%) rotate(45deg); }
+.playground-marker svg { width: 23px; height: 23px; fill: none; stroke: #FFFFFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
 .playground-marker-wrapper:hover .playground-marker,
 .playground-marker-wrapper:focus .playground-marker,
-.playground-marker-wrapper:focus-visible .playground-marker {
-    transform: scale(1.08);
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.36);
-}
-.playground-cluster {
-    width: 46px;
-    height: 46px;
-    border-radius: 999px;
-    background: #0F766E;
-    border: 3px solid #FFFFFF;
-    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.32);
-    color: #FFFFFF;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1px;
-    font-weight: 800;
-    line-height: 1;
-    transition: transform 140ms ease, box-shadow 140ms ease;
-}
-.playground-cluster svg {
-    width: 17px;
-    height: 17px;
-    fill: none;
-    stroke: #FFFFFF;
-    stroke-width: 2.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-.playground-cluster-count {
-    font-size: 0.95rem;
-    letter-spacing: -0.02em;
-}
-.playground-cluster-wrapper:hover .playground-cluster,
-.playground-cluster-wrapper:focus .playground-cluster,
-.playground-cluster-wrapper:focus-visible .playground-cluster {
-    transform: scale(1.08);
-    box-shadow: 0 7px 18px rgba(15, 23, 42, 0.4);
-}
+.playground-marker-wrapper:focus-visible .playground-marker { transform: scale(1.08); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.36); }
+.playground-cluster { width: 46px; height: 46px; border-radius: 999px; background: #0F766E; border: 3px solid #FFFFFF; box-shadow: 0 5px 15px rgba(15, 23, 42, 0.32); color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-weight: 800; line-height: 1; transition: transform 140ms ease, box-shadow 140ms ease; }
+.playground-cluster svg { width: 17px; height: 17px; fill: none; stroke: #FFFFFF; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.playground-cluster-count { font-size: 0.95rem; letter-spacing: -0.02em; }
 .popup-title { font-weight: 700; margin-bottom: 0.25rem; }
 .popup-meta { color: #64748B; font-size: 0.9rem; }
-.popup-photo-placeholder { width: 220px; height: 120px; border-radius: 0.75rem; background: #F1F5F9; display: none; }
 @media (max-width: 767.98px) { .map-page { padding-top: 0.75rem; padding-bottom: 0.75rem; } }
 {% endblock %}
 
@@ -109,8 +40,8 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
         <div class="map-toolbar p-3 p-lg-4 border-bottom">
             <div class="row g-3 align-items-center">
                 <div class="col-lg-8">
-                    <h1 class="h4 fw-bold mb-1">{% trans "Become a playground pro!" %}</h1>
-                    <div class="text-secondary">{% trans "Select a playground on the map and get exciting detailed information." %}</div>
+                    <h1 class="h4 fw-bold mb-1">{% if organization_filter %}{{ organization_filter.name }}{% else %}{% trans "Become a playground pro!" %}{% endif %}</h1>
+                    <div class="text-secondary">{% if organization_filter %}{% trans "Select a playground on the map and get exciting detailed information." %}{% else %}{% trans "Select a playground on the map and get exciting detailed information." %}{% endif %}</div>
                 </div>
                 <div class="col-lg-4">
                     <input id="searchInput" type="search" class="form-control" placeholder="{% trans 'Search playground, address or district' %}">
@@ -128,248 +59,35 @@ html, body { height: 100%; margin: 0; overflow: hidden; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.10.0/proj4.js"></script>
 <script src="https://unpkg.com/proj4leaflet@1.0.2/src/proj4leaflet.js"></script>
 <script>
-const i18n = {
-    playgrounds: "{% trans 'playgrounds' %}",
-    playgroundFallback: "{% trans 'Playground' %}",
-    previewImageAltPrefix: "{% trans 'Preview image of' %}",
-    nextInspection: "{% trans 'Next inspection:' %}",
-    nextInspectionPlanned: "{% trans 'will be planned' %}",
-    showDetails: "{% trans 'Show details' %}",
-};
-const swissResolutions = [4000, 3750, 3500, 3250, 3000, 2750, 2500, 2250, 2000, 1750, 1500, 1250, 1000, 750, 650, 500, 250, 100, 50, 20, 10, 5, 2.5, 2, 1.5, 1, 0.5];
+const i18n = { playgrounds: "{% trans 'playgrounds' %}", playgroundFallback: "{% trans 'Playground' %}", previewImageAltPrefix: "{% trans 'Preview image of' %}", nextInspection: "{% trans 'Next inspection:' %}", nextInspectionPlanned: "{% trans 'will be planned' %}", showDetails: "{% trans 'Show details' %}" };
+const organizationFilterSlug = "{{ organization_filter.slug|default:''|escapejs }}";
+const playgroundsApiUrl = organizationFilterSlug ? "{% url 'public:playgrounds_api' %}?organization=" + encodeURIComponent(organizationFilterSlug) : "{% url 'public:playgrounds_api' %}";
+const swissResolutions = [4000,3750,3500,3250,3000,2750,2500,2250,2000,1750,1500,1250,1000,750,650,500,250,100,50,20,10,5,2.5,2,1.5,1,0.5];
 const crs2056 = new L.Proj.CRS("EPSG:2056", "+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs", { origin: [2420000, 1350000], resolutions: swissResolutions, bounds: L.bounds([2420000, 1030000], [2900000, 1350000]) });
 function lv95ToLatLng(x, y) { return crs2056.unproject(L.point(Number(x), Number(y))); }
 const swissMapPaddingMeters = 10000;
-const swissMapBounds = L.latLngBounds(
-    lv95ToLatLng(2480000 - swissMapPaddingMeters, 1070000 - swissMapPaddingMeters),
-    lv95ToLatLng(2840000 + swissMapPaddingMeters, 1302000 + swissMapPaddingMeters)
-);
-const map = L.map("map", {
-    crs: crs2056,
-    zoomControl: true,
-    scrollWheelZoom: true,
-    minZoom: 0,
-    maxZoom: 26,
-    maxBounds: swissMapBounds,
-    maxBoundsViscosity: 1.0,
-});
+const swissMapBounds = L.latLngBounds(lv95ToLatLng(2480000 - swissMapPaddingMeters, 1070000 - swissMapPaddingMeters), lv95ToLatLng(2840000 + swissMapPaddingMeters, 1302000 + swissMapPaddingMeters));
+const map = L.map("map", { crs: crs2056, zoomControl: true, scrollWheelZoom: true, minZoom: 0, maxZoom: 26, maxBounds: swissMapBounds, maxBoundsViscosity: 1.0 });
 map.setView(lv95ToLatLng(2697000, 1262000), 20);
 L.tileLayer("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/2056/{z}/{x}/{y}.jpeg", { minZoom: 0, maxZoom: 26, tileSize: 256, opacity: 0.3, attribution: "&copy; swisstopo" }).addTo(map);
-const markersLayer = L.markerClusterGroup({
-    maxClusterRadius: 52,
-    showCoverageOnHover: false,
-    spiderfyOnMaxZoom: true,
-    disableClusteringAtZoom: 24,
-    chunkedLoading: true,
-    chunkInterval: 80,
-    chunkDelay: 20,
-    iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        return L.divIcon({
-            className: "playground-cluster-wrapper",
-            html: `
-                <div class="playground-cluster" aria-label="${count} ${i18n.playgrounds}">
-                    <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-                        <path d="M9 7h14" />
-                        <path d="M11 7L7 25" />
-                        <path d="M21 7l4 18" />
-                        <path d="M13 9l1.5 10" />
-                        <path d="M19 9l-1.5 10" />
-                        <path d="M13 20h6" />
-                    </svg>
-                    <span class="playground-cluster-count">${count}</span>
-                </div>
-            `,
-            iconSize: [46, 46],
-            iconAnchor: [23, 23],
-        });
-    },
-}).addTo(map);
-const playgroundIcon = L.divIcon({
-    className: "playground-marker-wrapper",
-    html: `
-        <div class="playground-marker" aria-hidden="true">
-            <svg viewBox="0 0 32 32" focusable="false">
-                <path d="M9 7h14" />
-                <path d="M11 7L7 25" />
-                <path d="M21 7l4 18" />
-                <path d="M13 9l1.5 10" />
-                <path d="M19 9l-1.5 10" />
-                <path d="M13 20h6" />
-            </svg>
-        </div>
-    `,
-    iconSize: [36, 42],
-    iconAnchor: [18, 42],
-    popupAnchor: [0, -38],
-});
+const markersLayer = L.markerClusterGroup({ maxClusterRadius: 52, showCoverageOnHover: false, spiderfyOnMaxZoom: true, disableClusteringAtZoom: 24, chunkedLoading: true, chunkInterval: 80, chunkDelay: 20, iconCreateFunction: (cluster) => { const count = cluster.getChildCount(); return L.divIcon({ className: "playground-cluster-wrapper", html: `<div class="playground-cluster" aria-label="${count} ${i18n.playgrounds}"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M9 7h14" /><path d="M11 7L7 25" /><path d="M21 7l4 18" /><path d="M13 9l1.5 10" /><path d="M19 9l-1.5 10" /><path d="M13 20h6" /></svg><span class="playground-cluster-count">${count}</span></div>`, iconSize: [46, 46], iconAnchor: [23, 23] }); } }).addTo(map);
+const playgroundIcon = L.divIcon({ className: "playground-marker-wrapper", html: `<div class="playground-marker" aria-hidden="true"><svg viewBox="0 0 32 32" focusable="false"><path d="M9 7h14" /><path d="M11 7L7 25" /><path d="M21 7l4 18" /><path d="M13 9l1.5 10" /><path d="M19 9l-1.5 10" /><path d="M13 20h6" /></svg></div>`, iconSize: [36, 42], iconAnchor: [18, 42], popupAnchor: [0, -38] });
 let allFeatures = [];
 let renderVersion = 0;
 const popupDetailsCache = new Map();
 function safeText(value) { return (value || "").toString(); }
-function safeUrl(value, fallback) {
-    const fallbackValue = fallback === undefined ? "#" : fallback;
-    const url = safeText(value).trim();
-    if (!url) { return fallbackValue; }
-    if (url.startsWith("/") && !url.startsWith("//")) { return url; }
-    return fallbackValue;
-}
-function appendTextElement(parent, className, text, tagName) {
-    const element = document.createElement(tagName || "div");
-    element.className = className;
-    element.textContent = safeText(text);
-    parent.appendChild(element);
-    return element;
-}
-function createPopupImage(previewPhotoUrl, title) {
-    const photoWrapper = document.createElement("div");
-    photoWrapper.className = "mb-2";
-    const image = document.createElement("img");
-    image.dataset.previewSrc = previewPhotoUrl;
-    image.alt = `${i18n.previewImageAltPrefix} ${title}`;
-    image.loading = "lazy";
-    image.decoding = "async";
-    image.style.width = "220px";
-    image.style.height = "120px";
-    image.style.objectFit = "cover";
-    image.style.borderRadius = "0.75rem";
-    image.style.display = "block";
-    photoWrapper.appendChild(image);
-    return photoWrapper;
-}
-function loadPopupPreviewImages(popupElement) {
-    if (!popupElement) { return; }
-    popupElement.querySelectorAll("img[data-preview-src]").forEach((image) => {
-        if (image.src) { return; }
-        image.src = image.dataset.previewSrc;
-        delete image.dataset.previewSrc;
-    });
-}
-function markerPopupContent(feature) {
-    const props = feature.properties || {};
-    const title = safeText(props.name || i18n.playgroundFallback);
-    const detailUrl = safeUrl(props.detail_url, "#");
-    const wrapper = document.createElement("div");
-    wrapper.style.minWidth = "220px";
-    const photoSlot = document.createElement("div");
-    photoSlot.className = "popup-photo-slot";
-    wrapper.appendChild(photoSlot);
-    appendTextElement(wrapper, "popup-title", title);
-    appendTextElement(wrapper, "popup-meta", props.address);
-    appendTextElement(wrapper, "popup-meta", props.district);
-    appendTextElement(wrapper, "popup-meta mb-2", props.organization);
-    const inspectionMeta = document.createElement("div");
-    inspectionMeta.className = "popup-meta mb-2";
-    const label = document.createElement("strong");
-    label.textContent = i18n.nextInspection;
-    inspectionMeta.appendChild(label);
-    inspectionMeta.appendChild(document.createTextNode(` ${i18n.nextInspectionPlanned}`));
-    wrapper.appendChild(inspectionMeta);
-    const detailLink = document.createElement("a");
-    detailLink.href = detailUrl;
-    detailLink.className = "btn btn-sm btn-atlas-primary";
-    detailLink.textContent = i18n.showDetails;
-    wrapper.appendChild(detailLink);
-    wrapper.dataset.popupLoaded = "false";
-    return wrapper;
-}
-function applyPopupDetails(contentElement, feature, details) {
-    const props = feature.properties || {};
-    const title = safeText(props.name || i18n.playgroundFallback);
-    const photoSlot = contentElement.querySelector(".popup-photo-slot");
-    const inspectionMeta = contentElement.querySelector(".popup-meta.mb-2");
-    if (photoSlot && details.preview_photo_url && !photoSlot.hasChildNodes()) {
-        photoSlot.appendChild(createPopupImage(safeUrl(details.preview_photo_url, ""), title));
-    }
-    if (inspectionMeta) {
-        const label = document.createElement("strong");
-        label.textContent = i18n.nextInspection;
-        inspectionMeta.replaceChildren(label, document.createTextNode(` ${safeText(details.next_inspection_label || i18n.nextInspectionPlanned)}`));
-    }
-    contentElement.dataset.popupLoaded = "true";
-    loadPopupPreviewImages(contentElement);
-}
-function loadPopupDetails(marker, feature) {
-    const props = feature.properties || {};
-    const popup = marker.getPopup();
-    const contentElement = popup ? popup.getContent() : null;
-    if (!contentElement || contentElement.dataset.popupLoaded === "true") { return; }
-    if (!props.popup_url) {
-        contentElement.dataset.popupLoaded = "true";
-        return;
-    }
-    if (popupDetailsCache.has(props.id)) {
-        applyPopupDetails(contentElement, feature, popupDetailsCache.get(props.id));
-        return;
-    }
-    fetch(props.popup_url)
-        .then((response) => response.ok ? response.json() : Promise.reject(response))
-        .then((details) => {
-            popupDetailsCache.set(props.id, details);
-            applyPopupDetails(contentElement, feature, details);
-        })
-        .catch(() => {
-            contentElement.dataset.popupLoaded = "true";
-        });
-}
-function createMarker(feature, bounds) {
-    const coords = feature.geometry.coordinates;
-    const x = coords[0];
-    const y = coords[1];
-    if (!x || !y) { return null; }
-    const latLng = lv95ToLatLng(x, y);
-    const markerTitle = safeText((feature.properties || {}).name || i18n.playgroundFallback);
-    const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle });
-    marker.bindPopup(markerPopupContent(feature));
-    marker.on("popupopen", () => loadPopupDetails(marker, feature));
-    bounds.push(latLng);
-    return marker;
-}
-function renderMarkers(features) {
-    renderVersion += 1;
-    const currentVersion = renderVersion;
-    markersLayer.clearLayers();
-    const bounds = [];
-    const markerBatch = [];
-    let index = 0;
-    function renderBatch() {
-        if (currentVersion !== renderVersion) { return; }
-        const batchEnd = Math.min(index + 75, features.length);
-        for (; index < batchEnd; index += 1) {
-            const marker = createMarker(features[index], bounds);
-            if (marker) { markerBatch.push(marker); }
-        }
-        if (markerBatch.length) {
-            markersLayer.addLayers(markerBatch);
-            markerBatch.length = 0;
-        }
-        if (index < features.length) {
-            window.requestAnimationFrame(renderBatch);
-            return;
-        }
-        if (bounds.length > 0) {
-            map.fitBounds(L.latLngBounds(bounds), { padding: [28, 28], maxZoom: 24 });
-        }
-    }
-    window.requestAnimationFrame(renderBatch);
-}
+function safeUrl(value, fallback) { const fallbackValue = fallback === undefined ? "#" : fallback; const url = safeText(value).trim(); if (!url) { return fallbackValue; } if (url.startsWith("/") && !url.startsWith("//")) { return url; } return fallbackValue; }
+function appendTextElement(parent, className, text, tagName) { const element = document.createElement(tagName || "div"); element.className = className; element.textContent = safeText(text); parent.appendChild(element); return element; }
+function createPopupImage(previewPhotoUrl, title) { const photoWrapper = document.createElement("div"); photoWrapper.className = "mb-2"; const image = document.createElement("img"); image.dataset.previewSrc = previewPhotoUrl; image.alt = `${i18n.previewImageAltPrefix} ${title}`; image.loading = "lazy"; image.decoding = "async"; image.style.width = "220px"; image.style.height = "120px"; image.style.objectFit = "cover"; image.style.borderRadius = "0.75rem"; image.style.display = "block"; photoWrapper.appendChild(image); return photoWrapper; }
+function loadPopupPreviewImages(popupElement) { if (!popupElement) { return; } popupElement.querySelectorAll("img[data-preview-src]").forEach((image) => { if (image.src) { return; } image.src = image.dataset.previewSrc; delete image.dataset.previewSrc; }); }
+function markerPopupContent(feature) { const props = feature.properties || {}; const title = safeText(props.name || i18n.playgroundFallback); const detailUrl = safeUrl(props.detail_url, "#"); const wrapper = document.createElement("div"); wrapper.style.minWidth = "220px"; const photoSlot = document.createElement("div"); photoSlot.className = "popup-photo-slot"; wrapper.appendChild(photoSlot); appendTextElement(wrapper, "popup-title", title); appendTextElement(wrapper, "popup-meta", props.address); appendTextElement(wrapper, "popup-meta", props.district); appendTextElement(wrapper, "popup-meta mb-2", props.organization); const inspectionMeta = document.createElement("div"); inspectionMeta.className = "popup-meta mb-2"; const label = document.createElement("strong"); label.textContent = i18n.nextInspection; inspectionMeta.appendChild(label); inspectionMeta.appendChild(document.createTextNode(` ${i18n.nextInspectionPlanned}`)); wrapper.appendChild(inspectionMeta); const detailLink = document.createElement("a"); detailLink.href = detailUrl; detailLink.className = "btn btn-sm btn-atlas-primary"; detailLink.textContent = i18n.showDetails; wrapper.appendChild(detailLink); wrapper.dataset.popupLoaded = "false"; return wrapper; }
+function applyPopupDetails(contentElement, feature, details) { const props = feature.properties || {}; const title = safeText(props.name || i18n.playgroundFallback); const photoSlot = contentElement.querySelector(".popup-photo-slot"); const inspectionMeta = contentElement.querySelector(".popup-meta.mb-2"); if (photoSlot && details.preview_photo_url && !photoSlot.hasChildNodes()) { photoSlot.appendChild(createPopupImage(safeUrl(details.preview_photo_url, ""), title)); } if (inspectionMeta) { const label = document.createElement("strong"); label.textContent = i18n.nextInspection; inspectionMeta.replaceChildren(label, document.createTextNode(` ${safeText(details.next_inspection_label || i18n.nextInspectionPlanned)}`)); } contentElement.dataset.popupLoaded = "true"; loadPopupPreviewImages(contentElement); }
+function loadPopupDetails(marker, feature) { const props = feature.properties || {}; const popup = marker.getPopup(); const contentElement = popup ? popup.getContent() : null; if (!contentElement || contentElement.dataset.popupLoaded === "true") { return; } if (!props.popup_url) { contentElement.dataset.popupLoaded = "true"; return; } if (popupDetailsCache.has(props.id)) { applyPopupDetails(contentElement, feature, popupDetailsCache.get(props.id)); return; } fetch(props.popup_url).then((response) => response.ok ? response.json() : Promise.reject(response)).then((details) => { popupDetailsCache.set(props.id, details); applyPopupDetails(contentElement, feature, details); }).catch(() => { contentElement.dataset.popupLoaded = "true"; }); }
+function createMarker(feature, bounds) { const coords = feature.geometry.coordinates; const x = coords[0]; const y = coords[1]; if (!x || !y) { return null; } const latLng = lv95ToLatLng(x, y); const markerTitle = safeText((feature.properties || {}).name || i18n.playgroundFallback); const marker = L.marker(latLng, { icon: playgroundIcon, title: markerTitle }); marker.bindPopup(markerPopupContent(feature)); marker.on("popupopen", () => loadPopupDetails(marker, feature)); bounds.push(latLng); return marker; }
+function renderMarkers(features) { renderVersion += 1; const currentVersion = renderVersion; markersLayer.clearLayers(); const bounds = []; const markerBatch = []; let index = 0; function renderBatch() { if (currentVersion !== renderVersion) { return; } const batchEnd = Math.min(index + 75, features.length); for (; index < batchEnd; index += 1) { const marker = createMarker(features[index], bounds); if (marker) { markerBatch.push(marker); } } if (markerBatch.length) { markersLayer.addLayers(markerBatch); markerBatch.length = 0; } if (index < features.length) { window.requestAnimationFrame(renderBatch); return; } if (bounds.length > 0) { map.fitBounds(L.latLngBounds(bounds), { padding: [28, 28], maxZoom: 24 }); } } window.requestAnimationFrame(renderBatch); }
 function normalizeText(value) { return (value || "").toString().toLowerCase().trim(); }
-function filterFeatures(query) {
-    const q = normalizeText(query);
-    if (!q) { return allFeatures; }
-    return allFeatures.filter((feature) => {
-        const props = feature.properties;
-        const haystack = [props.name, props.address, props.district, props.organization].map(normalizeText).join(" ");
-        return haystack.includes(q);
-    });
-}
-fetch("{% url 'public:playgrounds_api' %}")
-    .then(response => response.json())
-    .then(data => {
-        allFeatures = data.features || [];
-        renderMarkers(allFeatures);
-        setTimeout(() => map.invalidateSize(), 0);
-    });
+function filterFeatures(query) { const q = normalizeText(query); if (!q) { return allFeatures; } return allFeatures.filter((feature) => { const props = feature.properties; const haystack = [props.name, props.address, props.district, props.organization].map(normalizeText).join(" "); return haystack.includes(q); }); }
+fetch(playgroundsApiUrl).then(response => response.json()).then(data => { allFeatures = data.features || []; renderMarkers(allFeatures); setTimeout(() => map.invalidateSize(), 0); });
 document.getElementById("searchInput").addEventListener("input", (event) => { renderMarkers(filterFeatures(event.target.value)); });
 window.addEventListener("resize", () => { map.invalidateSize(); });
 </script>
