@@ -34,19 +34,19 @@ from playgrounds.models import PlayEquipment, Playground
 from tenants.forms import OrganizationRegistrationRequestForm
 
 
-MONTH_NAMES = {
-    1: _("January"),
-    2: _("February"),
-    3: _("March"),
-    4: _("April"),
-    5: _("May"),
-    6: _("June"),
-    7: _("July"),
-    8: _("August"),
-    9: _("September"),
-    10: _("October"),
-    11: _("November"),
-    12: _("December"),
+MONTH_MSGIDS = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
 }
 
 REGISTRATION_RATE_LIMIT_WINDOW_SECONDS = 60 * 60
@@ -103,7 +103,7 @@ def register_registration_attempt(request):
 def format_month_year(date_value):
     if not date_value:
         return _("is being planned")
-    return f"{MONTH_NAMES[date_value.month]} {date_value.year}"
+    return f"{_(MONTH_MSGIDS[date_value.month])} {date_value.year}"
 
 
 def format_lv95_coordinate(value):
