@@ -1,37 +1,17 @@
+{% load i18n %}
 <div class="task-card p-3">
     <div class="d-flex justify-content-between gap-2 mb-2">
-        <div>
-            <div class="fw-bold">{{ task.playground.name }}</div>
-            <div class="task-meta">{{ task.organization.name }}</div>
-        </div>
-        <span class="badge {% if task.status == 'overdue' %}text-bg-danger{% elif task.status == 'planned' %}text-bg-primary{% elif task.status == 'suspended' %}text-bg-secondary{% else %}text-bg-light text-dark{% endif %}">
-            {{ task.get_status_display }}
-        </span>
+        <div><div class="fw-bold">{{ task.playground.name }}</div><div class="task-meta">{{ task.organization.name }}</div></div>
+        <span class="badge {% if task.status == 'overdue' %}text-bg-danger{% elif task.status == 'planned' %}text-bg-primary{% elif task.status == 'suspended' %}text-bg-secondary{% else %}text-bg-light text-dark{% endif %}">{{ task.get_status_display }}</span>
     </div>
-
     <div class="task-meta mb-2">
-        <div><strong>Kontrollart:</strong> {{ task.get_inspection_type_display }}</div>
-        <div><strong>Fällig:</strong> {{ task.due_date|date:"d.m.Y" }}</div>
-        <div><strong>Geplant:</strong> {{ task.planned_date|date:"d.m.Y"|default:"Nicht geplant" }}</div>
+        <div><strong>{% trans "Inspection type" %}:</strong> {{ task.get_inspection_type_display }}</div>
+        <div><strong>{% trans "Due" %}:</strong> {{ task.due_date|date:"d.m.Y" }}</div>
+        <div><strong>{% trans "Planned" %}:</strong> {{ task.planned_date|date:"d.m.Y"|default:_('Not planned') }}</div>
     </div>
-
-    {% if task.note %}
-        <div class="alert alert-light border py-2 small mb-3">{{ task.note }}</div>
-    {% endif %}
-
+    {% if task.note %}<div class="alert alert-light border py-2 small mb-3">{{ task.note }}</div>{% endif %}
     <div class="d-flex flex-wrap gap-2">
-        {% if show_accept %}
-            <form method="post" action="{% url 'internal:accept_inspection_task' task.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-primary">Übernehmen</button>
-            </form>
-        {% endif %}
-
-        {% if task.status != 'completed' and task.status != 'cancelled' %}
-            <form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-success">Kontrolle starten</button>
-            </form>
-        {% endif %}
+        {% if show_accept %}<form method="post" action="{% url 'internal:accept_inspection_task' task.id %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Accept" %}</button></form>{% endif %}
+        {% if task.status != 'completed' and task.status != 'cancelled' %}<form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success">{% trans "Start inspection" %}</button></form>{% endif %}
     </div>
 </div>
