@@ -238,16 +238,16 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Grunddaten", {"fields": ("playground", "equipment_type", "name", "sequence_number", "inventory_number")}),
-        ("Herstellung und Lieferung", {"fields": ("manufacturer", "supplier", "norm", "year_built", "build_date")}),
+        ("Lieferung und Norm", {"fields": ("supplier", "norm", "year_built", "build_date")}),
         ("Sanierung und Rückbau", {"fields": ("renovation_type", "recommended_renovation_year", "renovation_comment", "demolition_date")}),
         ("Administrative Prüfausnahme", {"fields": ("not_to_inspect", "not_to_inspect_reason"), "description": "Diese Einstellung wird durch die Organisation verwaltet und nimmt das Gerät aus neuen Kontrollprotokollen heraus."}),
         ("Prüfbarkeit während der Kontrolle", {"fields": ("not_inspectable", "not_inspectable_reason"), "description": "Diese Felder beschreiben, ob ein grundsätzlich prüfpflichtiges Gerät bei einer Kontrolle nicht geprüft werden konnte."}),
         ("Foto", {"fields": ("photo", "photo_upload")}),
         ("Koordinaten und Sichtbarkeit", {"fields": ("latitude", "longitude", "public_visible", "is_active")}),
     )
-    list_display = ("name", "playground", "equipment_type", "sequence_number", "inventory_number", "not_to_inspect", "not_inspectable", "recommended_renovation_year", "demolition_date", "public_visible", "is_active")
+    list_display = ("name", "playground", "equipment_type", "supplier", "sequence_number", "inventory_number", "not_to_inspect", "not_inspectable", "recommended_renovation_year", "demolition_date", "public_visible", "is_active")
     list_filter = ("playground__organization", "equipment_type", "supplier", "renovation_type", "not_to_inspect", "not_inspectable", "public_visible", "is_active")
-    search_fields = ("name", "inventory_number", "manufacturer", "supplier__name", "norm", "playground__name")
+    search_fields = ("name", "inventory_number", "supplier__name", "norm", "playground__name")
     autocomplete_fields = ("playground", "equipment_type", "supplier", "photo")
 
     def get_queryset(self, request):
