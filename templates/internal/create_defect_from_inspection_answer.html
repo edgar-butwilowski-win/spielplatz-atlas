@@ -1,157 +1,44 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
-
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mangel aus Prüfpunkt erfassen – playsafeswiss</title>
-
+    <title>{% trans "Record defect from inspection item" %} – playsafeswiss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
-        :root {
-            --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }};
-            --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }};
-            --atlas-bg: #F8FAFC;
-            --atlas-text: #0F172A;
-            --atlas-navbar-height: 58px;
-        }
-
-        body {
-            background: var(--atlas-bg);
-            color: var(--atlas-text);
-        }
-
-        .content-card {
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-        }
-
-        .btn-atlas-primary {
-            background: var(--atlas-primary);
-            border-color: var(--atlas-primary);
-            color: white;
-        }
-
-        .btn-atlas-primary:hover {
-            filter: brightness(0.92);
-            color: white;
-        }
-
-        .context-label {
-            color: #64748B;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
+        :root { --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }}; --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }}; --atlas-bg:#F8FAFC; --atlas-text:#0F172A; --atlas-navbar-height:58px; }
+        body { background:var(--atlas-bg); color:var(--atlas-text); }
+        .content-card { background:white; border:1px solid #E2E8F0; border-radius:1.25rem; box-shadow:0 18px 45px rgba(15,23,42,.06); }
+        .btn-atlas-primary { background:var(--atlas-primary); border-color:var(--atlas-primary); color:white; }
+        .btn-atlas-primary:hover { filter:brightness(.92); color:white; }
+        .context-label { color:#64748B; font-size:.85rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
-
 <body>
-
-    {% include "includes/main_navigation.html" %}
-
-    <main class="container py-4">
-        {% if messages %}
-            <div class="mb-3">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'info' }} mb-2">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="content-card p-3 p-lg-4 mb-4">
-            <div class="context-label mb-2">Mangel aus Prüfpunkt erfassen</div>
-
-            <h1 class="fw-bold h3 mb-3">
-                {{ playground.name }}
-            </h1>
-
-            <div class="row g-3">
-                <div class="col-lg-6">
-                    <div class="small text-secondary mb-1">Prüfbereich</div>
-                    <div class="fw-semibold">
-                        {% if answer.scope %}
-                            {{ answer.scope.label }}
-                        {% else %}
-                            Ohne Prüfbereich
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-lg-6">
-                    <div class="small text-secondary mb-1">Prüfkriterium</div>
-                    <div class="fw-semibold">{{ answer.criterion.title }}</div>
-                </div>
-
-                {% if answer.criterion.inspection_text %}
-                    <div class="col-12">
-                        <div class="small text-secondary mb-1">Prüfhinweis</div>
-                        <div>{{ answer.criterion.inspection_text }}</div>
-                    </div>
-                {% endif %}
-
-                {% if answer.comment %}
-                    <div class="col-12">
-                        <div class="small text-secondary mb-1">Kommentar aus der Kontrolle</div>
-                        <div class="p-3 rounded-3 bg-light">{{ answer.comment }}</div>
-                    </div>
-                {% endif %}
-            </div>
+{% include "includes/main_navigation.html" %}
+<main class="container py-4">
+    {% if messages %}<div class="mb-3">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
+    <div class="content-card p-3 p-lg-4 mb-4">
+        <div class="context-label mb-2">{% trans "Record defect from inspection item" %}</div>
+        <h1 class="fw-bold h3 mb-3">{{ playground.name }}</h1>
+        <div class="row g-3">
+            <div class="col-lg-6"><div class="small text-secondary mb-1">{% trans "Inspection area" %}</div><div class="fw-semibold">{% if answer.scope %}{{ answer.scope.label }}{% else %}{% trans "Without inspection area" %}{% endif %}</div></div>
+            <div class="col-lg-6"><div class="small text-secondary mb-1">{% trans "Inspection criterion" %}</div><div class="fw-semibold">{{ answer.criterion.title }}</div></div>
+            {% if answer.criterion.inspection_text %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Inspection note" %}</div><div>{{ answer.criterion.inspection_text }}</div></div>{% endif %}
+            {% if answer.comment %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Comment from inspection" %}</div><div class="p-3 rounded-3 bg-light">{{ answer.comment }}</div></div>{% endif %}
         </div>
-
-        {% if existing_defects %}
-            <div class="content-card p-3 p-lg-4 mb-4">
-                <h2 class="h5 fw-bold mb-3">Bereits erfasste Mängel zu diesem Prüfpunkt</h2>
-
-                <div class="list-group list-group-flush">
-                    {% for defect in existing_defects %}
-                        <div class="list-group-item px-0">
-                            <div class="d-flex justify-content-between gap-3">
-                                <div>
-                                    <div class="fw-semibold">Mangel #{{ defect.id }}</div>
-                                    <div class="text-secondary small">
-                                        {{ defect.get_status_display }} · gemeldet am {{ defect.reported_at|date:"d.m.Y H:i" }}
-                                    </div>
-                                </div>
-
-                                {% if defect.has_safety_risk %}
-                                    <span class="badge text-bg-danger align-self-start">Sicherheitsrisiko</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endif %}
-
-        <form method="post" enctype="multipart/form-data" class="content-card p-3 p-lg-4">
-            {% csrf_token %}
-
-            <h2 class="h5 fw-bold mb-3">Neuen Mangel erfassen</h2>
-
-            {% include "internal/partials/defect_form_fields.html" %}
-
-            <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
-                <a href="{% url 'internal:inspection_detail' inspection.id %}" class="btn btn-outline-secondary">
-                    Abbrechen
-                </a>
-
-                <button type="submit" class="btn btn-atlas-primary">
-                    Mangel erfassen
-                </button>
-            </div>
-        </form>
-    </main>
-
-    {% include "includes/main_navigation_script.html" %}
+    </div>
+    {% if existing_defects %}<div class="content-card p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold mb-3">{% trans "Existing defects for this inspection item" %}</h2><div class="list-group list-group-flush">{% for defect in existing_defects %}<div class="list-group-item px-0"><div class="d-flex justify-content-between gap-3"><div><div class="fw-semibold">{% blocktrans with id=defect.id %}Defect #{{ id }}{% endblocktrans %}</div><div class="text-secondary small">{{ defect.get_status_display }} · {% trans "reported on" %} {{ defect.reported_at|date:"d.m.Y H:i" }}</div></div>{% if defect.has_safety_risk %}<span class="badge text-bg-danger align-self-start">{% trans "Safety risk" %}</span>{% endif %}</div></div>{% endfor %}</div></div>{% endif %}
+    <form method="post" enctype="multipart/form-data" class="content-card p-3 p-lg-4">
+        {% csrf_token %}
+        <h2 class="h5 fw-bold mb-3">{% trans "Record new defect" %}</h2>
+        {% include "internal/partials/defect_form_fields.html" %}
+        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4"><a href="{% url 'internal:inspection_detail' inspection.id %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a><button type="submit" class="btn btn-atlas-primary">{% trans "Record defect" %}</button></div>
+    </form>
+</main>
+{% include "includes/main_navigation_script.html" %}
 </body>
-
 </html>
