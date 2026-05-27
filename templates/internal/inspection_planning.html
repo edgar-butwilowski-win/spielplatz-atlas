@@ -1,309 +1,55 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
-
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Einsatzplanung – playsafeswiss</title>
-
+    <title>{% trans "Deployment planning" %} – playsafeswiss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
-        :root {
-            --atlas-primary: #0F766E;
-            --atlas-secondary: #F59E0B;
-            --atlas-bg: #F8FAFC;
-            --atlas-text: #0F172A;
-            --atlas-navbar-height: 58px;
-        }
-
+        :root { --atlas-primary:#0F766E; --atlas-secondary:#F59E0B; --atlas-bg:#F8FAFC; --atlas-text:#0F172A; --atlas-navbar-height:58px; }
         body { background: var(--atlas-bg); color: var(--atlas-text); }
-        .navbar { background: white; border-bottom: 1px solid #E2E8F0; min-height: var(--atlas-navbar-height); }
-        .brand-mark {
-            width: 34px;
-            height: 34px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 auto;
-        }
-        .brand-mark svg { width: 100%; height: 100%; display: block; }
-        .content-card, .metric-card {
-            background: white; border: 1px solid #E2E8F0; border-radius: 1.25rem;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-        }
-        .metric-value { font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; }
-        .metric-label { color: #64748B; font-size: 0.9rem; }
-        .section-label {
-            color: var(--atlas-primary); font-size: 0.82rem; font-weight: 700;
-            letter-spacing: 0.08em; text-transform: uppercase;
-        }
-        .atlas-menu { position: relative; }
-        .atlas-menu-panel {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: calc(100% + 0.35rem);
-            min-width: 220px;
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 0.75rem;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
-            padding: 0.35rem 0;
-            z-index: 1050;
-        }
-        .atlas-menu-panel.show { display: block; }
-        .atlas-menu-panel a {
-            display: block;
-            padding: 0.5rem 0.9rem;
-            color: #0F172A;
-            text-decoration: none;
-            white-space: nowrap;
-        }
-        .atlas-menu-panel a:hover { background: #F1F5F9; }
-        .table td, .table th { vertical-align: middle; }
-        .planning-column { min-width: 46rem; }
-        .action-column { width: 9rem; min-width: 9rem; }
-        .planning-form {
-            display: grid;
-            grid-template-columns: minmax(11rem, 1fr) minmax(14rem, 1.35fr) minmax(16rem, 1.35fr) auto;
-            gap: 0.5rem;
-            align-items: start;
-        }
-        .planning-form .btn { white-space: nowrap; }
-        .task-note textarea { min-height: 3rem; }
-        .task-action-form { margin: 0; }
-        .task-action-form .btn {
-            white-space: normal;
-            min-width: 8rem;
-        }
-        @media (max-width: 1199.98px) {
-            .planning-column { min-width: 22rem; }
-            .planning-form { grid-template-columns: 1fr; }
-            .planning-form .btn { width: 100%; }
-        }
-        @media (max-width: 991.98px) {
-            .atlas-direct-link { display: none !important; }
-        }
-        @media (min-width: 992px) {
-            .atlas-menu-only-mobile { display: none !important; }
-        }
-        @media (max-width: 767.98px) {
-            .navbar .container-fluid { gap: 0.5rem; }
-            .navbar-brand .fw-bold { display: none; }
-        }
+        .content-card,.metric-card { background:white; border:1px solid #E2E8F0; border-radius:1.25rem; box-shadow:0 18px 45px rgba(15,23,42,.06); }
+        .metric-value { font-size:1.7rem; font-weight:800; letter-spacing:-.04em; }
+        .metric-label { color:#64748B; font-size:.9rem; }
+        .section-label { color:var(--atlas-primary); font-size:.82rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+        .table td,.table th { vertical-align:middle; }
+        .planning-column { min-width:46rem; }
+        .action-column { width:9rem; min-width:9rem; }
+        .planning-form { display:grid; grid-template-columns:minmax(11rem,1fr) minmax(14rem,1.35fr) minmax(16rem,1.35fr) auto; gap:.5rem; align-items:start; }
+        .planning-form .btn { white-space:nowrap; }
+        .task-note textarea { min-height:3rem; }
+        .task-action-form { margin:0; }
+        .task-action-form .btn { white-space:normal; min-width:8rem; }
+        @media (max-width:1199.98px){ .planning-column{min-width:22rem;} .planning-form{grid-template-columns:1fr;} .planning-form .btn{width:100%;} }
+        {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
-
 <body>
-<nav class="navbar navbar-expand-lg sticky-top">
-    <div class="container-fluid px-3 px-lg-4">
-        <a class="navbar-brand d-flex align-items-center gap-2" href="/" aria-label="playsafeswiss Startseite">
-            <span class="brand-mark">{% include "includes/playsafeswiss_logo_mark.svg" %}</span>
-            <span class="fw-bold">playsafeswiss</span>
-        </a>
-        <div class="d-flex align-items-center gap-2 atlas-menu">
-            <a href="/" class="btn btn-sm btn-outline-secondary atlas-direct-link">Karte</a>
-            <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">Über</a>
-            <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">Impressum</a>
-            <button type="button" class="btn btn-sm btn-outline-secondary atlas-menu-toggle" aria-label="Menü öffnen" aria-expanded="false">☰</button>
-            <div class="atlas-menu-panel" id="atlas-menu-panel">
-                <a class="atlas-menu-only-mobile" href="/">Karte</a>
-                <a class="atlas-menu-only-mobile" href="{% url 'public:about' %}">Über</a>
-                <a class="atlas-menu-only-mobile" href="{% url 'public:imprint' %}">Impressum</a>
-                <a href="{% url 'notifications:list' %}">Nachrichten</a>
-                <a href="{% url 'internal:dashboard' %}">Dashboard</a>
-                {% if can_inspect %}
-                    <a href="{% url 'internal:my_inspections' %}">Meine Kontrollen</a>
-                {% endif %}
-                {% if can_inspect or can_manage or is_superadmin %}
-                    <a href="{% url 'internal:inspection_planning' %}">Einsatzplanung</a>
-                {% endif %}
-                {% if can_manage or is_superadmin %}
-                    <a href="/admin/">Admin</a>
-                {% endif %}
-                <a href="/logout/">Logout</a>
-            </div>
-        </div>
-    </div>
-</nav>
-
+{% include "includes/main_navigation.html" %}
 <main class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
     <div class="mb-4">
-        <div class="section-label mb-2">Interne Einsatzplanung</div>
-        <h1 class="fw-bold mb-2">Kontrollaufträge planen</h1>
-        <p class="text-secondary fs-5 mb-0">
-            {% if selected_organization %}
-                Fällige und geplante Kontrollen für {{ selected_organization.name }}.
-            {% elif is_superadmin %}
-                Bitte eine Organisation auswählen, um die Planung gezielt zu bearbeiten.
-            {% endif %}
-        </p>
+        <div class="section-label mb-2">{% trans "Internal deployment planning" %}</div>
+        <h1 class="fw-bold mb-2">{% trans "Plan inspection tasks" %}</h1>
+        <p class="text-secondary fs-5 mb-0">{% if selected_organization %}{% blocktrans with organization_name=selected_organization.name %}Due and planned inspections for {{ organization_name }}.{% endblocktrans %}{% elif is_superadmin %}{% trans "Please select an organization to edit its planning." %}{% endif %}</p>
     </div>
-
-    {% if messages %}
-        <div class="mb-4">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <section class="row g-3 mb-4">
-        {% for item in task_counts_by_status %}
-            <div class="col-md-6 col-xl-2">
-                <div class="metric-card p-3 h-100">
-                    <div class="metric-value">{{ item.count }}</div>
-                    <div class="metric-label">{{ item.label }}</div>
-                </div>
-            </div>
-        {% endfor %}
-    </section>
-
+    {% if messages %}<div class="mb-4">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
+    <section class="row g-3 mb-4">{% for item in task_counts_by_status %}<div class="col-md-6 col-xl-2"><div class="metric-card p-3 h-100"><div class="metric-value">{{ item.count }}</div><div class="metric-label">{{ item.label }}</div></div></div>{% endfor %}</section>
     <section class="content-card p-3 p-lg-4 mb-4">
         <form method="get" class="row g-3 align-items-end">
-            {% if is_superadmin %}
-                <div class="col-md-4 col-xl-3">
-                    <label class="form-label" for="organization">Organisation</label>
-                    <select class="form-select" id="organization" name="organization">
-                        <option value="">Alle Organisationen</option>
-                        {% for organization in organizations %}
-                            <option value="{{ organization.id }}" {% if selected_organization and selected_organization.id == organization.id %}selected{% endif %}>{{ organization.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            {% endif %}
-            <div class="col-md-4 col-xl-3">
-                <label class="form-label" for="status">Status</label>
-                <select class="form-select" id="status" name="status">
-                    {% for key, label in status_choices %}
-                        <option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4 col-xl-3">
-                <label class="form-label" for="inspection_type">Kontrollart</label>
-                <select class="form-select" id="inspection_type" name="inspection_type">
-                    <option value="">Alle Kontrollarten</option>
-                    {% for key, label in inspection_type_choices %}
-                        <option value="{{ key }}" {% if inspection_type_filter == key %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4 col-xl-3 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">Filtern</button>
-                <a href="{% url 'internal:inspection_planning' %}" class="btn btn-outline-secondary">Zurücksetzen</a>
-            </div>
+            {% if is_superadmin %}<div class="col-md-4 col-xl-3"><label class="form-label" for="organization">{% trans "Organization" %}</label><select class="form-select" id="organization" name="organization"><option value="">{% trans "All organizations" %}</option>{% for organization in organizations %}<option value="{{ organization.id }}" {% if selected_organization and selected_organization.id == organization.id %}selected{% endif %}>{{ organization.name }}</option>{% endfor %}</select></div>{% endif %}
+            <div class="col-md-4 col-xl-3"><label class="form-label" for="status">{% trans "Status" %}</label><select class="form-select" id="status" name="status">{% for key, label in status_choices %}<option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div class="col-md-4 col-xl-3"><label class="form-label" for="inspection_type">{% trans "Inspection type" %}</label><select class="form-select" id="inspection_type" name="inspection_type"><option value="">{% trans "All inspection types" %}</option>{% for key, label in inspection_type_choices %}<option value="{{ key }}" {% if inspection_type_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div class="col-md-4 col-xl-3 d-flex gap-2"><button type="submit" class="btn btn-primary">{% trans "Filter" %}</button><a href="{% url 'internal:inspection_planning' %}" class="btn btn-outline-secondary">{% trans "Reset" %}</a></div>
         </form>
-
-        {% if can_manage_selected_organization %}
-            <form method="post" action="{% url 'internal:rebuild_inspection_planning' %}" class="mt-3">
-                {% csrf_token %}
-                <input type="hidden" name="organization" value="{{ selected_organization.id }}">
-                <button type="submit" class="btn btn-sm btn-outline-primary">Kontrollplanung neu berechnen</button>
-            </form>
-        {% endif %}
+        {% if can_manage_selected_organization %}<form method="post" action="{% url 'internal:rebuild_inspection_planning' %}" class="mt-3">{% csrf_token %}<input type="hidden" name="organization" value="{{ selected_organization.id }}"><button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Recalculate inspection planning" %}</button></form>{% endif %}
     </section>
-
     <section class="content-card p-3 p-lg-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h2 class="h5 fw-bold mb-0">Kontrollaufträge</h2>
-            <span class="text-secondary small">Maximal 100 Einträge</span>
-        </div>
-
-        {% if tasks %}
-            <div class="table-responsive">
-                <table class="table table-sm align-middle mb-0">
-                    <thead>
-                    <tr>
-                        <th>Fällig</th>
-                        <th>Spielplatz</th>
-                        {% if is_superadmin %}<th>Organisation</th>{% endif %}
-                        <th>Kontrollart</th>
-                        <th>Status</th>
-                        <th class="planning-column">Planung</th>
-                        <th class="action-column">Aktion</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for task in tasks %}
-                        <tr>
-                            <td>
-                                <span class="fw-semibold {% if task.status == 'overdue' %}text-danger{% endif %}">
-                                    {{ task.due_date|date:"d.m.Y" }}
-                                </span>
-                            </td>
-                            <td>{{ task.playground.name }}</td>
-                            {% if is_superadmin %}<td>{{ task.organization.name }}</td>{% endif %}
-                            <td>{{ task.get_inspection_type_display }}</td>
-                            <td>{{ task.get_status_display }}</td>
-                            <td class="planning-column">
-                                {% if can_manage_selected_organization or can_manage and not is_superadmin %}
-                                    <form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="planning-form">
-                                        {% csrf_token %}
-                                        <div>
-                                            {{ task.planning_form.planned_date }}
-                                        </div>
-                                        <div>
-                                            {{ task.planning_form.assigned_to }}
-                                        </div>
-                                        <div class="task-note">
-                                            {{ task.planning_form.note }}
-                                        </div>
-                                        <div>
-                                            <button type="submit" class="btn btn-sm btn-outline-primary">Speichern</button>
-                                        </div>
-                                    </form>
-                                {% else %}
-                                    <div>{{ task.planned_date|date:"d.m.Y"|default:"–" }}</div>
-                                    <div class="text-secondary small">{{ task.assigned_to|default:"Nicht zugewiesen" }}</div>
-                                {% endif %}
-                            </td>
-                            <td class="action-column">
-                                {% if can_inspect and task.status != 'completed' and task.status != 'cancelled' %}
-                                    <form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}" class="task-action-form">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-success">Kontrolle starten</button>
-                                    </form>
-                                {% else %}
-                                    <span class="text-secondary">–</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="text-secondary">Keine Kontrollaufträge für die aktuelle Auswahl vorhanden.</div>
-        {% endif %}
+        <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">{% trans "Inspection tasks" %}</h2><span class="text-secondary small">{% trans "Maximum 100 entries" %}</span></div>
+        {% if tasks %}<div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>{% trans "Due" %}</th><th>{% trans "Playground" %}</th>{% if is_superadmin %}<th>{% trans "Organization" %}</th>{% endif %}<th>{% trans "Inspection type" %}</th><th>{% trans "Status" %}</th><th class="planning-column">{% trans "Planning" %}</th><th class="action-column">{% trans "Action" %}</th></tr></thead><tbody>{% for task in tasks %}<tr><td><span class="fw-semibold {% if task.status == 'overdue' %}text-danger{% endif %}">{{ task.due_date|date:"d.m.Y" }}</span></td><td>{{ task.playground.name }}</td>{% if is_superadmin %}<td>{{ task.organization.name }}</td>{% endif %}<td>{{ task.get_inspection_type_display }}</td><td>{{ task.get_status_display }}</td><td class="planning-column">{% if can_manage_selected_organization or can_manage and not is_superadmin %}<form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="planning-form">{% csrf_token %}<div>{{ task.planning_form.planned_date }}</div><div>{{ task.planning_form.assigned_to }}</div><div class="task-note">{{ task.planning_form.note }}</div><div><button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Save" %}</button></div></form>{% else %}<div>{{ task.planned_date|date:"d.m.Y"|default:"–" }}</div><div class="text-secondary small">{{ task.assigned_to|default:_('Not assigned') }}</div>{% endif %}</td><td class="action-column">{% if can_inspect and task.status != 'completed' and task.status != 'cancelled' %}<form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}" class="task-action-form">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success">{% trans "Start inspection" %}</button></form>{% else %}<span class="text-secondary">–</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="text-secondary">{% trans "No inspection tasks available for the current selection." %}</div>{% endif %}
     </section>
 </main>
-
-<script>
-    function closeMenu() {
-        const panel = document.getElementById('atlas-menu-panel');
-        const button = document.querySelector('.atlas-menu-toggle');
-        if (panel) { panel.classList.remove('show'); }
-        if (button) { button.setAttribute('aria-expanded', 'false'); }
-    }
-
-    document.addEventListener('click', function (event) {
-        const button = event.target.closest('.atlas-menu-toggle');
-        const panel = document.getElementById('atlas-menu-panel');
-
-        if (button && panel) {
-            const isOpen = panel.classList.contains('show');
-            panel.classList.toggle('show', !isOpen);
-            button.setAttribute('aria-expanded', String(!isOpen));
-            event.preventDefault();
-            return;
-        }
-
-        if (!event.target.closest('.atlas-menu')) {
-            closeMenu();
-        }
-    });
-</script>
+{% include "includes/main_navigation_script.html" %}
 </body>
 </html>
