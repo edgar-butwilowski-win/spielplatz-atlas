@@ -18,6 +18,7 @@ RECENT_INSPECTION_DAYS = 365
 DASHBOARD_MONTHS = 12
 DASHBOARD_WEEKS = 12
 MIN_SUPPLIER_EQUIPMENT_COUNT = 5
+SUPPLIER_RATE_LIMIT = 10
 
 
 def dashboard_json(data):
@@ -122,7 +123,7 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
 
 def supplier_rate_chart(rows, value_key):
     visible_rows = [row for row in rows if row["equipment_count"] >= MIN_SUPPLIER_EQUIPMENT_COUNT]
-    visible_rows = sorted(visible_rows, key=lambda row: (-row[value_key], row["supplier_name"]))[:12]
+    visible_rows = sorted(visible_rows, key=lambda row: (-row[value_key], row["supplier_name"]))[:SUPPLIER_RATE_LIMIT]
     return {
         "labels": [row["supplier_name"] for row in visible_rows],
         "data": [row[value_key] for row in visible_rows],
@@ -130,6 +131,7 @@ def supplier_rate_chart(rows, value_key):
         "safetyDefects": [row["safety_defect_count"] for row in visible_rows],
         "equipment": [row["equipment_count"] for row in visible_rows],
         "minimumEquipment": MIN_SUPPLIER_EQUIPMENT_COUNT,
+        "limit": SUPPLIER_RATE_LIMIT,
     }
 
 
