@@ -1,100 +1,50 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Neue Kontrolle – playsafeswiss</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
+    <title>{% trans "Record new inspection" %} – playsafeswiss</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }};
-            --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }};
-            --atlas-bg: #F8FAFC;
-            --atlas-text: #0F172A;
-            --atlas-navbar-height: 58px;
-        }
-
-        body {
-            background: var(--atlas-bg);
-            color: var(--atlas-text);
-        }
-
-        .content-card {
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-        }
-
-        .btn-atlas-primary {
-            background: var(--atlas-primary);
-            border-color: var(--atlas-primary);
-            color: white;
-        }
-
-        .btn-atlas-primary:hover {
-            filter: brightness(0.92);
-            color: white;
-        }
-
+        :root { --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }}; --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }}; --atlas-bg: #F8FAFC; --atlas-text: #0F172A; --atlas-navbar-height: 58px; }
+        body { background: var(--atlas-bg); color: var(--atlas-text); }
+        .content-card { background: white; border: 1px solid #E2E8F0; border-radius: 1.25rem; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06); }
+        .btn-atlas-primary { background: var(--atlas-primary); border-color: var(--atlas-primary); color: white; }
+        .btn-atlas-primary:hover { filter: brightness(0.92); color: white; }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
 <body>
-
 {% include "includes/main_navigation.html" %}
-
 <main class="container py-4 py-lg-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-xl-7">
             <div class="mb-4">
-                <div class="text-uppercase fw-semibold small mb-2" style="color: var(--atlas-primary);">
-                    Neue Kontrolle
-                </div>
+                <div class="text-uppercase fw-semibold small mb-2" style="color: var(--atlas-primary);">{% trans "Record new inspection" %}</div>
                 <h1 class="fw-bold mb-2">{{ playground.name }}</h1>
-                <p class="text-secondary fs-5 mb-0">
-                    Wählen Sie die Kontrollart. Danach wird eine neue Kontrolle mit allen aktiven Prüfkriterien angelegt.
-                </p>
+                <p class="text-secondary fs-5 mb-0">{% trans "Select the inspection type. A new inspection with all active inspection criteria will then be created." %}</p>
             </div>
-
             <div class="content-card p-3 p-lg-4">
                 <form method="post">
                     {% csrf_token %}
-
                     <div class="mb-4">
-                        <label for="inspection_type" class="form-label fw-semibold">
-                            Kontrollart
-                        </label>
+                        <label for="inspection_type" class="form-label fw-semibold">{% trans "Inspection type" %}</label>
                         <select id="inspection_type" name="inspection_type" class="form-select">
-                            {% for value, label in inspection_types %}
-                                <option value="{{ value }}">{{ label }}</option>
-                            {% endfor %}
+                            {% for value, label in inspection_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
                         </select>
                     </div>
-
                     <div class="d-flex justify-content-between gap-2">
-                        <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
-                            Abbrechen
-                        </a>
-                        <button type="submit" class="btn btn-atlas-primary">
-                            Kontrolle starten
-                        </button>
+                        <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+                        <button type="submit" class="btn btn-atlas-primary">{% trans "Start inspection" %}</button>
                     </div>
                 </form>
             </div>
-
-            <p class="text-secondary small mt-3">
-                Die Prüfung basiert auf dem aktiven Prüfkatalog auf Basis von SN EN 1176/1177 sowie allfälligen lokalen Ergänzungen der Organisation.
-            </p>
+            <p class="text-secondary small mt-3">{% trans "The inspection is based on the active inspection catalogue according to SN EN 1176/1177 and any local additions made by the organization." %}</p>
         </div>
     </div>
 </main>
-
 {% include "includes/main_navigation_script.html" %}
 </body>
 </html>
