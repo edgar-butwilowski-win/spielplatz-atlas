@@ -16,6 +16,11 @@ urlpatterns = [
         name="playground_document_download",
     ),
     path(
+        "playgrounds/<slug:organization_slug>/",
+        map_views.organization_index,
+        name="organization_index",
+    ),
+    path(
         "playgrounds/<slug:organization_slug>/<slug:playground_slug>/photo/upload/",
         photo_views.upload_playground_photo,
         name="upload_playground_photo",
