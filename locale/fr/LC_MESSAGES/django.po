@@ -3,8 +3,7 @@ msgstr ""
 "Project-Id-Version: playsafeswiss\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-21 13:06+0000\n"
-"PO-Revision-Date: 2026-05-21 00:00+0000\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2026-05-27 00:00+0000\n"
 "Language-Team: Français\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -12,517 +11,362 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: config/settings.py:166
 msgid "English"
 msgstr "Anglais"
 
-#: config/settings.py:167
 msgid "Deutsch"
 msgstr "Allemand"
 
-#: config/settings.py:168
 msgid "Français"
 msgstr "Français"
 
-#: config/settings.py:169
 msgid "Italiano"
 msgstr "Italien"
 
-#: config/settings.py:170
 msgid "Rumantsch"
 msgstr "Romanche"
 
-#: inspections/models.py:24 inspections/models.py:185
 msgid "Visual routine inspection"
-msgstr ""
+msgstr "Contrôle visuel de routine"
 
-#: inspections/models.py:25 inspections/models.py:186
-#, fuzzy
-#| msgid "Next inspection:"
 msgid "Operational inspection"
-msgstr "Prochain contrôle :"
+msgstr "Contrôle opérationnel"
 
-#: inspections/models.py:26 inspections/models.py:187
-#, fuzzy
-#| msgid "My inspections"
 msgid "Annual main inspection"
-msgstr "Mes contrôles"
+msgstr "Inspection principale annuelle"
 
-#: inspections/models.py:133 inspections/models.py:525
-#, fuzzy
-#| msgid "Become a playground pro!"
 msgid "General playground inspection"
-msgstr "Deviens un pro des places de jeux !"
+msgstr "Contrôle général de la place de jeux"
 
-#: inspections/models.py:134 inspections/models.py:526
 msgid "Play equipment"
-msgstr ""
+msgstr "Équipements de jeu"
 
-#: inspections/models.py:135 inspections/models.py:527
 msgid "Impact protection surface / ground"
-msgstr ""
+msgstr "Surface amortissante / sol"
 
-#: inspections/models.py:136 inspections/models.py:528
 msgid "Additional equipment"
-msgstr ""
+msgstr "Équipement complémentaire"
 
-#: inspections/models.py:194 inspections/models.py:598
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
-#: inspections/models.py:195
 msgid "Defects found"
-msgstr ""
+msgstr "Défauts constatés"
 
-#: inspections/models.py:202 inspections/models.py:680
-#: inspections/models.py:913
 msgid "In progress"
-msgstr ""
+msgstr "En cours"
 
-#: inspections/models.py:203 inspections/models.py:914
 msgid "Completed"
-msgstr ""
+msgstr "Terminé"
 
-#: inspections/models.py:345 inspections/models.py:679
-#, fuzzy
-#| msgid "Open menu"
 msgid "Open"
-msgstr "Ouvrir le menu"
+msgstr "Ouvert"
 
-#: inspections/models.py:346 inspections/models.py:681
-#: inspections/models.py:912 templates/internal/dashboard.html:81
 msgid "Planned"
-msgstr ""
+msgstr "Planifié"
 
-#: inspections/models.py:347
 msgid "Done"
-msgstr ""
+msgstr "Fait"
 
-#: inspections/models.py:348
 msgid "Overdue"
-msgstr ""
+msgstr "En retard"
 
-#: inspections/models.py:349
 msgid "Suspended"
-msgstr ""
+msgstr "Suspendu"
 
-#: inspections/models.py:350 inspections/models.py:915
-#, fuzzy
-#| msgid "Cancel"
 msgid "Cancelled"
-msgstr "Annuler"
+msgstr "Annulé"
 
-#: inspections/models.py:357
 msgid "Automatic"
-msgstr ""
+msgstr "Automatique"
 
-#: inspections/models.py:358
 msgid "Manual"
-msgstr ""
+msgstr "Manuel"
 
-#: inspections/models.py:597
 msgid "Not checked yet"
-msgstr ""
+msgstr "Pas encore contrôlé"
 
-#: inspections/models.py:599 templates/internal/dashboard.html:81
 msgid "Defect"
-msgstr ""
+msgstr "Défaut"
 
-#: inspections/models.py:600
 msgid "Not applicable"
-msgstr ""
+msgstr "Non applicable"
 
-#: inspections/models.py:682
 msgid "Resolved"
-msgstr ""
+msgstr "Résolu"
 
-#: inspections/models.py:683
 msgid "Checked / completed"
-msgstr ""
+msgstr "Contrôlé / terminé"
 
-#: inspections/models.py:693
-#, fuzzy
-#| msgid "My inspections"
 msgid "Inspection"
-msgstr "Mes contrôles"
+msgstr "Contrôle"
 
-#: inspections/models.py:694
 msgid "Citizen report"
-msgstr ""
+msgstr "Signalement citoyen"
 
-#: inspections/models.py:695
-#, fuzzy
-#| msgid "Internal access"
 msgid "Internal report"
-msgstr "Accès interne"
+msgstr "Signalement interne"
 
-#: inspections/models.py:696
 msgid "Maintenance / care"
-msgstr ""
+msgstr "Maintenance / entretien"
 
-#: inspections/models.py:697
 msgid "Other"
-msgstr ""
+msgstr "Autre"
 
-#: inspections/models.py:704
 msgid "A (immediate)"
-msgstr ""
+msgstr "A (immédiat)"
 
-#: inspections/models.py:705
 msgid "B (medium-term)"
-msgstr ""
+msgstr "B (à moyen terme)"
 
-#: inspections/models.py:894
-msgid ""
-"A defect with a safety risk is known for this play equipment. Please observe "
-"the notices on site."
-msgstr ""
+msgid "A defect with a safety risk is known for this play equipment. Please observe the notices on site."
+msgstr "Un défaut présentant un risque de sécurité est connu pour cet équipement de jeu. Veuillez respecter les indications sur place."
 
-#: inspections/models.py:899
-msgid ""
-"A defect is known for this play equipment. The defect does not pose a safety "
-"risk. Repair is planned."
-msgstr ""
+msgid "A defect is known for this play equipment. The defect does not pose a safety risk. Repair is planned."
+msgstr "Un défaut est connu pour cet équipement de jeu. Le défaut ne présente pas de risque de sécurité. La réparation est planifiée."
 
-#: templates/accounts/login.html:8 templates/accounts/login.html:46
-#: templates/accounts/login.html:66 templates/includes/main_navigation.html:54
 msgid "Login"
 msgstr "Connexion"
 
-#: templates/accounts/login.html:35 templates/includes/main_navigation.html:4
 msgid "playsafeswiss home page"
 msgstr "Page d’accueil playsafeswiss"
 
-#: templates/accounts/login.html:41 templates/includes/main_navigation.html:13
-#: templates/includes/main_navigation.html:47
 msgid "Map"
 msgstr "Carte"
 
-#: templates/accounts/login.html:42 templates/includes/main_navigation.html:15
-#: templates/includes/main_navigation.html:49
 msgid "About"
 msgstr "À propos"
 
-#: templates/accounts/login.html:43 templates/includes/main_navigation.html:16
-#: templates/includes/main_navigation.html:50
 msgid "Imprint"
 msgstr "Mentions légales"
 
-#: templates/accounts/login.html:45 templates/includes/main_navigation.html:18
-#: templates/includes/main_navigation.html:53
 msgid "Join"
 msgstr "Participer"
 
-#: templates/accounts/login.html:50 templates/includes/main_navigation.html:24
 msgid "Open menu"
 msgstr "Ouvrir le menu"
 
-#: templates/accounts/login.html:52 templates/includes/main_navigation.html:57
-#: templates/internal/dashboard.html:8
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: templates/accounts/login.html:53 templates/includes/main_navigation.html:65
 msgid "Admin"
 msgstr "Admin"
 
-#: templates/accounts/login.html:54 templates/includes/main_navigation.html:67
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: templates/accounts/login.html:65
 msgid "Internal access"
 msgstr "Accès interne"
 
-#: templates/accounts/login.html:67
-msgid "Sign in with your email address and password."
-msgstr "Connectez-vous avec votre adresse e-mail et votre mot de passe."
-
-#: templates/accounts/login.html:71
-msgid "Please check your email address and password."
-msgstr "Veuillez vérifier votre adresse e-mail et votre mot de passe."
-
-#: templates/accounts/login.html:74
-msgid "Email address"
-msgstr "Adresse e-mail"
-
-#: templates/accounts/login.html:75
-msgid "Password"
-msgstr "Mot de passe"
-
-#: templates/accounts/login.html:76
-msgid "Log in"
-msgstr "Se connecter"
-
-#: templates/accounts/login.html:80
-msgid "Public visitors do not need a user account."
-msgstr "Les visiteurs publics n’ont pas besoin de compte utilisateur."
-
-#: templates/includes/main_navigation.html:36
 msgid "Language"
 msgstr "Langue"
 
-#: templates/includes/main_navigation.html:56
 msgid "Messages"
 msgstr "Messages"
 
-#: templates/includes/main_navigation.html:59
 msgid "My inspections"
 msgstr "Mes contrôles"
 
-#: templates/includes/main_navigation.html:62
 msgid "Deployment planning"
 msgstr "Planification des interventions"
 
-#: templates/internal/dashboard.html:39
-#, fuzzy
-#| msgid "Internal access"
-msgid "Internal dashboard"
-msgstr "Accès interne"
+msgid "Your playground. Your information."
+msgstr "Ta place de jeux. Tes informations."
 
-#: templates/internal/dashboard.html:40
-msgid "Analytics and key figures"
-msgstr ""
-
-#: templates/internal/dashboard.html:41
-#, fuzzy, python-format
-#| msgid "Register organization"
-msgid "Overview for %(organization_name)s."
-msgstr "Enregistrer une organisation"
-
-#: templates/internal/dashboard.html:41
-msgid "Cross-tenant overview for super admins."
-msgstr ""
-
-#: templates/internal/dashboard.html:45
-#, fuzzy
-#| msgid "New organization"
-msgid "Organizations"
-msgstr "Nouvelle organisation"
-
-#: templates/internal/dashboard.html:46
-#, fuzzy
-#| msgid "playgrounds"
-msgid "Active playgrounds"
-msgstr "places de jeux"
-
-#: templates/internal/dashboard.html:47
-msgid "Open defects"
-msgstr ""
-
-#: templates/internal/dashboard.html:48 templates/internal/dashboard.html:81
-msgid "Defects with safety risk"
-msgstr ""
-
-#: templates/internal/dashboard.html:49 templates/internal/dashboard.html:71
-msgid "Planned maintenance actions"
-msgstr ""
-
-#: templates/internal/dashboard.html:51
-msgid "Inspections in progress"
-msgstr ""
-
-#: templates/internal/dashboard.html:52
-#, fuzzy
-#| msgid "Next inspection:"
-msgid "Completed inspections"
-msgstr "Prochain contrôle :"
-
-#: templates/internal/dashboard.html:57
-msgid "Defects by status"
-msgstr ""
-
-#: templates/internal/dashboard.html:58
-msgid "Defects by source"
-msgstr ""
-
-#: templates/internal/dashboard.html:63
-#, fuzzy
-#| msgid "My inspections"
-msgid "Inspections by type"
-msgstr "Mes contrôles"
-
-#: templates/internal/dashboard.html:64
-msgid "Inspections by status"
-msgstr ""
-
-#: templates/internal/dashboard.html:70
-msgid "Maintenance by status"
-msgstr ""
-
-#: templates/internal/dashboard.html:71 templates/internal/dashboard.html:82
-msgid "Date"
-msgstr ""
-
-#: templates/internal/dashboard.html:71
-msgid "Title"
-msgstr ""
-
-#: templates/internal/dashboard.html:71 templates/internal/dashboard.html:76
-#: templates/internal/dashboard.html:77 templates/internal/dashboard.html:81
-#: templates/internal/dashboard.html:82 templates/public/index.html:132
-msgid "Playground"
-msgstr "Place de jeux"
-
-#: templates/internal/dashboard.html:71 templates/internal/dashboard.html:81
-msgid "Status"
-msgstr ""
-
-#: templates/internal/dashboard.html:71
-msgid "No planned maintenance actions available."
-msgstr ""
-
-#: templates/internal/dashboard.html:76
-msgid "Open defects by playground"
-msgstr ""
-
-#: templates/internal/dashboard.html:76 templates/internal/dashboard.html:77
-#, fuzzy
-#| msgid "New organization"
-msgid "Organization"
-msgstr "Nouvelle organisation"
-
-#: templates/internal/dashboard.html:76
-msgid "Defects"
-msgstr ""
-
-#: templates/internal/dashboard.html:76
-#, fuzzy
-#| msgid "playgrounds"
-msgid "Without playground"
-msgstr "places de jeux"
-
-#: templates/internal/dashboard.html:76
-msgid "No open defects available."
-msgstr ""
-
-#: templates/internal/dashboard.html:77
-msgid "Playgrounds without a recent completed inspection"
-msgstr ""
-
-#: templates/internal/dashboard.html:77
 #, python-format
-msgid "The last %(days)s days are considered."
-msgstr ""
+msgid "Preview image of %(name)s"
+msgstr "Image d’aperçu de %(name)s"
 
-#: templates/internal/dashboard.html:77
-#, fuzzy
-#| msgid "Next inspection:"
+msgid "Replace playground image"
+msgstr "Remplacer l’image de la place de jeux"
+
+msgid "Upload image"
+msgstr "Téléverser l’image"
+
+msgid "Rotate image by 90°"
+msgstr "Faire pivoter l’image de 90°"
+
+msgid "The current preview image comes from a play equipment item. It can be rotated there."
+msgstr "L’image d’aperçu actuelle provient d’un équipement de jeu. Elle peut y être pivotée."
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "No address stored"
+msgstr "Aucune adresse enregistrée"
+
+msgid "District"
+msgstr "Quartier"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Publicly visible"
+msgstr "Visible publiquement"
+
+msgid "Internally visible"
+msgstr "Visible en interne"
+
+msgid "Swiss coordinates"
+msgstr "Coordonnées suisses"
+
+msgid "Show specialist map"
+msgstr "Afficher la carte métier"
+
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Certificate documents"
+msgstr "Documents de certificat"
+
+msgid "Acceptance documents"
+msgstr "Documents de réception"
+
+msgid "Care status"
+msgstr "État d’entretien"
+
+msgid "Known defects and planned repairs."
+msgstr "Défauts connus et remises en état planifiées."
+
+msgid "Record new inspection"
+msgstr "Saisir un nouveau contrôle"
+
+msgid "Record defect"
+msgstr "Saisir un défaut"
+
+msgid "Inspection is currently suspended."
+msgstr "L’inspection est actuellement suspendue."
+
 msgid "Last inspection"
-msgstr "Prochain contrôle :"
+msgstr "Dernier contrôle"
 
-#: templates/internal/dashboard.html:77
-msgid "None"
-msgstr ""
+msgid "No completed inspection yet"
+msgstr "Aucun contrôle terminé pour l’instant"
 
-#: templates/internal/dashboard.html:77
-msgid "All shown playgrounds have a recent completed inspection."
-msgstr ""
+msgid "Next planned inspection"
+msgstr "Prochain contrôle planifié"
 
-#: templates/internal/dashboard.html:81
-msgid "No open defects with safety risk available."
-msgstr ""
+msgid "is being planned"
+msgstr "est en cours de planification"
 
-#: templates/internal/dashboard.html:82
-msgid "Latest completed inspections"
-msgstr ""
+msgid "General playground defect"
+msgstr "Défaut général de la place de jeux"
 
-#: templates/internal/dashboard.html:82
-msgid "Type"
-msgstr ""
+msgid "Safety risk"
+msgstr "Risque de sécurité"
 
-#: templates/internal/dashboard.html:82
-msgid "Result"
-msgstr ""
+msgid "No safety risk"
+msgstr "Aucun risque de sécurité"
 
-#: templates/internal/dashboard.html:82
-#, fuzzy
-#| msgid "Next inspection:"
-msgid "No completed inspections yet."
-msgstr "Prochain contrôle :"
+#, python-format
+msgid "%(counter)s defect"
+msgid_plural "%(counter)s defects"
+msgstr[0] "%(counter)s défaut"
+msgstr[1] "%(counter)s défauts"
 
-#: templates/internal/dashboard.html:89
-msgid "Count"
-msgstr ""
+msgid "Open defect"
+msgstr "Ouvrir le défaut"
 
-#: templates/public/index.html:111
-msgid "Become a playground pro!"
-msgstr "Deviens un pro des places de jeux !"
+msgid "No defects known"
+msgstr "Aucun défaut connu"
 
-#: templates/public/index.html:112
-msgid "Select a playground on the map and get exciting detailed information."
-msgstr ""
-"Choisis une place de jeux sur la carte et obtiens des informations "
-"détaillées intéressantes."
+msgid "Equipment on this playground."
+msgstr "Équipement de cette place de jeux."
 
-#: templates/public/index.html:115
-msgid "Search playground, address or district"
-msgstr "Rechercher une place de jeux, une adresse ou un quartier"
+#, python-format
+msgid "%(counter)s entry"
+msgid_plural "%(counter)s entries"
+msgstr[0] "%(counter)s entrée"
+msgstr[1] "%(counter)s entrées"
 
-#: templates/public/index.html:131
-msgid "playgrounds"
-msgstr "places de jeux"
+#, python-format
+msgid "Photo of %(name)s"
+msgstr "Photo de %(name)s"
 
-#: templates/public/index.html:133
-msgid "Preview image of"
-msgstr "Image d’aperçu de"
+msgid "Replace image"
+msgstr "Remplacer l’image"
 
-#: templates/public/index.html:134
-msgid "Next inspection:"
-msgstr "Prochain contrôle :"
+msgid "Defect with safety risk"
+msgstr "Défaut avec risque de sécurité"
 
-#: templates/public/index.html:135
-msgid "will be planned"
-msgstr "sera planifié"
+msgid "Defect without safety risk"
+msgstr "Défaut sans risque de sécurité"
 
-#: templates/public/index.html:136
-msgid "Show details"
-msgstr "Afficher les détails"
+msgid "In operation"
+msgstr "En service"
 
-#: templates/public/register_organization.html:3
-#: templates/public/register_organization.html:10
-msgid "Register organization"
-msgstr "Enregistrer une organisation"
+msgid "Renovation pending"
+msgstr "Rénovation en attente"
 
-#: templates/public/register_organization.html:9
-msgid "New organization"
-msgstr "Nouvelle organisation"
+msgid "No renovation planned"
+msgstr "Aucune rénovation planifiée"
 
-#: templates/public/register_organization.html:12
-msgid ""
-"Request your own organization area in playsafeswiss. The request will be "
-"reviewed by a super admin."
-msgstr ""
-"Demandez votre propre espace d’organisation dans playsafeswiss. La demande "
-"sera examinée par un super administrateur."
+#, python-format
+msgid "Will be removed on %(date)s"
+msgstr "Sera démonté le %(date)s"
 
-#: templates/public/register_organization.html:32
-msgid "Cancel"
-msgstr "Annuler"
+msgid "Renovation details"
+msgstr "Informations de rénovation"
 
-#: templates/public/register_organization.html:32
-msgid "Submit request"
-msgstr "Envoyer la demande"
+msgid "Recommended renovation year"
+msgstr "Année de rénovation recommandée"
 
-#: templates/public/register_organization.html:36
-msgid ""
-"After review, the organization can be activated and an organization admin "
-"can be created."
-msgstr ""
-"Après vérification, l’organisation peut être activée et un administrateur "
-"d’organisation peut être créé."
+msgid "Renovation type"
+msgstr "Type de rénovation"
 
-#: templates/public/register_organization_done.html:3
-#: templates/public/register_organization_done.html:10
-msgid "Request submitted"
-msgstr "Demande envoyée"
+msgid "Renovation comment"
+msgstr "Commentaire sur la rénovation"
 
-#: templates/public/register_organization_done.html:11
-msgid ""
-"Thank you. Your organization request has been saved and will be reviewed."
-msgstr ""
-"Merci. Votre demande d’organisation a été enregistrée et sera examinée."
+msgid "Inventory no."
+msgstr "N° d’inventaire"
 
-#: templates/public/register_organization_done.html:12
-msgid "Back to map"
-msgstr "Retour à la carte"
+msgid "Year built"
+msgstr "Année de construction"
+
+msgid "Supplier"
+msgstr "Fournisseur"
+
+msgid "Standard"
+msgstr "Norme"
+
+msgid "No play equipment recorded yet"
+msgstr "Aucun équipement de jeu enregistré pour l’instant"
+
+msgid "As soon as publicly visible play equipment has been recorded, it will be shown here."
+msgstr "Dès que des équipements de jeu visibles publiquement seront enregistrés, ils apparaîtront ici."
+
+msgid "January"
+msgstr "janvier"
+
+msgid "February"
+msgstr "février"
+
+msgid "March"
+msgstr "mars"
+
+msgid "April"
+msgstr "avril"
+
+msgid "May"
+msgstr "mai"
+
+msgid "June"
+msgstr "juin"
+
+msgid "July"
+msgstr "juillet"
+
+msgid "August"
+msgstr "août"
+
+msgid "September"
+msgstr "septembre"
+
+msgid "October"
+msgstr "octobre"
+
+msgid "November"
+msgstr "novembre"
+
+msgid "December"
+msgstr "décembre"
