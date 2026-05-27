@@ -120,7 +120,7 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
 
 
 def build_equipment_charts(defects, equipment):
-    manufacturer_rows = list(defects.filter(equipment__isnull=False).values("equipment__manufacturer").annotate(count=Count("id")).order_by("-count", "equipment__manufacturer")[:12])
+    supplier_rows = list(defects.filter(equipment__isnull=False).values("equipment__supplier__name").annotate(count=Count("id")).order_by("-count", "equipment__supplier__name")[:12])
     bucket_names = ["0-5 years", "6-10 years", "11-15 years", "16-20 years", "21-30 years", "Over 30 years", "Unknown age"]
     buckets = {name: {"equipment": 0, "defects": 0} for name in bucket_names}
     current_year = timezone.localdate().year
@@ -144,7 +144,7 @@ def build_equipment_charts(defects, equipment):
         buckets[bucket]["equipment"] += 1
         buckets[bucket]["defects"] += item.defect_count
     return {
-        "manufacturerDefects": {"labels": [row["equipment__manufacturer"] or "Unknown manufacturer" for row in manufacturer_rows], "data": [row["count"] for row in manufacturer_rows]},
+        "supplierDefects": {"labels": [row["equipment__supplier__name"] or "Unknown supplier" for row in supplier_rows], "data": [row["count"] for row in supplier_rows]},
         "equipmentAgeDefects": {"labels": bucket_names, "series": [chart_series("Defects", [buckets[name]["defects"] for name in bucket_names]), chart_series("Play equipment", [buckets[name]["equipment"] for name in bucket_names])]},
     }
 
@@ -152,11 +152,11 @@ def build_equipment_charts(defects, equipment):
 def build_dashboard_context(scope):
     organization = scope["organization"]
     playgrounds = Playground.objects.select_related("organization")
-    defects = Defect.objects.select_related("playground", "playground__organization", "equipment")
+    defects = Defect.objects.select_related("playground", "playground__organization", "equipment", "equipment__supplier")
     inspections = Inspection.objects.select_related("playground", "playground__organization")
     maintenance_actions = MaintenanceAction.objects.select_related("defect", "defect__playground", "defect__playground__organization")
     inspection_tasks = InspectionTask.objects.select_related("playground", "organization")
-    equipment = PlayEquipment.objects.select_related("playground", "playground__organization")
+    equipment = PlayEquipment.objects.select_related("playground", "playground__organization", "supplier")
     if organization is not None:
         playgrounds = playgrounds.filter(organization=organization)
         defects = defects.filter(playground__organization=organization)
