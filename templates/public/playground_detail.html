@@ -20,12 +20,12 @@
 .renovation-panel { border: 1px solid #E2E8F0; border-radius: 0.9rem; background: #F8FAFC; padding: 0.75rem; }
 .document-panel { border-top: 1px solid #E2E8F0; padding-top: 1rem; }
 .document-link { display: inline-flex; align-items: center; gap: 0.35rem; border-radius: 999px; border: 1px solid #CBD5E1; padding: 0.35rem 0.7rem; background: #F8FAFC; color: #0F172A; text-decoration: none; font-size: 0.875rem; font-weight: 600; }
-.document-link:hover { background: #E2E8F0; color: #0F172A; }
 .empty-state { border: 1px dashed #CBD5E1; border-radius: 1rem; background: #F8FAFC; }
 .defect-card { border-radius: 1rem; }
 .internal-defect-row { background: rgba(255, 255, 255, 0.55); border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 0.75rem; padding: 0.5rem; }
 .internal-defect-description { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .care-panel { max-height: 620px; overflow-y: auto; }
+.photo-actions { border: 1px solid #E2E8F0; border-radius: .9rem; background: #F8FAFC; padding: .75rem; }
 </style>
 {% endblock %}
 
@@ -42,7 +42,27 @@
             </div>
             <div class="col-12 col-xl-4">
                 <div class="content-card p-3 p-lg-4 h-100">
-                    {% if preview_photo %}<div class="mb-3"><img src="{% url 'media_assets:image_content' preview_photo.id %}" alt="Vorschaubild von {{ playground.name }}" class="img-fluid rounded-4 border" style="width: 100%; max-height: 260px; object-fit: cover;"></div>{% endif %}
+                    {% if preview_photo %}
+                        <div class="mb-3"><img src="{% url 'media_assets:image_content' preview_photo.id %}" alt="Vorschaubild von {{ playground.name }}" class="img-fluid rounded-4 border" style="width: 100%; max-height: 260px; object-fit: cover;"></div>
+                    {% endif %}
+                    {% if can_manage_photos %}
+                        <div class="photo-actions mb-3">
+                            <form method="post" enctype="multipart/form-data" action="{% url 'public:upload_playground_photo' playground.organization.slug playground.slug %}" class="d-flex flex-column gap-2 mb-2">
+                                {% csrf_token %}
+                                <label class="form-label small fw-semibold mb-0" for="playground_photo">Spielplatzbild ersetzen</label>
+                                <input type="file" name="photo" id="playground_photo" accept="image/*" class="form-control form-control-sm" required>
+                                <button type="submit" class="btn btn-sm btn-atlas-primary">Bild hochladen</button>
+                            </form>
+                            {% if preview_photo_is_own %}
+                                <form method="post" action="{% url 'public:rotate_playground_photo' playground.organization.slug playground.slug %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary w-100">Bild 90° drehen</button>
+                                </form>
+                            {% else %}
+                                <div class="small text-secondary">Das aktuelle Vorschaubild stammt von einem Spielgerät. Drehen ist dort möglich.</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                     <div class="row g-3">
                         <div class="col-12"><div class="meta-label">Adresse</div><div class="fw-semibold">{{ playground.address|default:"Keine Adresse hinterlegt" }}</div></div>
                         <div class="col-6"><div class="meta-label">Quartier</div><div class="fw-semibold">{{ playground.district|default:"-" }}</div></div>
@@ -52,27 +72,7 @@
                             {% if request.user.is_authenticated %}<div class="col-12"><a href="https://stadtplan.winterthur.ch/mini?gbapp=portal&amp;topic=Spielplatzkarte&amp;infoactive=1&amp;maponly=1&amp;onlymap=1&amp;scale=200&amp;x={{ playground.longitude|unlocalize }}&amp;y={{ playground.latitude|unlocalize }}&amp;back=Hintergrundkarte_LK_AV_Situationsplan" class="btn btn-atlas-primary w-100" target="_blank" rel="noopener noreferrer">Fachkarte anzeigen</a></div>{% endif %}
                         {% endif %}
                         {% if can_view_playground_documents and certificate_documents or can_view_playground_documents and acceptance_documents %}
-                            <div class="col-12">
-                                <div class="document-panel">
-                                    <div class="meta-label mb-2">Dokumente</div>
-                                    {% if certificate_documents %}
-                                        <div class="mb-3">
-                                            <div class="small fw-semibold mb-2">Zertifikatsdokumente</div>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                {% for document in certificate_documents %}<a href="{% url 'public:playground_document_download' document.id %}" class="document-link">PDF #{{ document.id }}</a>{% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    {% if acceptance_documents %}
-                                        <div>
-                                            <div class="small fw-semibold mb-2">Abnahmedokumente</div>
-                                            <div class="d-flex flex-wrap gap-2">
-                                                {% for document in acceptance_documents %}<a href="{% url 'public:playground_document_download' document.id %}" class="document-link">PDF #{{ document.id }}</a>{% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            <div class="col-12"><div class="document-panel"><div class="meta-label mb-2">Dokumente</div>{% if certificate_documents %}<div class="mb-3"><div class="small fw-semibold mb-2">Zertifikatsdokumente</div><div class="d-flex flex-wrap gap-2">{% for document in certificate_documents %}<a href="{% url 'public:playground_document_download' document.id %}" class="document-link">PDF #{{ document.id }}</a>{% endfor %}</div></div>{% endif %}{% if acceptance_documents %}<div><div class="small fw-semibold mb-2">Abnahmedokumente</div><div class="d-flex flex-wrap gap-2">{% for document in acceptance_documents %}<a href="{% url 'public:playground_document_download' document.id %}" class="document-link">PDF #{{ document.id }}</a>{% endfor %}</div></div>{% endif %}</div></div>
                         {% endif %}
                     </div>
                 </div>
@@ -86,17 +86,11 @@
                             {% if can_create_inspection %}{% if can_start_inspection %}<a href="{% url 'internal:create_inspection' playground.organization.slug playground.slug %}" class="btn btn-atlas-primary">Neue Kontrolle erfassen</a>{% else %}<button type="button" class="btn btn-atlas-primary" disabled>Neue Kontrolle erfassen</button>{% endif %}{% endif %}
                             {% if can_create_defect %}<a href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">Mangel erfassen</a>{% endif %}
                         </div>
-                        {% if inspection_is_suspended %}<div class="alert alert-warning small mb-3">Die Inspektion ist aktuell ausgesetzt. {% if playground.inspection_suspended_from %}Von {{ playground.inspection_suspended_from|date:"d.m.Y" }} {% endif %}{% if playground.inspection_suspended_until %}bis {{ playground.inspection_suspended_until|date:"d.m.Y" }}.{% else %}auf unbestimmte Zeit.{% endif %}</div>{% endif %}
+                        {% if inspection_is_suspended %}<div class="alert alert-warning small mb-3">Die Inspektion ist aktuell ausgesetzt.</div>{% endif %}
                     {% endif %}
-                    <div class="p-3 rounded-4 border bg-light mb-3">
-                        <div class="meta-label mb-1">Letzte Kontrolle</div>
-                        {% if latest_completed_inspection %}<div class="fw-bold">{{ latest_completed_inspection.inspected_at|date:"d.m.Y" }}</div><div class="text-secondary small">{{ latest_completed_inspection.get_inspection_type_display }}</div>{% else %}<div class="fw-semibold">Noch keine abgeschlossene Kontrolle vorhanden</div><div class="text-secondary small">Sobald eine Kontrolle abgeschlossen wurde, erscheint sie hier.</div>{% endif %}
-                    </div>
-                    <div class="p-3 rounded-4 border bg-light mb-3">
-                        <div class="meta-label mb-1">Nächste geplante Kontrolle</div>
-                        {% if next_public_inspection.has_date %}<div class="fw-bold">{{ next_public_inspection.display_label }}</div>{% if next_public_inspection.inspection_type_label %}<div class="text-secondary small">{{ next_public_inspection.inspection_type_label }}</div>{% endif %}{% else %}<div class="fw-semibold">{{ next_public_inspection.label }}</div><div class="text-secondary small">Der nächste Termin wird durch den Betreiber geplant.</div>{% endif %}
-                    </div>
-                    {% if defect_groups %}<div class="d-flex flex-column gap-3">{% for group in defect_groups %}<article class="defect-card p-3 border {% if group.has_safety_risk %}bg-warning-subtle border-warning{% else %}bg-success-subtle border-success{% endif %}"><div class="d-flex justify-content-between gap-2 align-items-start mb-2"><div><div class="fw-bold">{{ group.label }}</div>{% if can_open_defect %}<div class="small text-secondary">{{ group.defects|length }} Mangel{% if group.defects|length != 1 %}e{% endif %}{% if group.has_internal_defect %} · enthält interne Mängel{% endif %}</div>{% endif %}</div>{% if group.has_safety_risk %}<span class="badge text-bg-warning">Sicherheitsrisiko</span>{% else %}<span class="badge text-bg-success">Kein Sicherheitsrisiko</span>{% endif %}</div><p class="mb-2">{{ group.representative.get_public_message }}</p>{% if group.representative.public_note %}<p class="small mb-2">{{ group.representative.public_note }}</p>{% endif %}{% if group.representative.planned_resolution_date %}<div class="small fw-semibold">Geplante Behebung: {{ group.representative.planned_resolution_date|date:"d.m.Y" }}</div>{% endif %}{% if can_open_defect %}<div class="small fw-semibold mt-3 mb-2">Interne Mängel</div><div class="d-flex flex-column gap-2">{% for defect in group.defects %}<div class="internal-defect-row d-flex flex-column flex-lg-row justify-content-between gap-2 align-items-lg-center"><div class="internal-defect-description" title="{{ defect.internal_description }}">#{{ defect.id }} · {{ defect.internal_description|truncatechars:55 }} {% if defect.public_visible %}<span class="badge text-bg-success ms-1">öffentlich</span>{% else %}<span class="badge text-bg-secondary ms-1">intern</span>{% endif %}</div><a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel öffnen</a></div>{% endfor %}</div>{% endif %}</article>{% endfor %}</div>{% else %}<div class="empty-state p-3"><div class="fw-semibold">Keine Mängel bekannt</div><div class="text-secondary small">Für diesen Spielplatz sind aktuell keine öffentlich freigegebenen Mängel hinterlegt.</div></div>{% endif %}
+                    <div class="p-3 rounded-4 border bg-light mb-3"><div class="meta-label mb-1">Letzte Kontrolle</div>{% if latest_completed_inspection %}<div class="fw-bold">{{ latest_completed_inspection.inspected_at|date:"d.m.Y" }}</div><div class="text-secondary small">{{ latest_completed_inspection.get_inspection_type_display }}</div>{% else %}<div class="fw-semibold">Noch keine abgeschlossene Kontrolle vorhanden</div>{% endif %}</div>
+                    <div class="p-3 rounded-4 border bg-light mb-3"><div class="meta-label mb-1">Nächste geplante Kontrolle</div>{% if next_public_inspection.has_date %}<div class="fw-bold">{{ next_public_inspection.display_label }}</div>{% if next_public_inspection.inspection_type_label %}<div class="text-secondary small">{{ next_public_inspection.inspection_type_label }}</div>{% endif %}{% else %}<div class="fw-semibold">{{ next_public_inspection.label }}</div>{% endif %}</div>
+                    {% if defect_groups %}<div class="d-flex flex-column gap-3">{% for group in defect_groups %}<article class="defect-card p-3 border {% if group.has_safety_risk %}bg-warning-subtle border-warning{% else %}bg-success-subtle border-success{% endif %}"><div class="d-flex justify-content-between gap-2 align-items-start mb-2"><div><div class="fw-bold">{{ group.label }}</div>{% if can_open_defect %}<div class="small text-secondary">{{ group.defects|length }} Mangel{% if group.defects|length != 1 %}e{% endif %}</div>{% endif %}</div>{% if group.has_safety_risk %}<span class="badge text-bg-warning">Sicherheitsrisiko</span>{% else %}<span class="badge text-bg-success">Kein Sicherheitsrisiko</span>{% endif %}</div><p class="mb-2">{{ group.representative.get_public_message }}</p>{% if can_open_defect %}<div class="d-flex flex-column gap-2">{% for defect in group.defects %}<div class="internal-defect-row d-flex flex-column flex-lg-row justify-content-between gap-2 align-items-lg-center"><div class="internal-defect-description" title="{{ defect.internal_description }}">#{{ defect.id }} · {{ defect.internal_description|truncatechars:55 }}</div><a href="{% url 'internal:edit_defect' defect.id %}" class="btn btn-sm btn-outline-secondary flex-shrink-0">Mangel öffnen</a></div>{% endfor %}</div>{% endif %}</article>{% endfor %}</div>{% else %}<div class="empty-state p-3"><div class="fw-semibold">Keine Mängel bekannt</div></div>{% endif %}
                 </section>
             </div>
         </div>
@@ -106,7 +100,32 @@
 <main class="container-fluid px-3 px-lg-4 py-4">
     <section class="content-card p-3 p-lg-4">
         <div class="d-flex align-items-start justify-content-between gap-3 mb-3"><div><h2 class="h4 fw-bold mb-1">Spielgeräte</h2><div class="text-secondary">Ausstattung dieses Spielplatzes.</div></div><div class="badge text-bg-light">{{ equipment_list|length }} Eintrag{% if equipment_list|length != 1 %}e{% endif %}</div></div>
-        {% if equipment_list %}<div class="row g-3">{% for equipment in equipment_list %}<div class="col-md-6 col-xl-4"><article class="equipment-card p-3 h-100">{% if equipment.photo %}<div class="mb-3"><img src="{% url 'media_assets:image_content' equipment.photo.id %}" alt="Foto von {{ equipment.name }}" class="img-fluid rounded-4 border" style="width: 100%; height: 180px; object-fit: cover;"></div>{% endif %}<div class="d-flex justify-content-between gap-3 align-items-start"><div><h3 class="h6 fw-bold mb-1">{{ equipment.name }}</h3><div class="text-secondary small">{{ equipment.equipment_type.name }}</div></div><div class="d-flex flex-column align-items-end gap-2">{% if equipment.is_planned %}<span class="lifecycle-pill lifecycle-pill-info">In Planung</span>{% elif equipment.has_public_safety_risk %}<span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>{% elif equipment.has_public_defect %}<span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>{% else %}<span class="status-pill">In Betrieb</span>{% endif %}{% if can_create_defect %}<a href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}?equipment={{ equipment.id }}" class="btn btn-sm btn-outline-danger">Mangel erfassen</a>{% endif %}</div></div><div class="d-flex flex-wrap gap-2 mt-3">{% if equipment.has_pending_renovation %}<span class="lifecycle-pill lifecycle-pill-warning">Sanierung ausstehend{% if equipment.recommended_renovation_year %} {{ equipment.recommended_renovation_year }}{% endif %}</span>{% else %}<span class="lifecycle-pill lifecycle-pill-success">Keine Sanierung geplant</span>{% endif %}{% if equipment.has_future_demolition %}<span class="lifecycle-pill lifecycle-pill-danger">Wird am {{ equipment.demolition_date|date:"d.m.Y" }} abgebrochen</span>{% endif %}</div>{% if can_view_equipment_renovation %}<div class="renovation-panel mt-3"><div class="small fw-semibold mb-2">Sanierungsangaben</div>{% if can_edit_equipment_renovation %}<form method="post" action="{% url 'internal:update_equipment_renovation' equipment.id %}">{% csrf_token %}<div class="row g-2"><div class="col-6"><label class="form-label small mb-1" for="renovation_year_{{ equipment.id }}">Empfohlenes Sanierungsjahr</label><input type="number" min="{% now 'Y' %}" max="9999" name="recommended_renovation_year" id="renovation_year_{{ equipment.id }}" value="{{ equipment.recommended_renovation_year|default_if_none:'' }}" class="form-control form-control-sm"></div><div class="col-6"><label class="form-label small mb-1" for="renovation_type_{{ equipment.id }}">Sanierungsart</label><select name="renovation_type" id="renovation_type_{{ equipment.id }}" class="form-select form-select-sm"><option value="">Keine Angabe</option>{% for value, label in renovation_type_choices %}<option value="{{ value }}" {% if equipment.renovation_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-12"><label class="form-label small mb-1" for="renovation_comment_{{ equipment.id }}">Kommentar zur Sanierung</label><input type="text" name="renovation_comment" id="renovation_comment_{{ equipment.id }}" value="{{ equipment.renovation_comment }}" class="form-control form-control-sm"></div><div class="col-12 d-flex justify-content-end"><button type="submit" class="btn btn-sm btn-atlas-primary">Sanierung speichern</button></div></div></form>{% else %}<div class="row g-2 small"><div class="col-6"><div class="meta-label">Empfohlenes Sanierungsjahr</div><div class="fw-semibold">{{ equipment.recommended_renovation_year|default:"-" }}</div></div><div class="col-6"><div class="meta-label">Sanierungsart</div><div class="fw-semibold">{{ equipment.get_renovation_type_display|default:"-" }}</div></div><div class="col-12"><div class="meta-label">Kommentar zur Sanierung</div><div class="fw-semibold">{{ equipment.renovation_comment|default:"-" }}</div></div></div>{% endif %}</div>{% endif %}<hr><div class="row g-2 small"><div class="col-6"><div class="meta-label">Inventar-Nr.</div><div class="fw-semibold">{{ equipment.inventory_number|default:"-" }}</div></div><div class="col-6"><div class="meta-label">Baujahr</div><div class="fw-semibold">{{ equipment.year_built|default:"-" }}</div></div><div class="col-12"><div class="meta-label">Hersteller</div><div class="fw-semibold">{{ equipment.manufacturer|default:"-" }}</div></div>{% if equipment.supplier %}<div class="col-12"><div class="meta-label">Lieferant</div><div class="fw-semibold">{{ equipment.supplier.name }}</div></div>{% endif %}{% if equipment.norm %}<div class="col-12"><div class="meta-label">Norm</div><div class="fw-semibold">{{ equipment.norm }}</div></div>{% endif %}</div></article></div>{% endfor %}</div>{% else %}<div class="empty-state p-4 text-center"><div class="fw-semibold mb-1">Noch keine Spielgeräte erfasst</div><div class="text-secondary">Sobald Spielgeräte öffentlich sichtbar erfasst sind, werden sie hier angezeigt.</div></div>{% endif %}
+        {% if equipment_list %}
+            <div class="row g-3">
+                {% for equipment in equipment_list %}
+                    <div class="col-md-6 col-xl-4">
+                        <article class="equipment-card p-3 h-100">
+                            {% if equipment.photo %}<div class="mb-3"><img src="{% url 'media_assets:image_content' equipment.photo.id %}" alt="Foto von {{ equipment.name }}" class="img-fluid rounded-4 border" style="width: 100%; height: 180px; object-fit: cover;"></div>{% endif %}
+                            {% if can_manage_photos %}
+                                <div class="photo-actions mb-3">
+                                    <form method="post" enctype="multipart/form-data" action="{% url 'public:upload_equipment_photo' equipment.id %}" class="d-flex flex-column gap-2 mb-2">
+                                        {% csrf_token %}
+                                        <label class="form-label small fw-semibold mb-0" for="equipment_photo_{{ equipment.id }}">Bild ersetzen</label>
+                                        <input type="file" name="photo" id="equipment_photo_{{ equipment.id }}" accept="image/*" class="form-control form-control-sm" required>
+                                        <button type="submit" class="btn btn-sm btn-atlas-primary">Bild hochladen</button>
+                                    </form>
+                                    {% if equipment.photo %}<form method="post" action="{% url 'public:rotate_equipment_photo' equipment.id %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-secondary w-100">Bild 90° drehen</button></form>{% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between gap-3 align-items-start"><div><h3 class="h6 fw-bold mb-1">{{ equipment.name }}</h3><div class="text-secondary small">{{ equipment.equipment_type.name }}</div></div><div class="d-flex flex-column align-items-end gap-2">{% if equipment.is_planned %}<span class="lifecycle-pill lifecycle-pill-info">In Planung</span>{% elif equipment.has_public_safety_risk %}<span class="badge text-bg-warning">Mangel mit Sicherheitsrisiko</span>{% elif equipment.has_public_defect %}<span class="badge text-bg-success">Mangel ohne Sicherheitsrisiko</span>{% else %}<span class="status-pill">In Betrieb</span>{% endif %}{% if can_create_defect %}<a href="{% url 'internal:create_defect' playground.organization.slug playground.slug %}?equipment={{ equipment.id }}" class="btn btn-sm btn-outline-danger">Mangel erfassen</a>{% endif %}</div></div>
+                            <div class="d-flex flex-wrap gap-2 mt-3">{% if equipment.has_pending_renovation %}<span class="lifecycle-pill lifecycle-pill-warning">Sanierung ausstehend{% if equipment.recommended_renovation_year %} {{ equipment.recommended_renovation_year }}{% endif %}</span>{% else %}<span class="lifecycle-pill lifecycle-pill-success">Keine Sanierung geplant</span>{% endif %}{% if equipment.has_future_demolition %}<span class="lifecycle-pill lifecycle-pill-danger">Wird am {{ equipment.demolition_date|date:"d.m.Y" }} abgebrochen</span>{% endif %}</div>
+                            {% if can_view_equipment_renovation %}<div class="renovation-panel mt-3"><div class="small fw-semibold mb-2">Sanierungsangaben</div><div class="row g-2 small"><div class="col-6"><div class="meta-label">Empfohlenes Sanierungsjahr</div><div class="fw-semibold">{{ equipment.recommended_renovation_year|default:"-" }}</div></div><div class="col-6"><div class="meta-label">Sanierungsart</div><div class="fw-semibold">{{ equipment.get_renovation_type_display|default:"-" }}</div></div><div class="col-12"><div class="meta-label">Kommentar zur Sanierung</div><div class="fw-semibold">{{ equipment.renovation_comment|default:"-" }}</div></div></div></div>{% endif %}
+                            <hr><div class="row g-2 small"><div class="col-6"><div class="meta-label">Inventar-Nr.</div><div class="fw-semibold">{{ equipment.inventory_number|default:"-" }}</div></div><div class="col-6"><div class="meta-label">Baujahr</div><div class="fw-semibold">{{ equipment.year_built|default:"-" }}</div></div><div class="col-12"><div class="meta-label">Hersteller</div><div class="fw-semibold">{{ equipment.manufacturer|default:"-" }}</div></div>{% if equipment.supplier %}<div class="col-12"><div class="meta-label">Lieferant</div><div class="fw-semibold">{{ equipment.supplier.name }}</div></div>{% endif %}{% if equipment.norm %}<div class="col-12"><div class="meta-label">Norm</div><div class="fw-semibold">{{ equipment.norm }}</div></div>{% endif %}</div>
+                        </article>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}<div class="empty-state p-4 text-center"><div class="fw-semibold mb-1">Noch keine Spielgeräte erfasst</div><div class="text-secondary">Sobald Spielgeräte öffentlich sichtbar erfasst sind, werden sie hier angezeigt.</div></div>{% endif %}
     </section>
 </main>
 {% endblock %}
