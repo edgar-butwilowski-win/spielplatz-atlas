@@ -10,6 +10,9 @@ TARGET_TYPE_EQUIPMENT = "equipment"
 TARGET_TYPE_SURFACE = "surface"
 TARGET_TYPE_ACCESSORY = "accessory"
 
+HTML_DATE_FORMAT = "%Y-%m-%d"
+HTML_DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
+
 TARGET_TYPE_CHOICES = [
     (TARGET_TYPE_NONE, _("General playground defect")),
     (TARGET_TYPE_EQUIPMENT, _("Play equipment")),
@@ -27,6 +30,16 @@ def apply_bootstrap_classes(form):
             field.widget.attrs["class"] = "form-check-input"
         elif "form-control" not in existing_classes and "form-select" not in existing_classes:
             field.widget.attrs["class"] = "form-select" if isinstance(field.widget, forms.Select) else "form-control"
+
+
+def use_html_date_input(field):
+    field.input_formats = [HTML_DATE_FORMAT]
+    field.widget.format = HTML_DATE_FORMAT
+
+
+def use_html_datetime_input(field):
+    field.input_formats = [HTML_DATETIME_FORMAT]
+    field.widget.format = HTML_DATETIME_FORMAT
 
 
 def restrict_target_fields_to_playground(form, playground):
@@ -127,8 +140,8 @@ class DefectCreateForm(forms.ModelForm):
         model = Defect
         fields = ("target_type", "equipment", "surface", "accessory", "source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "planned_resolution_date", "public_visible", "public_note")
         widgets = {
-            "reported_at": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}, format="%Y-%m-%dT%H:%M"),
-            "planned_resolution_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "reported_at": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}, format=HTML_DATETIME_FORMAT),
+            "planned_resolution_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}, format=HTML_DATE_FORMAT),
             "internal_description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "internal_note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "public_note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
@@ -139,6 +152,8 @@ class DefectCreateForm(forms.ModelForm):
         self.playground = playground
         restrict_target_fields_to_playground(self, playground)
         apply_bootstrap_classes(self)
+        use_html_datetime_input(self.fields["reported_at"])
+        use_html_date_input(self.fields["planned_resolution_date"])
         if not self.is_bound:
             if self.initial.get("equipment"):
                 self.initial["target_type"] = TARGET_TYPE_EQUIPMENT
@@ -167,8 +182,10 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
     def __init__(self, *args, inspection_answer=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.inspection_answer = inspection_answer
+        use_html_datetime_input(self.fields["reported_at"])
+        use_html_date_input(self.fields["planned_resolution_date"])
         if not self.is_bound:
-            self.initial.setdefault("reported_at", timezone.localtime().strftime("%Y-%m-%dT%H:%M"))
+            self.initial.setdefault("reported_at", timezone.localtime().strftime(HTML_DATETIME_FORMAT))
             self.initial.setdefault("source_type", Defect.SOURCE_INSPECTION)
             if inspection_answer and inspection_answer.comment:
                 self.initial.setdefault("internal_description", inspection_answer.comment)
@@ -189,6 +206,8 @@ class DefectEditForm(forms.ModelForm):
     def __init__(self, *args, playground=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.playground = playground
+        use_html_datetime_input(self.fields["reported_at"])
+        use_html_date_input(self.fields["planned_resolution_date"])
         apply_bootstrap_classes(self)
         for name in ["reported_by_text", "internal_note", "planned_resolution_date", "public_note"]:
             self.fields[name].required = False
