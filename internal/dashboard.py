@@ -17,6 +17,7 @@ from .permissions import get_active_profile_for_organization
 RECENT_INSPECTION_DAYS = 365
 DASHBOARD_MONTHS = 12
 DASHBOARD_WEEKS = 12
+MIN_SUPPLIER_EQUIPMENT_COUNT = 5
 
 
 def dashboard_json(data):
@@ -119,12 +120,45 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
     }
 
 
+def supplier_rate_chart(rows, value_key):
+    visible_rows = [row for row in rows if row["equipment_count"] >= MIN_SUPPLIER_EQUIPMENT_COUNT]
+    visible_rows = sorted(visible_rows, key=lambda row: (-row[value_key], row["supplier_name"]))[:12]
+    return {
+        "labels": [row["supplier_name"] for row in visible_rows],
+        "data": [row[value_key] for row in visible_rows],
+        "defects": [row["defect_count"] for row in visible_rows],
+        "safetyDefects": [row["safety_defect_count"] for row in visible_rows],
+        "equipment": [row["equipment_count"] for row in visible_rows],
+        "minimumEquipment": MIN_SUPPLIER_EQUIPMENT_COUNT,
+    }
+
+
+def build_supplier_rate_rows(equipment):
+    rows = []
+    for item in equipment.filter(supplier__isnull=False).values("supplier_id", "supplier__name").annotate(
+        equipment_count=Count("id", distinct=True),
+        defect_count=Count("defects"),
+        safety_defect_count=Count("defects", filter=Q(defects__has_safety_risk=True)),
+    ):
+        equipment_count = item["equipment_count"] or 0
+        defect_count = item["defect_count"] or 0
+        safety_defect_count = item["safety_defect_count"] or 0
+        if equipment_count <= 0:
+            continue
+        rows.append({
+            "supplier_name": item["supplier__name"] or "Unknown supplier",
+            "equipment_count": equipment_count,
+            "defect_count": defect_count,
+            "safety_defect_count": safety_defect_count,
+            "defect_rate": round(defect_count * 100 / equipment_count, 1),
+            "safety_defect_rate": round(safety_defect_count * 100 / equipment_count, 1),
+        })
+    return rows
+
+
 def build_equipment_charts(defects, equipment):
     supplier_rows = list(defects.filter(equipment__isnull=False).values("equipment__supplier__name").annotate(count=Count("id")).order_by("-count", "equipment__supplier__name")[:12])
-    known_supplier_rows = list(defects.filter(equipment__supplier__isnull=False).values("equipment__supplier__name").annotate(count=Count("id")).order_by("-count", "equipment__supplier__name"))
-    known_supplier_total = sum(row["count"] for row in known_supplier_rows) or 1
-    supplier_share_labels = [row["equipment__supplier__name"] for row in known_supplier_rows]
-    supplier_share_data = [round(row["count"] * 100 / known_supplier_total, 1) for row in known_supplier_rows]
+    supplier_rate_rows = build_supplier_rate_rows(equipment)
     bucket_names = ["0-5 years", "6-10 years", "11-15 years", "16-20 years", "21-30 years", "Over 30 years", "Unknown age"]
     buckets = {name: {"equipment": 0, "defects": 0} for name in bucket_names}
     current_year = timezone.localdate().year
@@ -149,7 +183,8 @@ def build_equipment_charts(defects, equipment):
         buckets[bucket]["defects"] += item.defect_count
     return {
         "supplierDefects": {"labels": [row["equipment__supplier__name"] or "Unknown supplier" for row in supplier_rows], "data": [row["count"] for row in supplier_rows]},
-        "supplierDefectShare": {"labels": supplier_share_labels, "data": supplier_share_data},
+        "supplierDefectRate": supplier_rate_chart(supplier_rate_rows, "defect_rate"),
+        "supplierSafetyDefectRate": supplier_rate_chart(supplier_rate_rows, "safety_defect_rate"),
         "equipmentAgeDefects": {"labels": bucket_names, "series": [chart_series("Defects", [buckets[name]["defects"] for name in bucket_names]), chart_series("Play equipment", [buckets[name]["equipment"] for name in bucket_names])]},
     }
 
