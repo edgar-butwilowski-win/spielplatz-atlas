@@ -1,232 +1,58 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
-
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nachrichten – playsafeswiss</title>
+    <title>{% trans "Messages" %} – playsafeswiss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --atlas-primary: #0F766E;
-            --atlas-secondary: #F59E0B;
-            --atlas-bg: #F8FAFC;
-            --atlas-text: #0F172A;
-            --atlas-navbar-height: 58px;
-        }
-        body { background: var(--atlas-bg); color: var(--atlas-text); }
-        .content-card { background: white; border: 1px solid #E2E8F0; border-radius: 1.25rem; box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06); }
-        .btn-atlas-primary { background: var(--atlas-primary); border-color: var(--atlas-primary); color: white; }
-        .btn-atlas-primary:hover { filter: brightness(0.92); color: white; }
-        .notification-unread { border-left: 5px solid var(--atlas-primary); }
+        :root { --atlas-primary:#0F766E; --atlas-secondary:#F59E0B; --atlas-bg:#F8FAFC; --atlas-text:#0F172A; --atlas-navbar-height:58px; }
+        body { background:var(--atlas-bg); color:var(--atlas-text); }
+        .content-card { background:white; border:1px solid #E2E8F0; border-radius:1.25rem; box-shadow:0 18px 45px rgba(15,23,42,.06); }
+        .btn-atlas-primary { background:var(--atlas-primary); border-color:var(--atlas-primary); color:white; }
+        .btn-atlas-primary:hover { filter:brightness(.92); color:white; }
+        .notification-unread { border-left:5px solid var(--atlas-primary); }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
-
 <body>
-    {% include "includes/main_navigation.html" %}
-
-    <main class="container py-4">
-        {% if messages %}
-            <div class="mb-3">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="content-card p-3 p-lg-4 mb-4">
-            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
-                <div>
-                    <h1 class="h3 fw-bold mb-2">Nachrichten</h1>
-                    <p class="text-secondary mb-0">Hier erscheinen interne Nachrichten, zum Beispiel zugewiesene Mängel.</p>
-                </div>
-
-                {% if push_enabled %}
-                    <button type="button" id="enable-push" class="btn btn-atlas-primary">
-                        Push-Benachrichtigungen aktivieren
-                    </button>
-                {% else %}
-                    <span class="badge text-bg-light border fs-6">Web-Push nicht konfiguriert</span>
-                {% endif %}
-            </div>
-            <div id="push-status" class="small text-secondary mt-3">
-                {% if active_push_subscriptions_count %}
-                    Aktive Push-Geräte für dieses Konto: {{ active_push_subscriptions_count }}
-                {% endif %}
-            </div>
+{% include "includes/main_navigation.html" %}
+<main class="container py-4">
+    {% if messages %}<div class="mb-3">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
+    <div class="content-card p-3 p-lg-4 mb-4">
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-lg-center">
+            <div><h1 class="h3 fw-bold mb-2">{% trans "Messages" %}</h1><p class="text-secondary mb-0">{% trans "Internal messages appear here, for example assigned defects." %}</p></div>
+            {% if push_enabled %}<button type="button" id="enable-push" class="btn btn-atlas-primary">{% trans "Enable push notifications" %}</button>{% else %}<span class="badge text-bg-light border fs-6">{% trans "Web push is not configured" %}</span>{% endif %}
         </div>
-
-        <div class="d-flex flex-column gap-3">
-            {% for notification in notifications %}
-                <div class="content-card p-3 {% if not notification.is_read %}notification-unread{% endif %}">
-                    <div class="d-flex flex-column flex-lg-row justify-content-between gap-2">
-                        <div>
-                            <h2 class="h5 fw-bold mb-1">{{ notification.title }}</h2>
-                            <div class="text-secondary small mb-2">
-                                {{ notification.created_at|date:"d.m.Y H:i" }} · {{ notification.organization.name }}
-                            </div>
-                            <p class="mb-2">{{ notification.message }}</p>
-                            <div class="small text-secondary">
-                                Zustellung: {{ notification.get_delivery_status_display }}
-                            </div>
-                        </div>
-
-                        <form method="post" action="{% url 'notifications:mark_read' notification.id %}" class="align-self-lg-center">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-secondary">
-                                Öffnen
-                            </button>
-                        </form>
-                    </div>
+        <div id="push-status" class="small text-secondary mt-3">{% if active_push_subscriptions_count %}{% blocktrans with count=active_push_subscriptions_count %}Active push devices for this account: {{ count }}{% endblocktrans %}{% endif %}</div>
+    </div>
+    <div class="d-flex flex-column gap-3">
+        {% for notification in notifications %}
+            <div class="content-card p-3 {% if not notification.is_read %}notification-unread{% endif %}">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-2">
+                    <div><h2 class="h5 fw-bold mb-1">{{ notification.title }}</h2><div class="text-secondary small mb-2">{{ notification.created_at|date:"d.m.Y H:i" }} · {{ notification.organization.name }}</div><p class="mb-2">{{ notification.message }}</p><div class="small text-secondary">{% trans "Delivery" %}: {{ notification.get_delivery_status_display }}</div></div>
+                    <form method="post" action="{% url 'notifications:mark_read' notification.id %}" class="align-self-lg-center">{% csrf_token %}<button type="submit" class="btn btn-outline-secondary">{% trans "Open" %}</button></form>
                 </div>
-            {% empty %}
-                <div class="content-card p-4 text-center text-secondary">
-                    Es sind noch keine Nachrichten vorhanden.
-                </div>
-            {% endfor %}
-        </div>
-    </main>
-
-    {% if push_enabled %}
-        <script>
-            (function () {
-                const publicKey = "{{ webpush_public_key|escapejs }}".trim();
-                const statusElement = document.getElementById("push-status");
-                const button = document.getElementById("enable-push");
-
-                function setStatus(message) {
-                    if (statusElement) {
-                        statusElement.textContent = message;
-                    }
-                }
-
-                function setButtonBusy(isBusy) {
-                    if (!button) {
-                        return;
-                    }
-
-                    button.disabled = isBusy;
-                    button.textContent = isBusy ? "Push wird aktiviert ..." : "Push-Benachrichtigungen aktivieren";
-                }
-
-                function urlBase64ToUint8Array(base64String) {
-                    if (!base64String || base64String.startsWith("/") || base64String.includes("BEGIN PUBLIC KEY")) {
-                        throw new Error("Der öffentliche Web-Push-Schlüssel ist falsch konfiguriert. WEBPUSH_VAPID_PUBLIC_KEY muss der Application Server Key sein, nicht der Pfad zur PEM-Datei.");
-                    }
-
-                    const padding = "=".repeat((4 - base64String.length % 4) % 4);
-                    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-                    const rawData = window.atob(base64);
-                    const outputArray = new Uint8Array(rawData.length);
-
-                    for (let i = 0; i < rawData.length; ++i) {
-                        outputArray[i] = rawData.charCodeAt(i);
-                    }
-                    return outputArray;
-                }
-
-                function getCookie(name) {
-                    const value = `; ${document.cookie}`;
-                    const parts = value.split(`; ${name}=`);
-                    if (parts.length === 2) {
-                        return parts.pop().split(";").shift();
-                    }
-                    return "";
-                }
-
-                async function subscribeWithFreshKey(registration, applicationServerKey) {
-                    const existingSubscription = await registration.pushManager.getSubscription();
-
-                    if (existingSubscription) {
-                        try {
-                            await existingSubscription.unsubscribe();
-                        } catch (error) {
-                            console.warn("Bestehende Push-Subscription konnte nicht sauber entfernt werden.", error);
-                        }
-                    }
-
-                    return registration.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: applicationServerKey
-                    });
-                }
-
-                async function enablePush() {
-                    setButtonBusy(true);
-                    setStatus("Push-Benachrichtigungen werden vorbereitet ...");
-
-                    try {
-                        if (!("serviceWorker" in navigator)) {
-                            setStatus("Dieses Gerät unterstützt Service Worker nicht.");
-                            return;
-                        }
-
-                        if (!("PushManager" in window)) {
-                            setStatus("Dieses Gerät unterstützt Web-Push-Benachrichtigungen nicht.");
-                            return;
-                        }
-
-                        if (!("Notification" in window)) {
-                            setStatus("Dieses Gerät unterstützt Browser-Benachrichtigungen nicht.");
-                            return;
-                        }
-
-                        const applicationServerKey = urlBase64ToUint8Array(publicKey);
-
-                        const permission = await Notification.requestPermission();
-                        if (permission !== "granted") {
-                            setStatus("Benachrichtigungen wurden nicht erlaubt.");
-                            return;
-                        }
-
-                        setStatus("Service Worker wird registriert ...");
-                        const registration = await navigator.serviceWorker.register("{% url 'notifications:service_worker' %}");
-                        await navigator.serviceWorker.ready;
-
-                        setStatus("Push-Gerät wird registriert ...");
-                        const subscription = await subscribeWithFreshKey(registration, applicationServerKey);
-
-                        setStatus("Push-Gerät wird auf dem Server gespeichert ...");
-                        const response = await fetch("{% url 'notifications:save_push_subscription' %}", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRFToken": getCookie("csrftoken")
-                            },
-                            body: JSON.stringify(subscription)
-                        });
-
-                        let result = null;
-                        try {
-                            result = await response.json();
-                        } catch (error) {
-                            result = null;
-                        }
-
-                        if (!response.ok || !result || !result.ok) {
-                            const errorMessage = result && result.error ? result.error : "Push-Benachrichtigungen konnten nicht gespeichert werden.";
-                            setStatus(errorMessage);
-                            return;
-                        }
-
-                        setStatus(`Push-Benachrichtigungen sind für dieses Gerät aktiviert. Aktive Push-Geräte für dieses Konto: ${result.active_count}.`);
-                    } catch (error) {
-                        console.error("Push-Aktivierung fehlgeschlagen", error);
-                        setStatus(`Push-Benachrichtigungen konnten nicht aktiviert werden: ${error.message}`);
-                    } finally {
-                        setButtonBusy(false);
-                    }
-                }
-
-                if (button) {
-                    button.addEventListener("click", enablePush);
-                }
-            })();
-        </script>
-    {% endif %}
-
-    {% include "includes/main_navigation_script.html" %}
+            </div>
+        {% empty %}<div class="content-card p-4 text-center text-secondary">{% trans "No messages are available yet." %}</div>{% endfor %}
+    </div>
+</main>
+{% if push_enabled %}
+<script>
+(function(){
+const publicKey="{{ webpush_public_key|escapejs }}".trim();const statusElement=document.getElementById("push-status");const button=document.getElementById("enable-push");
+const labels={busy:"{% trans 'Push is being enabled ...' %}",enable:"{% trans 'Enable push notifications' %}",badKey:"{% trans 'The public web push key is configured incorrectly.' %}",prepare:"{% trans 'Push notifications are being prepared ...' %}",noSw:"{% trans 'This device does not support service workers.' %}",noPush:"{% trans 'This device does not support web push notifications.' %}",noNotif:"{% trans 'This device does not support browser notifications.' %}",denied:"{% trans 'Notifications were not allowed.' %}",regSw:"{% trans 'Service worker is being registered ...' %}",regDevice:"{% trans 'Push device is being registered ...' %}",saving:"{% trans 'Push device is being saved on the server ...' %}",saveError:"{% trans 'Push notifications could not be saved.' %}",activePrefix:"{% trans 'Push notifications are enabled for this device. Active push devices for this account:' %}",failedPrefix:"{% trans 'Push notifications could not be enabled:' %}",cleanupWarn:"{% trans 'Existing push subscription could not be removed cleanly.' %}",failedLog:"{% trans 'Push activation failed' %}"};
+function setStatus(message){if(statusElement)statusElement.textContent=message;}function setButtonBusy(isBusy){if(!button)return;button.disabled=isBusy;button.textContent=isBusy?labels.busy:labels.enable;}
+function urlBase64ToUint8Array(base64String){if(!base64String||base64String.startsWith("/")||base64String.includes("BEGIN PUBLIC KEY")){throw new Error(labels.badKey);}const padding="=".repeat((4-base64String.length%4)%4);const base64=(base64String+padding).replace(/-/g,"+").replace(/_/g,"/");const rawData=window.atob(base64);const outputArray=new Uint8Array(rawData.length);for(let i=0;i<rawData.length;++i){outputArray[i]=rawData.charCodeAt(i);}return outputArray;}
+function getCookie(name){const value=`; ${document.cookie}`;const parts=value.split(`; ${name}=`);if(parts.length===2)return parts.pop().split(";").shift();return "";}
+async function subscribeWithFreshKey(registration,applicationServerKey){const existingSubscription=await registration.pushManager.getSubscription();if(existingSubscription){try{await existingSubscription.unsubscribe();}catch(error){console.warn(labels.cleanupWarn,error);}}return registration.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:applicationServerKey});}
+async function enablePush(){setButtonBusy(true);setStatus(labels.prepare);try{if(!("serviceWorker" in navigator)){setStatus(labels.noSw);return;}if(!("PushManager" in window)){setStatus(labels.noPush);return;}if(!("Notification" in window)){setStatus(labels.noNotif);return;}const applicationServerKey=urlBase64ToUint8Array(publicKey);const permission=await Notification.requestPermission();if(permission!=="granted"){setStatus(labels.denied);return;}setStatus(labels.regSw);const registration=await navigator.serviceWorker.register("{% url 'notifications:service_worker' %}");await navigator.serviceWorker.ready;setStatus(labels.regDevice);const subscription=await subscribeWithFreshKey(registration,applicationServerKey);setStatus(labels.saving);const response=await fetch("{% url 'notifications:save_push_subscription' %}",{method:"POST",headers:{"Content-Type":"application/json","X-CSRFToken":getCookie("csrftoken")},body:JSON.stringify(subscription)});let result=null;try{result=await response.json();}catch(error){result=null;}if(!response.ok||!result||!result.ok){setStatus(result&&result.error?result.error:labels.saveError);return;}setStatus(`${labels.activePrefix} ${result.active_count}.`);}catch(error){console.error(labels.failedLog,error);setStatus(`${labels.failedPrefix} ${error.message}`);}finally{setButtonBusy(false);}}
+if(button)button.addEventListener("click",enablePush);
+})();
+</script>
+{% endif %}
+{% include "includes/main_navigation_script.html" %}
 </body>
-
 </html>
