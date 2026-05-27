@@ -1,215 +1,60 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
-
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% if can_edit_defect %}Mangel bearbeiten{% else %}Mangel öffnen{% endif %} – playsafeswiss</title>
-
+    <title>{% if can_edit_defect %}{% trans "Edit defect" %}{% else %}{% trans "Open defect" %}{% endif %} – playsafeswiss</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
-        :root {
-            --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }};
-            --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }};
-            --atlas-bg: #F8FAFC;
-            --atlas-text: #0F172A;
-            --atlas-navbar-height: 58px;
-        }
-
-        body {
-            background: var(--atlas-bg);
-            color: var(--atlas-text);
-        }
-
-        .content-card {
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-        }
-
-        .btn-atlas-primary {
-            background: var(--atlas-primary);
-            border-color: var(--atlas-primary);
-            color: white;
-        }
-
-        .btn-atlas-primary:hover {
-            filter: brightness(0.92);
-            color: white;
-        }
-
-        .context-label {
-            color: #64748B;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
+        :root { --atlas-primary: {{ playground.organization.primary_color|default:"#0F766E" }}; --atlas-secondary: {{ playground.organization.secondary_color|default:"#F59E0B" }}; --atlas-bg:#F8FAFC; --atlas-text:#0F172A; --atlas-navbar-height:58px; }
+        body { background:var(--atlas-bg); color:var(--atlas-text); }
+        .content-card { background:white; border:1px solid #E2E8F0; border-radius:1.25rem; box-shadow:0 18px 45px rgba(15,23,42,.06); }
+        .btn-atlas-primary { background:var(--atlas-primary); border-color:var(--atlas-primary); color:white; }
+        .btn-atlas-primary:hover { filter:brightness(.92); color:white; }
+        .context-label { color:#64748B; font-size:.85rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
-
 <body>
-
-    {% include "includes/main_navigation.html" %}
-
-    <main class="container py-4">
-        {% if messages %}
-            <div class="mb-3">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'info' }} mb-2">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="content-card p-3 p-lg-4 mb-4">
-            <div class="context-label mb-2">{% if can_edit_defect %}Mangel bearbeiten{% else %}Mangel öffnen{% endif %}</div>
-
-            <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
-                <div>
-                    <h1 class="fw-bold h3 mb-2">
-                        Mangel #{{ defect.id }}
-                    </h1>
-
-                    <div class="text-secondary">
-                        {{ playground.name }} · {{ playground.organization.name }}
-                    </div>
-                </div>
-
-                <div class="d-flex flex-wrap gap-2 align-self-start">
-                    <span class="badge text-bg-light border fs-6">
-                        {{ defect.get_status_display }}
-                    </span>
-
-                    {% if defect.has_safety_risk %}
-                        <span class="badge text-bg-danger fs-6">
-                            Sicherheitsrisiko
-                        </span>
-                    {% endif %}
-
-                    {% if defect.public_visible %}
-                        <span class="badge text-bg-success fs-6">
-                            Öffentlich sichtbar
-                        </span>
-                    {% else %}
-                        <span class="badge text-bg-secondary fs-6">
-                            Intern
-                        </span>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% if not can_edit_defect %}
-                <div class="alert alert-info mt-3 mb-0">
-                    Sie haben lesenden Zugriff auf diesen Mangel. Änderungen sind mit Ihrer Rolle nicht möglich.
-                </div>
-            {% endif %}
-
-            <div class="row g-3 mt-3">
-                <div class="col-lg-4">
-                    <div class="small text-secondary mb-1">Quelle</div>
-                    <div class="fw-semibold">{{ defect.get_source_type_display }}</div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="small text-secondary mb-1">Gemeldet am</div>
-                    <div class="fw-semibold">{{ defect.reported_at|date:"d.m.Y H:i" }}</div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="small text-secondary mb-1">Betroffenes Objekt</div>
-                    <div class="fw-semibold">
-                        {% if defect.equipment %}
-                            {{ defect.equipment.name }}
-                        {% elif defect.surface %}
-                            {{ defect.surface.name }}
-                        {% elif defect.accessory %}
-                            {{ defect.accessory.name }}
-                        {% else %}
-                            Allgemeiner Spielplatzmangel
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="small text-secondary mb-1">Zuständige Person</div>
-                    <div class="fw-semibold">
-                        {% if current_assignment and current_assignment.assigned_to %}
-                            {{ current_assignment.assigned_to.get_full_name|default:current_assignment.assigned_to.username }}
-                        {% else %}
-                            Noch nicht zugewiesen
-                        {% endif %}
-                    </div>
-                </div>
-
-                {% if defect.inspection_answer %}
-                    <div class="col-12">
-                        <div class="small text-secondary mb-1">Entstanden aus Prüfpunkt</div>
-                        <div class="p-3 rounded-3 bg-light">
-                            {% if defect.inspection_answer.scope %}
-                                <strong>{{ defect.inspection_answer.scope.label }}</strong><br>
-                            {% endif %}
-                            {{ defect.inspection_answer.criterion.title }}
-                        </div>
-                    </div>
-                {% endif %}
+{% include "includes/main_navigation.html" %}
+<main class="container py-4">
+    {% if messages %}<div class="mb-3">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
+    <div class="content-card p-3 p-lg-4 mb-4">
+        <div class="context-label mb-2">{% if can_edit_defect %}{% trans "Edit defect" %}{% else %}{% trans "Open defect" %}{% endif %}</div>
+        <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+            <div><h1 class="fw-bold h3 mb-2">{% blocktrans with id=defect.id %}Defect #{{ id }}{% endblocktrans %}</h1><div class="text-secondary">{{ playground.name }} · {{ playground.organization.name }}</div></div>
+            <div class="d-flex flex-wrap gap-2 align-self-start">
+                <span class="badge text-bg-light border fs-6">{{ defect.get_status_display }}</span>
+                {% if defect.has_safety_risk %}<span class="badge text-bg-danger fs-6">{% trans "Safety risk" %}</span>{% endif %}
+                {% if defect.public_visible %}<span class="badge text-bg-success fs-6">{% trans "Publicly visible" %}</span>{% else %}<span class="badge text-bg-secondary fs-6">{% trans "Internal" %}</span>{% endif %}
             </div>
         </div>
-
-        {% if can_edit_defect %}
-            <form method="post" action="{% url 'notifications:assign_defect' defect.id %}" class="content-card p-3 p-lg-4 mb-4">
-                {% csrf_token %}
-                <h2 class="h5 fw-bold mb-2">Zuweisung und Systemnachricht</h2>
-                <p class="text-secondary mb-3">
-                    Die ausgewählte Person erhält eine Systemnachricht. Wenn Push-Benachrichtigungen aktiviert sind, wird zusätzlich eine Meldung auf dem Gerät ausgelöst.
-                </p>
-
-                <div class="row g-3 align-items-end">
-                    <div class="col-12 col-lg-8">
-                        <label class="form-label fw-semibold" for="{{ assignment_form.assigned_to.id_for_label }}">
-                            {{ assignment_form.assigned_to.label }}
-                        </label>
-                        {{ assignment_form.assigned_to }}
-                        {% if assignment_form.assigned_to.help_text %}
-                            <div class="form-text">{{ assignment_form.assigned_to.help_text }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-12 col-lg-4">
-                        <button type="submit" class="btn btn-atlas-primary w-100">
-                            Zuweisung speichern
-                        </button>
-                    </div>
-                </div>
-            </form>
-        {% endif %}
-
-        <form method="post" enctype="multipart/form-data" class="content-card p-3 p-lg-4">
+        {% if not can_edit_defect %}<div class="alert alert-info mt-3 mb-0">{% trans "You have read-only access to this defect. Your role does not allow changes." %}</div>{% endif %}
+        <div class="row g-3 mt-3">
+            <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Source" %}</div><div class="fw-semibold">{{ defect.get_source_type_display }}</div></div>
+            <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Reported on" %}</div><div class="fw-semibold">{{ defect.reported_at|date:"d.m.Y H:i" }}</div></div>
+            <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Affected object" %}</div><div class="fw-semibold">{% if defect.equipment %}{{ defect.equipment.name }}{% elif defect.surface %}{{ defect.surface.name }}{% elif defect.accessory %}{{ defect.accessory.name }}{% else %}{% trans "General playground defect" %}{% endif %}</div></div>
+            <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Responsible person" %}</div><div class="fw-semibold">{% if current_assignment and current_assignment.assigned_to %}{{ current_assignment.assigned_to.get_full_name|default:current_assignment.assigned_to.username }}{% else %}{% trans "Not assigned yet" %}{% endif %}</div></div>
+            {% if defect.inspection_answer %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Created from inspection item" %}</div><div class="p-3 rounded-3 bg-light">{% if defect.inspection_answer.scope %}<strong>{{ defect.inspection_answer.scope.label }}</strong><br>{% endif %}{{ defect.inspection_answer.criterion.title }}</div></div>{% endif %}
+        </div>
+    </div>
+    {% if can_edit_defect %}
+        <form method="post" action="{% url 'notifications:assign_defect' defect.id %}" class="content-card p-3 p-lg-4 mb-4">
             {% csrf_token %}
-
-            <h2 class="h5 fw-bold mb-3">Angaben zum Mangel</h2>
-
-            {% include "internal/partials/defect_form_fields.html" %}
-
-            <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4">
-                <a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">
-                    Zurück zum Spielplatz
-                </a>
-
-                {% if can_edit_defect %}
-                    <button type="submit" class="btn btn-atlas-primary">
-                        Mangel speichern
-                    </button>
-                {% endif %}
-            </div>
+            <h2 class="h5 fw-bold mb-2">{% trans "Assignment and system message" %}</h2>
+            <p class="text-secondary mb-3">{% trans "The selected person receives a system message. If push notifications are enabled, a notification is also triggered on the device." %}</p>
+            <div class="row g-3 align-items-end"><div class="col-12 col-lg-8"><label class="form-label fw-semibold" for="{{ assignment_form.assigned_to.id_for_label }}">{{ assignment_form.assigned_to.label }}</label>{{ assignment_form.assigned_to }}{% if assignment_form.assigned_to.help_text %}<div class="form-text">{{ assignment_form.assigned_to.help_text }}</div>{% endif %}</div><div class="col-12 col-lg-4"><button type="submit" class="btn btn-atlas-primary w-100">{% trans "Save assignment" %}</button></div></div>
         </form>
-    </main>
-
-    {% include "includes/main_navigation_script.html" %}
+    {% endif %}
+    <form method="post" enctype="multipart/form-data" class="content-card p-3 p-lg-4">
+        {% csrf_token %}
+        <h2 class="h5 fw-bold mb-3">{% trans "Defect details" %}</h2>
+        {% include "internal/partials/defect_form_fields.html" %}
+        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4"><a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">{% trans "Back to playground" %}</a>{% if can_edit_defect %}<button type="submit" class="btn btn-atlas-primary">{% trans "Save defect" %}</button>{% endif %}</div>
+    </form>
+</main>
+{% include "includes/main_navigation_script.html" %}
 </body>
-
 </html>
