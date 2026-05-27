@@ -121,6 +121,10 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
 
 def build_equipment_charts(defects, equipment):
     supplier_rows = list(defects.filter(equipment__isnull=False).values("equipment__supplier__name").annotate(count=Count("id")).order_by("-count", "equipment__supplier__name")[:12])
+    known_supplier_rows = list(defects.filter(equipment__supplier__isnull=False).values("equipment__supplier__name").annotate(count=Count("id")).order_by("-count", "equipment__supplier__name"))
+    known_supplier_total = sum(row["count"] for row in known_supplier_rows) or 1
+    supplier_share_labels = [row["equipment__supplier__name"] for row in known_supplier_rows]
+    supplier_share_data = [round(row["count"] * 100 / known_supplier_total, 1) for row in known_supplier_rows]
     bucket_names = ["0-5 years", "6-10 years", "11-15 years", "16-20 years", "21-30 years", "Over 30 years", "Unknown age"]
     buckets = {name: {"equipment": 0, "defects": 0} for name in bucket_names}
     current_year = timezone.localdate().year
@@ -145,6 +149,7 @@ def build_equipment_charts(defects, equipment):
         buckets[bucket]["defects"] += item.defect_count
     return {
         "supplierDefects": {"labels": [row["equipment__supplier__name"] or "Unknown supplier" for row in supplier_rows], "data": [row["count"] for row in supplier_rows]},
+        "supplierDefectShare": {"labels": supplier_share_labels, "data": supplier_share_data},
         "equipmentAgeDefects": {"labels": bucket_names, "series": [chart_series("Defects", [buckets[name]["defects"] for name in bucket_names]), chart_series("Play equipment", [buckets[name]["equipment"] for name in bucket_names])]},
     }
 
