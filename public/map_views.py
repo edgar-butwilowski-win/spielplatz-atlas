@@ -1,12 +1,13 @@
 from django.db.models import Prefetch, Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 
 from accounts.permissions import get_active_profile
 from inspections.planning import get_next_public_task_for_playground
 from playgrounds.models import PlayEquipment, Playground
+from tenants.models import Organization
 
 
 MONTH_NAMES_DE = {
@@ -23,6 +24,22 @@ MONTH_NAMES_DE = {
     11: "November",
     12: "Dezember",
 }
+
+
+def organization_index(request, organization_slug):
+    organization = get_object_or_404(
+        Organization,
+        slug=organization_slug,
+        is_active=True,
+        is_public=True,
+    )
+    return render(
+        request,
+        "public/index.html",
+        {
+            "organization_filter": organization,
+        },
+    )
 
 
 def format_month_year(date_value):
@@ -81,8 +98,20 @@ def get_public_next_inspection_label(playground):
 
 
 def public_playgrounds_api(request):
+    playgrounds = playground_base_queryset_for_user(request.user)
+    organization_slug = (request.GET.get("organization") or "").strip()
+
+    if organization_slug:
+        organization = get_object_or_404(
+            Organization,
+            slug=organization_slug,
+            is_active=True,
+            is_public=True,
+        )
+        playgrounds = playgrounds.filter(organization=organization)
+
     playgrounds = (
-        playground_base_queryset_for_user(request.user)
+        playgrounds
         .select_related("organization")
         .filter(latitude__isnull=False, longitude__isnull=False)
         .only(
