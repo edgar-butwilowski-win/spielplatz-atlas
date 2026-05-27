@@ -15,6 +15,7 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from accounts.permissions import (
     get_active_profile,
@@ -33,19 +34,19 @@ from playgrounds.models import PlayEquipment, Playground
 from tenants.forms import OrganizationRegistrationRequestForm
 
 
-MONTH_NAMES_DE = {
-    1: "Januar",
-    2: "Februar",
-    3: "März",
-    4: "April",
-    5: "Mai",
-    6: "Juni",
-    7: "Juli",
-    8: "August",
-    9: "September",
-    10: "Oktober",
-    11: "November",
-    12: "Dezember",
+MONTH_NAMES = {
+    1: _("January"),
+    2: _("February"),
+    3: _("March"),
+    4: _("April"),
+    5: _("May"),
+    6: _("June"),
+    7: _("July"),
+    8: _("August"),
+    9: _("September"),
+    10: _("October"),
+    11: _("November"),
+    12: _("December"),
 }
 
 REGISTRATION_RATE_LIMIT_WINDOW_SECONDS = 60 * 60
@@ -101,8 +102,8 @@ def register_registration_attempt(request):
 
 def format_month_year(date_value):
     if not date_value:
-        return "wird geplant"
-    return f"{MONTH_NAMES_DE[date_value.month]} {date_value.year}"
+        return _("is being planned")
+    return f"{MONTH_NAMES[date_value.month]} {date_value.year}"
 
 
 def format_lv95_coordinate(value):
@@ -164,10 +165,10 @@ def get_playground_detail_permissions(user, playground):
 
 def get_public_next_inspection_context(playground):
     if playground.is_inspection_suspended:
-        return {"label": "wird geplant", "inspection_type_label": "", "has_date": False}
+        return {"label": _("is being planned"), "inspection_type_label": "", "has_date": False}
     task = get_next_public_task_for_playground(playground)
     if not task:
-        return {"label": "wird geplant", "inspection_type_label": "", "has_date": False}
+        return {"label": _("is being planned"), "inspection_type_label": "", "has_date": False}
     display_date = task.planned_date or task.due_date
     return {"task": task, "display_date": display_date, "display_label": format_month_year(display_date), "inspection_type_label": task.get_inspection_type_display(), "has_date": True}
 
@@ -234,7 +235,7 @@ def get_defect_group_label(defect):
         return defect.surface.name
     if defect.accessory:
         return defect.accessory.name
-    return "Allgemeiner Spielplatzmangel"
+    return _("General playground defect")
 
 
 def build_defect_groups(defects):
