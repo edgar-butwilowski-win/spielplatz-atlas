@@ -1,498 +1,79 @@
+{% load i18n %}
 <!doctype html>
-<html lang="de-CH">
-
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kontrolle – playsafeswiss</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        :root {
-            --atlas-primary: {{ inspection.playground.organization.primary_color|default:"#0F766E" }};
-            --atlas-secondary: {{ inspection.playground.organization.secondary_color|default:"#F59E0B" }};
-            --atlas-bg: #F8FAFC;
-            --atlas-text: #0F172A;
-            --atlas-navbar-height: 58px;
-        }
-
-        body {
-            background: var(--atlas-bg);
-            color: var(--atlas-text);
-        }
-
-        .content-card {
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1.25rem;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06);
-        }
-
-        .criterion-card {
-            background: white;
-            border: 1px solid #E2E8F0;
-            border-radius: 1rem;
-        }
-
-        .section-title {
-            position: sticky;
-            top: 58px;
-            z-index: 10;
-            background: var(--atlas-bg);
-            padding-top: 1rem;
-            padding-bottom: 0.75rem;
-        }
-
-        .area-label {
-            color: #64748B;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .status-pending {
-            background: #F1F5F9;
-            color: #334155;
-        }
-
-        .status-ok {
-            background: #DCFCE7;
-            color: #166534;
-        }
-
-        .status-defect {
-            background: #FEF3C7;
-            color: #92400E;
-        }
-
-        .status-na {
-            background: #E2E8F0;
-            color: #475569;
-        }
-
-        .btn-atlas-primary {
-            background: var(--atlas-primary);
-            border-color: var(--atlas-primary);
-            color: white;
-        }
-
-        .btn-atlas-primary:hover {
-            filter: brightness(0.92);
-            color: white;
-        }
-
-        .group-meta {
-            color: #64748B;
-        }
-
-        .scope-type-pill {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 999px;
-            padding: 0.2rem 0.55rem;
-            background: #E2E8F0;
-            color: #334155;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.75rem;
-        }
-
-        @media (min-width: 992px) {
-            .summary-grid {
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-            }
-        }
-
-        .summary-item {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 0.9rem;
-            padding: 0.75rem;
-        }
-
-        .summary-label {
-            color: #64748B;
-            font-size: 0.8rem;
-        }
-
-        .summary-value {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        {% include "includes/main_navigation_styles.html" %}
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% trans "Inspection" %} – playsafeswiss</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root{--atlas-primary:{{ inspection.playground.organization.primary_color|default:"#0F766E" }};--atlas-secondary:{{ inspection.playground.organization.secondary_color|default:"#F59E0B" }};--atlas-bg:#F8FAFC;--atlas-text:#0F172A;--atlas-navbar-height:58px}body{background:var(--atlas-bg);color:var(--atlas-text)}.content-card{background:#fff;border:1px solid #E2E8F0;border-radius:1.25rem;box-shadow:0 18px 45px rgba(15,23,42,.06)}.criterion-card{background:#fff;border:1px solid #E2E8F0;border-radius:1rem}.section-title{position:sticky;top:58px;z-index:10;background:var(--atlas-bg);padding-top:1rem;padding-bottom:.75rem}.area-label{color:#64748B;font-size:.85rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em}.status-pending{background:#F1F5F9;color:#334155}.status-ok{background:#DCFCE7;color:#166534}.status-defect{background:#FEF3C7;color:#92400E}.status-na{background:#E2E8F0;color:#475569}.btn-atlas-primary{background:var(--atlas-primary);border-color:var(--atlas-primary);color:#fff}.btn-atlas-primary:hover{filter:brightness(.92);color:#fff}.group-meta{color:#64748B}.scope-type-pill{display:inline-flex;align-items:center;border-radius:999px;padding:.2rem .55rem;background:#E2E8F0;color:#334155;font-size:.8rem;font-weight:600}.summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}@media(min-width:992px){.summary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}.summary-item{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:.9rem;padding:.75rem}.summary-label{color:#64748B;font-size:.8rem}.summary-value{font-size:1.25rem;font-weight:700}{% include "includes/main_navigation_styles.html" %}
+</style>
 </head>
-
 <body>
+{% include "includes/main_navigation.html" %}
+<main class="container-fluid px-3 px-lg-4 py-4">
+{% if messages %}<div class="mb-3">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
 
-    {% include "includes/main_navigation.html" %}
+<div class="content-card p-3 p-lg-4 mb-4">
+  <div class="row g-3 align-items-end">
+    <div class="col-lg-8">
+      <div class="text-uppercase fw-semibold small mb-2" style="color:var(--atlas-primary)">{% trans "Inspection" %}</div>
+      <h1 class="fw-bold mb-2">{{ inspection.playground.name }}</h1>
+      <div class="text-secondary">{{ inspection.get_inspection_type_display }} · {{ inspection.inspected_at|date:"d.m.Y" }} · {{ inspection.inspector.get_full_name|default:inspection.inspector.username }}</div>
+    </div>
+    <div class="col-lg-4 text-lg-end">
+      <div class="d-flex flex-column flex-lg-row justify-content-lg-end gap-2">
+        <span class="badge text-bg-light fs-6 align-self-lg-center">{% blocktrans count counter=answers|length %}{{ counter }} inspection item{% plural %}{{ counter }} inspection items{% endblocktrans %}</span>
+        {% if inspection.status == "completed" %}<span class="badge text-bg-success fs-6 align-self-lg-center">{% trans "Completed" %}</span>{% else %}<span class="badge text-bg-warning fs-6 align-self-lg-center">{% trans "In progress" %}</span>{% endif %}
+      </div>
+      <div class="d-flex flex-column flex-lg-row justify-content-lg-end gap-2 mt-3"><a href="{% url 'internal:inspection_pdf' inspection.id %}" class="btn btn-outline-secondary btn-sm">{% trans "Inspection report PDF" %}</a></div>
+    </div>
+  </div>
+  <div class="summary-grid mt-4">
+    <div class="summary-item"><div class="summary-label">{% trans "Inspection areas" %}</div><div class="summary-value">{{ scopes|length }}</div></div>
+    <div class="summary-item"><div class="summary-label">{% trans "Result" %}</div><div class="summary-value">{{ inspection.get_result_display }}</div></div>
+    <div class="summary-item"><div class="summary-label">{% trans "Organization" %}</div><div class="summary-value fs-6">{{ inspection.playground.organization.name }}</div></div>
+    <div class="summary-item"><div class="summary-label">{% trans "Inspection ID" %}</div><div class="summary-value">#{{ inspection.id }}</div></div>
+  </div>
+</div>
 
-    <main class="container-fluid px-3 px-lg-4 py-4">
-        {% if messages %}
-            <div class="mb-3">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags|default:'info' }} mb-2">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+{% if inspection.status != "completed" %}
+<div class="content-card p-3 p-lg-4 mb-4">
+  <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+    <div><h2 class="h5 fw-bold mb-1">{% trans "Complete inspection" %}</h2>{% if pending_answers_count %}<div class="text-secondary">{% blocktrans count counter=pending_answers_count %}{{ counter }} inspection item is still open.{% plural %}{{ counter }} inspection items are still open.{% endblocktrans %}</div>{% else %}<div class="text-secondary">{% trans "All inspection items have been answered. The inspection can be completed." %}</div>{% endif %}</div>
+    <form method="post" action="{% url 'internal:complete_inspection' inspection.id %}">{% csrf_token %}<button type="submit" class="btn btn-atlas-primary" {% if pending_answers_count %}disabled{% endif %}>{% trans "Complete inspection" %}</button></form>
+  </div>
+</div>
+{% else %}
+<div class="content-card p-3 p-lg-4 mb-4"><h2 class="h5 fw-bold mb-1">{% trans "Inspection completed" %}</h2><div class="text-secondary">{% trans "This inspection has been completed." %}{% if inspection.completed_at %} {% trans "Completed on" %}: {{ inspection.completed_at|date:"d.m.Y H:i" }}{% endif %}{% if inspection.completed_by %} · {% trans "by" %} {{ inspection.completed_by.get_full_name|default:inspection.completed_by.username }}{% endif %}</div></div>
+{% endif %}
 
-        <div class="content-card p-3 p-lg-4 mb-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-lg-8">
-                    <div class="text-uppercase fw-semibold small mb-2" style="color: var(--atlas-primary);">
-                        Kontrolle
-                    </div>
+<form method="post" action="{% url 'internal:save_inspection_answers' inspection.id %}">
+{% csrf_token %}
+{% if inspection.status != "completed" %}<div class="content-card p-3 p-lg-4 mb-4"><div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3"><div><h2 class="h5 fw-bold mb-1">{% trans "Record inspection answers" %}</h2><div class="text-secondary">{% trans "Set the status for each inspection item and add a comment if needed." %}</div></div><button type="submit" class="btn btn-atlas-primary">{% trans "Save inspection answers" %}</button></div></div>{% endif %}
 
-                    <h1 class="fw-bold mb-2">
-                        {{ inspection.playground.name }}
-                    </h1>
-
-                    <div class="text-secondary">
-                        {{ inspection.get_inspection_type_display }} ·
-                        {{ inspection.inspected_at|date:"d.m.Y" }} ·
-                        {{ inspection.inspector.get_full_name|default:inspection.inspector.username }}
-                    </div>
-                </div>
-
-                <div class="col-lg-4 text-lg-end">
-                    <div class="d-flex flex-column flex-lg-row justify-content-lg-end gap-2">
-                        <span class="badge text-bg-light fs-6 align-self-lg-center">
-                            {{ answers|length }} Prüfpunkte
-                        </span>
-
-                        {% if inspection.status == "completed" %}
-                            <span class="badge text-bg-success fs-6 align-self-lg-center">
-                                Abgeschlossen
-                            </span>
-                        {% else %}
-                            <span class="badge text-bg-warning fs-6 align-self-lg-center">
-                                In Bearbeitung
-                            </span>
-                        {% endif %}
-                    </div>
-
-                    <div class="d-flex flex-column flex-lg-row justify-content-lg-end gap-2 mt-3">
-                        <a href="{% url 'internal:inspection_pdf' inspection.id %}" class="btn btn-outline-secondary btn-sm">
-                            Prüfprotokoll PDF
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="summary-grid mt-4">
-                <div class="summary-item">
-                    <div class="summary-label">Prüfbereiche</div>
-                    <div class="summary-value">{{ scopes|length }}</div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Ergebnis</div>
-                    <div class="summary-value">{{ inspection.get_result_display }}</div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Organisation</div>
-                    <div class="summary-value fs-6">{{ inspection.playground.organization.name }}</div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Kontroll-ID</div>
-                    <div class="summary-value">#{{ inspection.id }}</div>
-                </div>
-            </div>
-        </div>
-
-        {% if inspection.status != "completed" %}
-            <div class="content-card p-3 p-lg-4 mb-4">
-                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                    <div>
-                        <h2 class="h5 fw-bold mb-1">Kontrolle abschliessen</h2>
-
-                        {% if pending_answers_count %}
-                            <div class="text-secondary">
-                                Es sind noch {{ pending_answers_count }} Prüfpunkte offen.
-                                Die Kontrolle kann erst abgeschlossen werden, wenn alle Prüfpunkte beantwortet sind.
-                            </div>
-                        {% else %}
-                            <div class="text-secondary">
-                                Alle Prüfpunkte sind beantwortet. Die Kontrolle kann abgeschlossen werden.
-                            </div>
-                        {% endif %}
-                    </div>
-
-                    <form method="post" action="{% url 'internal:complete_inspection' inspection.id %}">
-                        {% csrf_token %}
-                        <button
-                            type="submit"
-                            class="btn btn-atlas-primary"
-                            {% if pending_answers_count %}disabled{% endif %}
-                        >
-                            Kontrolle abschliessen
-                        </button>
-                    </form>
-                </div>
-            </div>
-        {% else %}
-            <div class="content-card p-3 p-lg-4 mb-4">
-                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-2">
-                    <div>
-                        <h2 class="h5 fw-bold mb-1">Kontrolle abgeschlossen</h2>
-                        <div class="text-secondary">
-                            Diese Kontrolle wurde abgeschlossen.
-                            {% if inspection.completed_at %}
-                                Abschluss: {{ inspection.completed_at|date:"d.m.Y H:i" }}
-                            {% endif %}
-                            {% if inspection.completed_by %}
-                                · durch {{ inspection.completed_by.get_full_name|default:inspection.completed_by.username }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <span class="badge text-bg-success fs-6 align-self-start align-self-lg-center">
-                        Abgeschlossen
-                    </span>
-                </div>
-            </div>
-        {% endif %}
-
-        <form method="post" action="{% url 'internal:save_inspection_answers' inspection.id %}">
-            {% csrf_token %}
-
-            {% if inspection.status != "completed" %}
-                <div class="content-card p-3 p-lg-4 mb-4">
-                    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-                        <div>
-                            <h2 class="h5 fw-bold mb-1">Prüfantworten erfassen</h2>
-                            <div class="text-secondary">
-                                Setze pro Prüfpunkt den Status und erfasse bei Bedarf einen Kommentar.
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-atlas-primary">
-                            Prüfantworten speichern
-                        </button>
-                    </div>
-                </div>
-            {% endif %}
-
-            {% for scope in scopes %}
-                <section class="mb-4">
-                    <div class="section-title">
-                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-                            <div>
-                                <div class="mb-2">
-                                    <span class="scope-type-pill">
-                                        {{ scope.get_scope_type_display }}
-                                    </span>
-                                </div>
-
-                                <h2 class="h4 fw-bold mb-1">
-                                    {{ scope.label }}
-                                </h2>
-
-                                <div class="group-meta">
-                                    {% if scope.scope_type == "playground" %}
-                                        Spielplatzbezogene Prüfpunkte ohne Zuordnung zu einem einzelnen Spielgerät.
-                                    {% elif scope.scope_type == "equipment" and scope.equipment %}
-                                        {{ scope.equipment.equipment_type.name }} · {{ scope.answers.all|length }} Prüfpunkte
-                                    {% elif scope.scope_type == "surface" %}
-                                        Fallschutzfläche / Boden · {{ scope.answers.all|length }} Prüfpunkte
-                                    {% elif scope.scope_type == "accessory" %}
-                                        Zusatzausstattung · {{ scope.answers.all|length }} Prüfpunkte
-                                    {% else %}
-                                        {{ scope.answers.all|length }} Prüfpunkte
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            {% if scope.equipment %}
-                                <div class="text-secondary small text-lg-end">
-                                    {% if scope.equipment.inventory_number %}
-                                        Inventar-Nr. {{ scope.equipment.inventory_number }}<br>
-                                    {% endif %}
-                                    {% if scope.equipment.manufacturer %}
-                                        {{ scope.equipment.manufacturer }}
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="row g-3">
-                        {% for answer in scope.answers.all %}
-                            <div class="col-12 col-xl-6">
-                                <article class="criterion-card p-3 h-100">
-                                    {% if answer.criterion.area %}
-                                        <div class="area-label mb-2">
-                                            {{ answer.criterion.area }}
-                                        </div>
-                                    {% endif %}
-
-                                    <div class="d-flex justify-content-between gap-3 align-items-start mb-3">
-                                        <div>
-                                            <h3 class="h6 fw-bold mb-2">
-                                                {{ answer.criterion.title }}
-                                            </h3>
-
-                                            {% if answer.criterion.inspection_text %}
-                                                <p class="text-secondary small mb-2">
-                                                    {{ answer.criterion.inspection_text }}
-                                                </p>
-                                            {% endif %}
-                                        </div>
-
-                                        {% if answer.answer == "ok" %}
-                                            <span class="badge status-ok">
-                                                {{ answer.get_answer_display }}
-                                            </span>
-                                        {% elif answer.answer == "defect" %}
-                                            <span class="badge status-defect">
-                                                {{ answer.get_answer_display }}
-                                            </span>
-                                        {% elif answer.answer == "not_applicable" %}
-                                            <span class="badge status-na">
-                                                {{ answer.get_answer_display }}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge status-pending">
-                                                {{ answer.get_answer_display }}
-                                            </span>
-                                        {% endif %}
-                                    </div>
-
-                                    {% if answer.criterion.maintenance_text %}
-                                        <div class="small mb-3 p-2 rounded-3 bg-light">
-                                            <strong>Wartung:</strong>
-                                            {{ answer.criterion.maintenance_text }}
-                                        </div>
-                                    {% endif %}
-
-                                    {% if inspection.status == "completed" %}
-                                        {% if answer.comment %}
-                                            <div class="small mt-3">
-                                                <strong>Kommentar:</strong>
-                                                {{ answer.comment }}
-                                            </div>
-                                        {% endif %}
-                                    {% else %}
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-semibold" for="answer_{{ answer.id }}">
-                                                Ergebnis
-                                            </label>
-                                            <select
-                                                id="answer_{{ answer.id }}"
-                                                name="answer_{{ answer.id }}"
-                                                class="form-select form-select-sm"
-                                            >
-                                                <option value="pending" {% if answer.answer == "pending" %}selected{% endif %}>
-                                                    Noch nicht geprüft
-                                                </option>
-                                                <option value="ok" {% if answer.answer == "ok" %}selected{% endif %}>
-                                                    In Ordnung
-                                                </option>
-                                                <option value="defect" {% if answer.answer == "defect" %}selected{% endif %}>
-                                                    Mangel
-                                                </option>
-                                                <option value="not_applicable" {% if answer.answer == "not_applicable" %}selected{% endif %}>
-                                                    Nicht anwendbar
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label class="form-label small fw-semibold" for="comment_{{ answer.id }}">
-                                                Kommentar
-                                            </label>
-                                            <textarea
-                                                id="comment_{{ answer.id }}"
-                                                name="comment_{{ answer.id }}"
-                                                class="form-control form-control-sm"
-                                                rows="2"
-                                                placeholder="Optionaler Kommentar"
-                                            >{{ answer.comment }}</textarea>
-                                        </div>
-                                    {% endif %}
-
-                                    {% if answer.defects.all %}
-                                        <div class="small mt-3 p-2 rounded-3 bg-light">
-                                            <strong>Erfasste Mängel:</strong>
-                                            {% for defect in answer.defects.all %}
-                                                <a
-                                                    href="{% url 'internal:edit_defect' defect.id %}"
-                                                    class="badge text-bg-light border ms-1 text-decoration-none"
-                                                >
-                                                    #{{ defect.id }} · {{ defect.get_status_display }}
-                                                </a>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
-
-                                    {% if inspection.status != "completed" and answer.answer == "defect" and can_create_defects %}
-                                        <div class="mt-3">
-                                            <a
-                                                href="{% url 'internal:create_defect_from_inspection_answer' answer.id %}"
-                                                class="btn btn-sm btn-outline-danger"
-                                            >
-                                                Mangel erfassen
-                                            </a>
-                                        </div>
-                                    {% elif inspection.status != "completed" and answer.answer == "defect" and not can_create_defects %}
-                                        <div class="small text-secondary mt-3">
-                                            Für das Erfassen von Mängeln ist eine Unterhaltsberechtigung erforderlich.
-                                        </div>
-                                    {% endif %}
-                                </article>
-                            </div>
-                        {% empty %}
-                            <div class="col-12">
-                                <div class="content-card p-4 text-center">
-                                    <div class="fw-semibold mb-1">
-                                        Keine Prüfpunkte vorhanden
-                                    </div>
-                                    <div class="text-secondary">
-                                        Für diesen Prüfbereich wurden keine passenden Prüfpunkte erzeugt.
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </section>
-            {% empty %}
-                <section class="mb-4">
-                    <div class="content-card p-4 text-center">
-                        <div class="fw-semibold mb-1">
-                            Keine Prüfbereiche vorhanden
-                        </div>
-                        <div class="text-secondary">
-                            Für diese Kontrolle wurden keine Prüfbereiche erzeugt.
-                        </div>
-                    </div>
-                </section>
-            {% endfor %}
-
-            {% if inspection.status != "completed" %}
-                <div class="content-card p-3 p-lg-4 mb-4">
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-atlas-primary">
-                            Prüfantworten speichern
-                        </button>
-                    </div>
-                </div>
-            {% endif %}
-        </form>
-    </main>
-
-    {% include "includes/main_navigation_script.html" %}
+{% for scope in scopes %}
+<section class="mb-4">
+  <div class="section-title"><div class="d-flex flex-wrap justify-content-between align-items-start gap-2"><div><div class="mb-2"><span class="scope-type-pill">{{ scope.get_scope_type_display }}</span></div><h2 class="h4 fw-bold mb-1">{{ scope.label }}</h2><div class="group-meta">{% if scope.scope_type == "playground" %}{% trans "Playground-related inspection items without assignment to a single play equipment item." %}{% elif scope.scope_type == "equipment" and scope.equipment %}{{ scope.equipment.equipment_type.name }} · {% blocktrans count counter=scope.answers.all|length %}{{ counter }} inspection item{% plural %}{{ counter }} inspection items{% endblocktrans %}{% elif scope.scope_type == "surface" %}{% trans "Impact protection surface / ground" %} · {% blocktrans count counter=scope.answers.all|length %}{{ counter }} inspection item{% plural %}{{ counter }} inspection items{% endblocktrans %}{% elif scope.scope_type == "accessory" %}{% trans "Additional equipment" %} · {% blocktrans count counter=scope.answers.all|length %}{{ counter }} inspection item{% plural %}{{ counter }} inspection items{% endblocktrans %}{% else %}{% blocktrans count counter=scope.answers.all|length %}{{ counter }} inspection item{% plural %}{{ counter }} inspection items{% endblocktrans %}{% endif %}</div></div>{% if scope.equipment %}<div class="text-secondary small text-lg-end">{% if scope.equipment.inventory_number %}{% trans "Inventory no." %} {{ scope.equipment.inventory_number }}<br>{% endif %}</div>{% endif %}</div></div>
+  <div class="row g-3">
+  {% for answer in scope.answers.all %}
+    <div class="col-12 col-xl-6"><article class="criterion-card p-3 h-100">
+      {% if answer.criterion.area %}<div class="area-label mb-2">{{ answer.criterion.area }}</div>{% endif %}
+      <div class="d-flex justify-content-between gap-3 align-items-start mb-3"><div><h3 class="h6 fw-bold mb-2">{{ answer.criterion.title }}</h3>{% if answer.criterion.inspection_text %}<p class="text-secondary small mb-2">{{ answer.criterion.inspection_text }}</p>{% endif %}</div><span class="badge {% if answer.answer == 'ok' %}status-ok{% elif answer.answer == 'defect' %}status-defect{% elif answer.answer == 'not_applicable' %}status-na{% else %}status-pending{% endif %}">{{ answer.get_answer_display }}</span></div>
+      {% if answer.criterion.maintenance_text %}<div class="small mb-3 p-2 rounded-3 bg-light"><strong>{% trans "Maintenance note" %}:</strong> {{ answer.criterion.maintenance_text }}</div>{% endif %}
+      {% if inspection.status == "completed" %}{% if answer.comment %}<div class="small mt-3"><strong>{% trans "Comment" %}:</strong> {{ answer.comment }}</div>{% endif %}{% else %}<div class="mb-3"><label class="form-label small fw-semibold" for="answer_{{ answer.id }}">{% trans "Result" %}</label><select id="answer_{{ answer.id }}" name="answer_{{ answer.id }}" class="form-select form-select-sm"><option value="pending" {% if answer.answer == "pending" %}selected{% endif %}>{% trans "Not checked yet" %}</option><option value="ok" {% if answer.answer == "ok" %}selected{% endif %}>{% trans "OK" %}</option><option value="defect" {% if answer.answer == "defect" %}selected{% endif %}>{% trans "Defect" %}</option><option value="not_applicable" {% if answer.answer == "not_applicable" %}selected{% endif %}>{% trans "Not applicable" %}</option></select></div><div><label class="form-label small fw-semibold" for="comment_{{ answer.id }}">{% trans "Comment" %}</label><textarea id="comment_{{ answer.id }}" name="comment_{{ answer.id }}" class="form-control form-control-sm" rows="2" placeholder="{% trans 'Optional comment' %}">{{ answer.comment }}</textarea></div>{% endif %}
+      {% if answer.defects.all %}<div class="small mt-3 p-2 rounded-3 bg-light"><strong>{% trans "Recorded defects" %}:</strong>{% for defect in answer.defects.all %}<a href="{% url 'internal:edit_defect' defect.id %}" class="badge text-bg-light border ms-1 text-decoration-none">#{{ defect.id }} · {{ defect.get_status_display }}</a>{% endfor %}</div>{% endif %}
+      {% if inspection.status != "completed" and answer.answer == "defect" and can_create_defects %}<div class="mt-3"><a href="{% url 'internal:create_defect_from_inspection_answer' answer.id %}" class="btn btn-sm btn-outline-danger">{% trans "Record defect" %}</a></div>{% elif inspection.status != "completed" and answer.answer == "defect" and not can_create_defects %}<div class="small text-secondary mt-3">{% trans "Maintenance permission is required to record defects." %}</div>{% endif %}
+    </article></div>
+  {% empty %}<div class="col-12"><div class="content-card p-4 text-center"><div class="fw-semibold mb-1">{% trans "No inspection items available" %}</div><div class="text-secondary">{% trans "No matching inspection items were generated for this inspection area." %}</div></div></div>{% endfor %}
+  </div>
+</section>
+{% empty %}<section class="mb-4"><div class="content-card p-4 text-center"><div class="fw-semibold mb-1">{% trans "No inspection areas available" %}</div><div class="text-secondary">{% trans "No inspection areas were generated for this inspection." %}</div></div></section>{% endfor %}
+{% if inspection.status != "completed" %}<div class="content-card p-3 p-lg-4 mb-4"><div class="d-flex justify-content-end"><button type="submit" class="btn btn-atlas-primary">{% trans "Save inspection answers" %}</button></div></div>{% endif %}
+</form>
+</main>
+{% include "includes/main_navigation_script.html" %}
 </body>
-
 </html>
