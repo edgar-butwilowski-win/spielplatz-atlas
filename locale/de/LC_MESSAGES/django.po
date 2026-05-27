@@ -1,10 +1,6 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: playsafeswiss\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-21 13:06+0000\n"
-"PO-Revision-Date: 2026-05-27 00:00+0000\n"
-"Language-Team: Deutsch\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -13,426 +9,339 @@ msgstr ""
 
 msgid "English"
 msgstr "Englisch"
-
 msgid "Deutsch"
 msgstr "Deutsch"
-
 msgid "Français"
 msgstr "Französisch"
-
 msgid "Italiano"
 msgstr "Italienisch"
-
 msgid "Rumantsch"
 msgstr "Rätoromanisch"
-
-msgid "Visual routine inspection"
-msgstr "Visuelle Routinekontrolle"
-
-msgid "Operational inspection"
-msgstr "Operative Kontrolle"
-
-msgid "Annual main inspection"
-msgstr "Jährliche Hauptinspektion"
-
-msgid "General playground inspection"
-msgstr "Allgemeine Spielplatzkontrolle"
-
-msgid "Play equipment"
-msgstr "Spielgeräte"
-
-msgid "Impact protection surface / ground"
-msgstr "Fallschutzfläche / Boden"
-
-msgid "Additional equipment"
-msgstr "Zusatzausstattung"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "Defects found"
-msgstr "Mängel festgestellt"
-
-msgid "In progress"
-msgstr "In Bearbeitung"
-
-msgid "Completed"
-msgstr "Abgeschlossen"
-
+msgid "Map"
+msgstr "Karte"
+msgid "About"
+msgstr "Über"
+msgid "Imprint"
+msgstr "Impressum"
+msgid "Join"
+msgstr "Teilnehmen"
+msgid "Open menu"
+msgstr "Menü öffnen"
+msgid "Login"
+msgstr "Login"
+msgid "Logout"
+msgstr "Logout"
+msgid "Admin"
+msgstr "Admin"
+msgid "Dashboard"
+msgstr "Dashboard"
+msgid "Language"
+msgstr "Sprache"
+msgid "Messages"
+msgstr "Nachrichten"
+msgid "My inspections"
+msgstr "Meine Kontrollen"
+msgid "Deployment planning"
+msgstr "Einsatzplanung"
+msgid "playsafeswiss home page"
+msgstr "playsafeswiss Startseite"
+msgid "Cancel"
+msgstr "Abbrechen"
+msgid "Save"
+msgstr "Speichern"
+msgid "Filter"
+msgstr "Filtern"
+msgid "Reset"
+msgstr "Zurücksetzen"
 msgid "Open"
 msgstr "Offen"
-
+msgid "Completed"
+msgstr "Abgeschlossen"
+msgid "In progress"
+msgstr "In Bearbeitung"
 msgid "Planned"
 msgstr "Geplant"
-
 msgid "Done"
 msgstr "Erledigt"
-
 msgid "Overdue"
 msgstr "Überfällig"
-
 msgid "Suspended"
 msgstr "Ausgesetzt"
-
 msgid "Cancelled"
 msgstr "Abgebrochen"
-
+msgid "Resolved"
+msgstr "Behoben"
+msgid "Checked / completed"
+msgstr "Geprüft / abgeschlossen"
+msgid "OK"
+msgstr "OK"
+msgid "Defects found"
+msgstr "Mängel festgestellt"
+msgid "Defect"
+msgstr "Mangel"
+msgid "Defects"
+msgstr "Mängel"
+msgid "Safety defects"
+msgstr "Sicherheitsmängel"
+msgid "Inspection"
+msgstr "Kontrolle"
+msgid "Inspection type"
+msgstr "Kontrollart"
+msgid "Visual routine inspection"
+msgstr "Visuelle Routinekontrolle"
+msgid "Operational inspection"
+msgstr "Operative Kontrolle"
+msgid "Annual main inspection"
+msgstr "Jährliche Hauptinspektion"
+msgid "General playground inspection"
+msgstr "Allgemeine Spielplatzkontrolle"
+msgid "Play equipment"
+msgstr "Spielgeräte"
+msgid "Impact protection surface / ground"
+msgstr "Fallschutzfläche / Boden"
+msgid "Additional equipment"
+msgstr "Zusatzausstattung"
+msgid "Not checked yet"
+msgstr "Noch nicht geprüft"
+msgid "Not applicable"
+msgstr "Nicht zutreffend"
+msgid "Citizen report"
+msgstr "Meldung aus der Bevölkerung"
+msgid "Internal report"
+msgstr "Interne Meldung"
+msgid "Maintenance / care"
+msgstr "Unterhalt / Pflege"
+msgid "Other"
+msgstr "Sonstiges"
+msgid "A (immediate)"
+msgstr "A (sofort)"
+msgid "B (medium-term)"
+msgstr "B (mittelfristig)"
 msgid "Automatic"
 msgstr "Automatisch"
-
 msgid "Manual"
 msgstr "Manuell"
 
-msgid "Not checked yet"
-msgstr "Noch nicht geprüft"
-
-msgid "Defect"
-msgstr "Mangel"
-
-msgid "Not applicable"
-msgstr "Nicht zutreffend"
-
-msgid "Resolved"
-msgstr "Behoben"
-
-msgid "Checked / completed"
-msgstr "Geprüft / abgeschlossen"
-
-msgid "Inspection"
-msgstr "Kontrolle"
-
-msgid "Citizen report"
-msgstr "Meldung aus der Bevölkerung"
-
-msgid "Internal report"
-msgstr "Interne Meldung"
-
-msgid "Maintenance / care"
-msgstr "Unterhalt / Pflege"
-
-msgid "Other"
-msgstr "Sonstiges"
-
-msgid "A (immediate)"
-msgstr "A (sofort)"
-
-msgid "B (medium-term)"
-msgstr "B (mittelfristig)"
-
-msgid "A defect with a safety risk is known for this play equipment. Please observe the notices on site."
-msgstr "Für dieses Spielgerät ist ein Mangel mit Sicherheitsrisiko bekannt. Bitte beachten Sie die Hinweise vor Ort."
-
-msgid "A defect is known for this play equipment. The defect does not pose a safety risk. Repair is planned."
-msgstr "Für dieses Spielgerät ist ein Mangel bekannt. Der Mangel stellt kein Sicherheitsrisiko dar. Die Reparatur ist geplant."
-
-msgid "Login"
-msgstr "Login"
-
-msgid "playsafeswiss home page"
-msgstr "playsafeswiss Startseite"
-
-msgid "Map"
-msgstr "Karte"
-
-msgid "About"
-msgstr "Über"
-
-msgid "Imprint"
-msgstr "Impressum"
-
-msgid "Join"
-msgstr "Teilnehmen"
-
-msgid "Open menu"
-msgstr "Menü öffnen"
-
-msgid "Dashboard"
-msgstr "Dashboard"
-
-msgid "Admin"
-msgstr "Admin"
-
-msgid "Logout"
-msgstr "Logout"
-
-msgid "Internal access"
-msgstr "Interner Zugang"
-
-msgid "Sign in with your email address and password."
-msgstr "Melden Sie sich mit Ihrer E-Mail-Adresse und Ihrem Passwort an."
-
-msgid "Please check your email address and password."
-msgstr "Bitte prüfen Sie E-Mail-Adresse und Passwort."
-
-msgid "Email address"
-msgstr "E-Mail-Adresse"
-
-msgid "Password"
-msgstr "Passwort"
-
-msgid "Log in"
-msgstr "Einloggen"
-
-msgid "Public visitors do not need a user account."
-msgstr "Öffentliche Besucherinnen und Besucher benötigen kein Benutzerkonto."
-
-msgid "Language"
-msgstr "Sprache"
-
-msgid "Messages"
-msgstr "Nachrichten"
-
-msgid "My inspections"
-msgstr "Meine Kontrollen"
-
-msgid "Deployment planning"
-msgstr "Einsatzplanung"
-
 msgid "Your playground. Your information."
 msgstr "Dein Spielplatz. Deine Informationen."
-
-#, python-format
-msgid "Preview image of %(name)s"
-msgstr "Vorschaubild von %(name)s"
-
-msgid "Replace playground image"
-msgstr "Spielplatzbild ersetzen"
-
-msgid "Upload image"
-msgstr "Bild hochladen"
-
-msgid "Rotate image by 90°"
-msgstr "Bild um 90° drehen"
-
-msgid "The current preview image comes from a play equipment item. It can be rotated there."
-msgstr "Das aktuelle Vorschaubild stammt von einem Spielgerät. Es kann dort gedreht werden."
-
 msgid "Address"
 msgstr "Adresse"
-
 msgid "No address stored"
 msgstr "Keine Adresse hinterlegt"
-
 msgid "District"
 msgstr "Quartier"
-
 msgid "Status"
 msgstr "Status"
-
 msgid "Publicly visible"
 msgstr "Öffentlich sichtbar"
-
 msgid "Internally visible"
 msgstr "Intern sichtbar"
-
 msgid "Swiss coordinates"
 msgstr "Schweizer Koordinaten"
-
 msgid "Show specialist map"
 msgstr "Fachkarte anzeigen"
-
 msgid "Documents"
 msgstr "Dokumente"
-
 msgid "Certificate documents"
 msgstr "Zertifikatsdokumente"
-
 msgid "Acceptance documents"
 msgstr "Abnahmedokumente"
-
 msgid "Care status"
 msgstr "Pflegestand"
-
 msgid "Known defects and planned repairs."
 msgstr "Bekannte Mängel und geplante Instandsetzungen."
-
 msgid "Record new inspection"
 msgstr "Neue Kontrolle erfassen"
-
 msgid "Record defect"
 msgstr "Mangel erfassen"
-
-msgid "Inspection is currently suspended."
-msgstr "Die Inspektion ist aktuell ausgesetzt."
-
-msgid "Last inspection"
-msgstr "Letzte Kontrolle"
-
-msgid "No completed inspection yet"
-msgstr "Noch keine abgeschlossene Kontrolle vorhanden"
-
-msgid "Next planned inspection"
-msgstr "Nächste geplante Kontrolle"
-
-msgid "is being planned"
-msgstr "wird geplant"
-
-msgid "General playground defect"
-msgstr "Allgemeiner Spielplatzmangel"
-
-msgid "Safety risk"
-msgstr "Sicherheitsrisiko"
-
-msgid "No safety risk"
-msgstr "Kein Sicherheitsrisiko"
-
-#, python-format
-msgid "%(counter)s defect"
-msgid_plural "%(counter)s defects"
-msgstr[0] "%(counter)s Mangel"
-msgstr[1] "%(counter)s Mängel"
-
+msgid "Record new defect"
+msgstr "Neuen Mangel erfassen"
+msgid "Save defect"
+msgstr "Mangel speichern"
 msgid "Open defect"
 msgstr "Mangel öffnen"
+msgid "Edit defect"
+msgstr "Mangel bearbeiten"
+msgid "Defect details"
+msgstr "Angaben zum Mangel"
+msgid "Inspection is currently suspended."
+msgstr "Die Inspektion ist aktuell ausgesetzt."
+msgid "Last inspection"
+msgstr "Letzte Kontrolle"
+msgid "No completed inspection yet"
+msgstr "Noch keine abgeschlossene Kontrolle vorhanden"
+msgid "Next planned inspection"
+msgstr "Nächste geplante Kontrolle"
+msgid "is being planned"
+msgstr "wird geplant"
+msgid "General playground defect"
+msgstr "Allgemeiner Spielplatzmangel"
+msgid "Safety risk"
+msgstr "Sicherheitsrisiko"
+msgid "No safety risk"
+msgstr "Kein Sicherheitsrisiko"
+msgid "Internal"
+msgstr "Intern"
+msgid "Source"
+msgstr "Quelle"
+msgid "Reported on"
+msgstr "Gemeldet am"
+msgid "reported on"
+msgstr "gemeldet am"
+msgid "Affected object"
+msgstr "Betroffenes Objekt"
+msgid "Responsible person"
+msgstr "Zuständige Person"
+msgid "Not assigned yet"
+msgstr "Noch nicht zugewiesen"
+msgid "Not assigned"
+msgstr "Nicht zugewiesen"
+msgid "Not planned"
+msgstr "Nicht geplant"
+msgid "Created from inspection item"
+msgstr "Entstanden aus Prüfpunkt"
+msgid "Assignment and system message"
+msgstr "Zuweisung und Systemnachricht"
+msgid "Save assignment"
+msgstr "Zuweisung speichern"
+msgid "Back to playground"
+msgstr "Zurück zum Spielplatz"
+msgid "Record defect from inspection item"
+msgstr "Mangel aus Prüfpunkt erfassen"
+msgid "Inspection area"
+msgstr "Prüfbereich"
+msgid "Without inspection area"
+msgstr "Ohne Prüfbereich"
+msgid "Inspection criterion"
+msgstr "Prüfkriterium"
+msgid "Inspection note"
+msgstr "Prüfhinweis"
+msgid "Comment from inspection"
+msgstr "Kommentar aus der Kontrolle"
+msgid "Existing defects for this inspection item"
+msgstr "Bereits erfasste Mängel zu diesem Prüfpunkt"
+msgid "Optional."
+msgstr "Optional."
+msgid "Photos of the defect"
+msgstr "Fotos zum Mangel"
+msgid "Up to three photos per defect."
+msgstr "Bis zu drei Fotos pro Mangel."
+msgid "Delete photo"
+msgstr "Foto löschen"
+msgid "Defect photo %(number)s"
+msgstr "Mangelfoto %(number)s"
+msgid "Optional free text, for example citizen hotline, depot or caretaker."
+msgstr "Optionaler Freitext, z. B. Bürgertelefon, Werkhof oder Hauswartung."
+msgid "Only activate this if the notice should appear in the public care status."
+msgstr "Nur aktivieren, wenn der Hinweis im öffentlichen Pflegestand erscheinen soll."
+msgid "This text may be publicly visible. Do not enter internal details."
+msgstr "Dieser Text kann öffentlich sichtbar sein. Keine internen Details eintragen."
 
-msgid "No defects known"
-msgstr "Keine Mängel bekannt"
-
-msgid "Equipment on this playground."
-msgstr "Ausstattung dieses Spielplatzes."
-
-#, python-format
-msgid "%(counter)s entry"
-msgid_plural "%(counter)s entries"
-msgstr[0] "%(counter)s Eintrag"
-msgstr[1] "%(counter)s Einträge"
-
-#, python-format
-msgid "Photo of %(name)s"
-msgstr "Foto von %(name)s"
-
-msgid "Replace image"
-msgstr "Bild ersetzen"
-
-msgid "Defect with safety risk"
-msgstr "Mangel mit Sicherheitsrisiko"
-
-msgid "Defect without safety risk"
-msgstr "Mangel ohne Sicherheitsrisiko"
-
-msgid "In operation"
-msgstr "In Betrieb"
-
-msgid "Renovation pending"
-msgstr "Sanierung ausstehend"
-
-msgid "No renovation planned"
-msgstr "Keine Sanierung geplant"
-
-#, python-format
-msgid "Will be removed on %(date)s"
-msgstr "Wird am %(date)s abgebrochen"
-
-msgid "Renovation details"
-msgstr "Sanierungsangaben"
-
-msgid "Recommended renovation year"
-msgstr "Empfohlenes Sanierungsjahr"
-
-msgid "Renovation type"
-msgstr "Sanierungsart"
-
-msgid "Renovation comment"
-msgstr "Kommentar zur Sanierung"
-
-msgid "Inventory no."
-msgstr "Inventar-Nr."
-
-msgid "Year built"
-msgstr "Baujahr"
-
-msgid "Supplier"
-msgstr "Lieferant"
-
-msgid "Standard"
-msgstr "Norm"
-
-msgid "No play equipment recorded yet"
-msgstr "Noch keine Spielgeräte erfasst"
-
-msgid "As soon as publicly visible play equipment has been recorded, it will be shown here."
-msgstr "Sobald Spielgeräte öffentlich sichtbar erfasst sind, werden sie hier angezeigt."
-
+msgid "Personal inspection list"
+msgstr "Persönliche Kontrollliste"
+msgid "Your inspections for today, overdue inspections and upcoming inspection tasks."
+msgstr "Ihre heutigen, überfälligen und nächsten Kontrollaufträge."
+msgid "Today"
+msgstr "Heute"
+msgid "No inspections are assigned for today."
+msgstr "Für heute sind keine Kontrollen zugewiesen."
+msgid "Next 30 days"
+msgstr "Nächste 30 Tage"
+msgid "No further assigned inspections in the next 30 days."
+msgstr "Keine weiteren zugewiesenen Kontrollen in den nächsten 30 Tagen."
+msgid "Open inspections without assignment"
+msgstr "Offene Kontrollen ohne Zuweisung"
+msgid "These tasks can be accepted by authorized inspectors."
+msgstr "Diese Aufträge können von berechtigten Kontrollpersonen übernommen werden."
+msgid "No open unassigned inspection tasks available."
+msgstr "Keine offenen unzugewiesenen Kontrollaufträge vorhanden."
+msgid "Due"
+msgstr "Fällig"
+msgid "Accept"
+msgstr "Übernehmen"
+msgid "Start inspection"
+msgstr "Kontrolle starten"
+msgid "Select the inspection type. A new inspection with all active inspection criteria will then be created."
+msgstr "Wählen Sie die Kontrollart. Danach wird eine neue Kontrolle mit allen aktiven Prüfkriterien angelegt."
+msgid "The inspection is based on the active inspection catalogue according to SN EN 1176/1177 and any local additions made by the organization."
+msgstr "Die Prüfung basiert auf dem aktiven Prüfkatalog nach SN EN 1176/1177 sowie auf allfälligen lokalen Ergänzungen der Organisation."
+msgid "Internal deployment planning"
+msgstr "Interne Einsatzplanung"
+msgid "Plan inspection tasks"
+msgstr "Kontrollaufträge planen"
+msgid "Please select an organization to edit its planning."
+msgstr "Bitte eine Organisation auswählen, um die Planung gezielt zu bearbeiten."
+msgid "Organization"
+msgstr "Organisation"
+msgid "All organizations"
+msgstr "Alle Organisationen"
+msgid "All inspection types"
+msgstr "Alle Kontrollarten"
+msgid "Recalculate inspection planning"
+msgstr "Kontrollplanung neu berechnen"
+msgid "Inspection tasks"
+msgstr "Kontrollaufträge"
+msgid "Maximum 100 entries"
+msgstr "Maximal 100 Einträge"
+msgid "Action"
+msgstr "Aktion"
+msgid "No inspection tasks available for the current selection."
+msgstr "Keine Kontrollaufträge für die aktuelle Auswahl vorhanden."
+msgid "Internal dashboard"
+msgstr "Internes Dashboard"
+msgid "Analytics and key figures"
+msgstr "Auswertungen und Kennzahlen"
+msgid "Key figures"
+msgstr "Kennzahlen"
+msgid "Trends"
+msgstr "Zeitverlauf"
+msgid "Planning"
+msgstr "Planung"
+msgid "Operational lists"
+msgstr "Operative Listen"
+msgid "Organizations"
+msgstr "Organisationen"
+msgid "Active playgrounds"
+msgstr "Aktive Spielplätze"
+msgid "Open defects"
+msgstr "Offene Mängel"
+msgid "Defects with safety risk"
+msgstr "Mängel mit Sicherheitsrisiko"
+msgid "Planned maintenance actions"
+msgstr "Geplante Unterhaltsmassnahmen"
+msgid "Inspections in progress"
+msgstr "Kontrollen in Bearbeitung"
+msgid "Completed inspections"
+msgstr "Abgeschlossene Kontrollen"
+msgid "Count"
+msgstr "Anzahl"
+msgid "Date"
+msgstr "Datum"
+msgid "Title"
+msgstr "Titel"
+msgid "Playground"
+msgstr "Spielplatz"
 msgid "January"
 msgstr "Januar"
-
 msgid "February"
 msgstr "Februar"
-
 msgid "March"
 msgstr "März"
-
 msgid "April"
 msgstr "April"
-
 msgid "May"
 msgstr "Mai"
-
 msgid "June"
 msgstr "Juni"
-
 msgid "July"
 msgstr "Juli"
-
 msgid "August"
 msgstr "August"
-
 msgid "September"
 msgstr "September"
-
 msgid "October"
 msgstr "Oktober"
-
 msgid "November"
 msgstr "November"
-
 msgid "December"
 msgstr "Dezember"
-
-msgid "Become a playground pro!"
-msgstr "Werde zum Spielplatz-Profi!"
-
-msgid "Select a playground on the map and get exciting detailed information."
-msgstr "Wähle einen Spielplatz auf der Karte aus und erhalte spannende Detailinformationen."
-
-msgid "Search playground, address or district"
-msgstr "Spielplatz, Adresse oder Quartier suchen"
-
-msgid "playgrounds"
-msgstr "Spielplätze"
-
-msgid "Next inspection:"
-msgstr "Nächste Kontrolle:"
-
-msgid "will be planned"
-msgstr "wird geplant"
-
-msgid "Show details"
-msgstr "Details anzeigen"
-
-msgid "Register organization"
-msgstr "Organisation registrieren"
-
-msgid "New organization"
-msgstr "Neue Organisation"
-
-msgid "Request your own organization area in playsafeswiss. The request will be reviewed by a super admin."
-msgstr "Beantragen Sie einen eigenen Organisationsbereich in playsafeswiss. Die Anfrage wird durch einen Super-Admin geprüft."
-
-msgid "Cancel"
-msgstr "Abbrechen"
-
-msgid "Submit request"
-msgstr "Anfrage einreichen"
-
-msgid "After review, the organization can be activated and an organization admin can be created."
-msgstr "Nach der Prüfung kann die Organisation aktiviert und ein Organisations-Admin eingerichtet werden."
-
-msgid "Request submitted"
-msgstr "Anfrage eingereicht"
-
-msgid "Thank you. Your organization request has been saved and will be reviewed."
-msgstr "Vielen Dank. Ihre Organisationsanfrage wurde gespeichert und wird geprüft."
-
-msgid "Back to map"
-msgstr "Zurück zur Karte"
