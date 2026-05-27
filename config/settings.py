@@ -88,7 +88,7 @@ INSTALLED_APPS = [
     "playgrounds.apps.PlaygroundsConfig",
     "inspections.apps.InspectionsConfig",
     "media_assets",
-    "public",
+    "public.apps.PublicConfig",
     "internal",
     "notifications.apps.NotificationsConfig",
 ]
