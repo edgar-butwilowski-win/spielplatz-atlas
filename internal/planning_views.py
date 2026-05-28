@@ -175,6 +175,13 @@ def get_inspection_task_for_user(task_id, user):
     return task
 
 
+def user_can_start_inspection_task(task, user):
+    if user.is_superuser:
+        return True
+
+    return not task.assigned_to_id or task.assigned_to_id == user.id
+
+
 def choice_count_map(queryset, field_name, choices):
     raw_counts = queryset.values(field_name).annotate(count=Count("id"))
     counts = {entry[field_name]: entry["count"] for entry in raw_counts}
@@ -189,7 +196,7 @@ def choice_count_map(queryset, field_name, choices):
     ]
 
 
-def add_planning_forms(tasks):
+def add_planning_forms(tasks, user=None):
     task_list = list(tasks[:100])
 
     for task in task_list:
@@ -197,6 +204,7 @@ def add_planning_forms(tasks):
             instance=task,
             organization=task.organization,
         )
+        task.can_be_started_by_current_user = user_can_start_inspection_task(task, user) if user else False
 
     return task_list
 
@@ -249,7 +257,7 @@ def inspection_planning(request):
             **scope,
             "selected_organization": selected_organization,
             "organizations": organizations,
-            "tasks": add_planning_forms(filtered_tasks),
+            "tasks": add_planning_forms(filtered_tasks, request.user),
             "status_filter": status_filter,
             "inspection_type_filter": inspection_type_filter,
             "status_choices": [("active", "Aktive Aufträge")] + list(InspectionTask.STATUS_CHOICES),
@@ -415,7 +423,11 @@ def accept_inspection_task(request, task_id):
 @login_required
 @require_POST
 def start_inspection_from_task(request, task_id):
-    task = get_inspection_task_for_user(task_id, request.user)
+    try:
+        task = get_inspection_task_for_user(task_id, request.user)
+    except PermissionDenied as error:
+        messages.error(request, str(error) or "Sie dürfen diesen Kontrollauftrag nicht starten.")
+        return redirect("internal:my_inspections")
 
     if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
         messages.error(request, "Aus diesem Kontrollauftrag kann keine neue Kontrolle gestartet werden.")
