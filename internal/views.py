@@ -370,6 +370,7 @@ def inspection_detail(request, inspection_id):
             "scope",
             "scope__equipment",
             "scope__equipment__equipment_type",
+            "scope__equipment__photo",
             "scope__surface",
             "scope__accessory",
         )
@@ -382,6 +383,7 @@ def inspection_detail(request, inspection_id):
         .select_related(
             "equipment",
             "equipment__equipment_type",
+            "equipment__photo",
             "surface",
             "accessory",
         )
@@ -558,236 +560,118 @@ def user_can_create_defects(user, organization):
 
 def get_allowed_minimum_inspection_types(inspection_type):
     if inspection_type == Inspection.TYPE_VISUAL:
-        return [
-            InspectionCriterion.MINIMUM_VISUAL,
-        ]
+        return [InspectionCriterionApplicability.MIN_VISUAL]
 
     if inspection_type == Inspection.TYPE_OPERATIONAL:
         return [
-            InspectionCriterion.MINIMUM_VISUAL,
-            InspectionCriterion.MINIMUM_OPERATIONAL,
+            InspectionCriterionApplicability.MIN_VISUAL,
+            InspectionCriterionApplicability.MIN_OPERATIONAL,
         ]
 
-    if inspection_type == Inspection.TYPE_ANNUAL:
+    if inspection_type == Inspection.TYPE_MAIN:
         return [
-            InspectionCriterion.MINIMUM_VISUAL,
-            InspectionCriterion.MINIMUM_OPERATIONAL,
-            InspectionCriterion.MINIMUM_ANNUAL,
+            InspectionCriterionApplicability.MIN_VISUAL,
+            InspectionCriterionApplicability.MIN_OPERATIONAL,
+            InspectionCriterionApplicability.MIN_MAIN,
         ]
 
-    return [
-        InspectionCriterion.MINIMUM_VISUAL,
-        InspectionCriterion.MINIMUM_OPERATIONAL,
-        InspectionCriterion.MINIMUM_ANNUAL,
-    ]
+    return [InspectionCriterionApplicability.MIN_VISUAL]
+
+
+def get_active_criteria_for_inspection(inspection):
+    minimum_types = get_allowed_minimum_inspection_types(inspection.inspection_type)
+
+    return (
+        InspectionCriterion.objects
+        .filter(is_active=True)
+        .filter(
+            models.Q(organization=inspection.playground.organization)
+            | models.Q(organization__isnull=True, is_standard=True)
+        )
+        .filter(applicabilities__minimum_inspection_type__in=minimum_types)
+        .distinct()
+    )
 
 
 def create_default_answers(inspection):
-    organization = inspection.playground.organization
+    criteria = get_active_criteria_for_inspection(inspection)
+    playground = inspection.playground
 
-    allowed_minimum_types = get_allowed_minimum_inspection_types(
-        inspection.inspection_type
-    )
-
-    base_criteria = (
-        InspectionCriterion.objects
-        .filter(is_active=True)
-        .filter(minimum_inspection_type__in=allowed_minimum_types)
-        .filter(
-            models.Q(organization__isnull=True)
-            | models.Q(organization=organization)
-        )
-        .distinct()
-    )
-
-    playground_criteria = list(
-        base_criteria
-        .filter(
-            applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_PLAYGROUND
-        )
-        .order_by("area", "title")
-        .distinct()
-    )
-
-    surface_criteria = list(
-        base_criteria
-        .filter(
-            applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_SURFACE
-        )
-        .order_by("area", "title")
-        .distinct()
-    )
-
-    accessory_criteria = list(
-        base_criteria
-        .filter(
-            applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_ACCESSORY
-        )
-        .order_by("area", "title")
-        .distinct()
-    )
-
-    scopes_with_criteria = []
-
-    playground_scope, _ = InspectionScope.objects.get_or_create(
+    InspectionScope.objects.create(
         inspection=inspection,
         scope_type=InspectionScope.SCOPE_PLAYGROUND,
-        equipment=None,
-        surface=None,
-        accessory=None,
-        defaults={
-            "label": "Allgemeine Spielplatzprüfung",
-            "sort_order": 0,
-        },
+        label="Allgemeine Spielplatzprüfung",
+        sort_order=0,
     )
 
-    scopes_with_criteria.append((playground_scope, playground_criteria))
+    equipment_list = playground.equipment.filter(
+        is_active=True,
+        public_visible=True,
+        not_to_inspect=False,
+    ).select_related("equipment_type").order_by("sequence_number", "name")
 
-    if inspection.inspection_type == Inspection.TYPE_VISUAL:
-        existing_pairs = set(
-            InspectionAnswer.objects
-            .filter(inspection=inspection)
-            .values_list("scope_id", "criterion_id")
-        )
-    
-        answers_to_create = []
-    
-        for criterion in playground_criteria:
-            key = (playground_scope.id, criterion.id)
-    
-            if key in existing_pairs:
-                continue
-            
-            answers_to_create.append(
-                InspectionAnswer(
-                    inspection=inspection,
-                    scope=playground_scope,
-                    criterion=criterion,
-                    equipment=None,
-                    answer=InspectionAnswer.ANSWER_PENDING,
-                )
-            )
-    
-        InspectionAnswer.objects.bulk_create(answers_to_create)
-        return
+    surfaces = playground.surfaces.filter(is_active=True, public_visible=True).order_by("name")
+    accessories = playground.accessories.filter(is_active=True, public_visible=True).order_by("name")
 
-    equipment_list = list(
-        PlayEquipment.objects
-        .filter(
-            playground=inspection.playground,
-            is_active=True,
-            public_visible=True,
-            not_to_inspect=False,
-        )
-        .select_related("equipment_type")
-        .order_by("name")
-    )
+    sort_order = 10
 
-    for index, equipment in enumerate(equipment_list, start=1):
-        equipment_scope, _ = InspectionScope.objects.get_or_create(
+    for equipment in equipment_list:
+        InspectionScope.objects.create(
             inspection=inspection,
             scope_type=InspectionScope.SCOPE_EQUIPMENT,
+            label=equipment.name,
             equipment=equipment,
-            surface=None,
-            accessory=None,
-            defaults={
-                "label": equipment.name,
-                "sort_order": index * 10,
-            },
+            sort_order=sort_order,
         )
+        sort_order += 10
 
-        equipment_criteria = list(
-            base_criteria
-            .filter(
-                applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_EQUIPMENT
-            )
-            .filter(
-                models.Q(applicabilities__applies_to_all_equipment=True)
-                | models.Q(applicabilities__equipment_types=equipment.equipment_type)
-            )
-            .order_by("area", "title")
-            .distinct()
-        )
-
-        scopes_with_criteria.append((equipment_scope, equipment_criteria))
-
-    surface_list = list(
-        PlaygroundSurface.objects
-        .filter(
-            playground=inspection.playground,
-            is_active=True,
-            public_visible=True,
-        )
-        .order_by("name")
-    )
-
-    surface_offset = 1000
-
-    for index, surface in enumerate(surface_list, start=1):
-        surface_scope, _ = InspectionScope.objects.get_or_create(
+    for surface in surfaces:
+        InspectionScope.objects.create(
             inspection=inspection,
             scope_type=InspectionScope.SCOPE_SURFACE,
-            equipment=None,
+            label=surface.name,
             surface=surface,
-            accessory=None,
-            defaults={
-                "label": surface.name,
-                "sort_order": surface_offset + index * 10,
-            },
+            sort_order=sort_order,
         )
+        sort_order += 10
 
-        scopes_with_criteria.append((surface_scope, surface_criteria))
-
-    accessory_list = list(
-        PlaygroundAccessory.objects
-        .filter(
-            playground=inspection.playground,
-            is_active=True,
-            public_visible=True,
-        )
-        .order_by("name")
-    )
-
-    accessory_offset = 2000
-
-    for index, accessory in enumerate(accessory_list, start=1):
-        accessory_scope, _ = InspectionScope.objects.get_or_create(
+    for accessory in accessories:
+        InspectionScope.objects.create(
             inspection=inspection,
             scope_type=InspectionScope.SCOPE_ACCESSORY,
-            equipment=None,
-            surface=None,
+            label=accessory.name,
             accessory=accessory,
-            defaults={
-                "label": accessory.name,
-                "sort_order": accessory_offset + index * 10,
-            },
+            sort_order=sort_order,
         )
+        sort_order += 10
 
-        scopes_with_criteria.append((accessory_scope, accessory_criteria))
+    scopes = inspection.scopes.select_related("equipment", "surface", "accessory")
 
-    existing_pairs = set(
-        InspectionAnswer.objects
-        .filter(inspection=inspection)
-        .values_list("scope_id", "criterion_id")
-    )
-
-    answers_to_create = []
-
-    for scope, criteria in scopes_with_criteria:
-        for criterion in criteria:
-            key = (scope.id, criterion.id)
-
-            if key in existing_pairs:
-                continue
-
-            answers_to_create.append(
-                InspectionAnswer(
-                    inspection=inspection,
-                    scope=scope,
-                    criterion=criterion,
-                    equipment=scope.equipment,
-                    answer=InspectionAnswer.ANSWER_PENDING,
-                )
+    for scope in scopes:
+        if scope.scope_type == InspectionScope.SCOPE_PLAYGROUND:
+            applicable_criteria = criteria.filter(
+                applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_PLAYGROUND,
             )
+        elif scope.scope_type == InspectionScope.SCOPE_EQUIPMENT and scope.equipment:
+            applicable_criteria = criteria.filter(
+                applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_EQUIPMENT,
+                applicabilities__equipment_type=scope.equipment.equipment_type,
+            )
+        elif scope.scope_type == InspectionScope.SCOPE_SURFACE:
+            applicable_criteria = criteria.filter(
+                applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_SURFACE,
+            )
+        elif scope.scope_type == InspectionScope.SCOPE_ACCESSORY:
+            applicable_criteria = criteria.filter(
+                applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_ACCESSORY,
+            )
+        else:
+            applicable_criteria = InspectionCriterion.objects.none()
 
-    InspectionAnswer.objects.bulk_create(answers_to_create)
+        for criterion in applicable_criteria:
+            InspectionAnswer.objects.create(
+                inspection=inspection,
+                scope=scope,
+                criterion=criterion,
+                equipment=scope.equipment if scope.scope_type == InspectionScope.SCOPE_EQUIPMENT else None,
+            )
