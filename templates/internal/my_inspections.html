@@ -14,6 +14,14 @@
         .section-label { color:var(--atlas-primary); font-size:.82rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
         .task-meta { color:#64748B; font-size:.92rem; }
         .empty-state { color:#64748B; }
+        .inspection-column-card { display:flex; flex-direction:column; max-height:calc(100vh - var(--atlas-navbar-height) - 9rem); min-height:26rem; }
+        .inspection-column-header { flex:0 0 auto; }
+        .inspection-task-list { flex:1 1 auto; overflow-y:auto; padding-right:.35rem; scrollbar-gutter:stable; }
+        .inspection-task-list::-webkit-scrollbar { width:.5rem; }
+        .inspection-task-list::-webkit-scrollbar-thumb { background:#CBD5E1; border-radius:999px; }
+        .inspection-task-count { background:#E0F2FE; color:#075985; border-radius:999px; font-weight:700; padding:.2rem .6rem; }
+        .overdue-count { background:#FFE4E6; color:#BE123C; }
+        @media (max-width:1199.98px){ .inspection-column-card{max-height:none; min-height:auto;} .inspection-task-list{overflow:visible; padding-right:0;} }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
@@ -27,9 +35,33 @@
     </div>
     {% if messages %}<div class="mb-4">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
     <section class="row g-4 mb-4">
-        <div class="col-xl-4"><div class="content-card p-3 p-lg-4 h-100"><h2 class="h5 fw-bold mb-3">{% trans "Today" %}</h2>{% if assigned_today %}<div class="d-grid gap-3">{% for task in assigned_today %}{% include "internal/partials/inspection_task_card.html" with task=task show_accept=False %}{% endfor %}</div>{% else %}<div class="empty-state">{% trans "No inspections are assigned for today." %}</div>{% endif %}</div></div>
-        <div class="col-xl-4"><div class="content-card p-3 p-lg-4 h-100"><h2 class="h5 fw-bold mb-3">{% trans "Overdue" %}</h2>{% if assigned_overdue %}<div class="d-grid gap-3">{% for task in assigned_overdue %}{% include "internal/partials/inspection_task_card.html" with task=task show_accept=False %}{% endfor %}</div>{% else %}<div class="empty-state">{% trans "No overdue assigned inspections." %}</div>{% endif %}</div></div>
-        <div class="col-xl-4"><div class="content-card p-3 p-lg-4 h-100"><h2 class="h5 fw-bold mb-3">{% trans "Next 30 days" %}</h2>{% if assigned_upcoming %}<div class="d-grid gap-3">{% for task in assigned_upcoming %}{% include "internal/partials/inspection_task_card.html" with task=task show_accept=False %}{% endfor %}</div>{% else %}<div class="empty-state">{% trans "No further assigned inspections in the next 30 days." %}</div>{% endif %}</div></div>
+        <div class="col-xl-4">
+            <div class="content-card inspection-column-card p-3 p-lg-4 h-100">
+                <div class="inspection-column-header d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="h5 fw-bold mb-0">{% trans "Today" %}</h2>
+                    <span class="inspection-task-count">{{ assigned_today|length }}</span>
+                </div>
+                {% if assigned_today %}<div class="inspection-task-list"><div class="d-grid gap-3">{% for task in assigned_today %}{% include "internal/partials/inspection_task_card.html" with task=task show_accept=False %}{% endfor %}</div></div>{% else %}<div class="empty-state">{% trans "No inspections are assigned for today." %}</div>{% endif %}
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="content-card inspection-column-card p-3 p-lg-4 h-100">
+                <div class="inspection-column-header d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="h5 fw-bold mb-0">{% trans "Overdue" %}</h2>
+                    <span class="inspection-task-count overdue-count">{{ assigned_overdue|length }}</span>
+                </div>
+                {% if assigned_overdue %}<div class="inspection-task-list"><div class="d-grid gap-3">{% for task in assigned_overdue %}{% include "internal/partials/inspection_task_card.html" with task=task show_accept=False %}{% endfor %}</div></div>{% else %}<div class="empty-state">{% trans "No overdue assigned inspections." %}</div>{% endif %}
+            </div>
+        </div>
+        <div class="col-xl-4">
+            <div class="content-card inspection-column-card p-3 p-lg-4 h-100">
+                <div class="inspection-column-header d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="h5 fw-bold mb-0">{% trans "Next 30 days" %}</h2>
+                    <span class="inspection-task-count">{{ assigned_upcoming|length }}</span>
+                </div>
+                {% if assigned_upcoming %}<div class="inspection-task-list"><div class="d-grid gap-3">{% for task in assigned_upcoming %}{% include "internal/partials/inspection_task_card.html" with task=task show_accept=False %}{% endfor %}</div></div>{% else %}<div class="empty-state">{% trans "No further assigned inspections in the next 30 days." %}</div>{% endif %}
+            </div>
+        </div>
     </section>
     <section class="content-card p-3 p-lg-4">
         <div class="d-flex justify-content-between align-items-center mb-3"><div><h2 class="h5 fw-bold mb-1">{% trans "Open inspections without assignment" %}</h2><p class="text-secondary mb-0">{% trans "These tasks can be accepted by authorized inspectors." %}</p></div></div>
