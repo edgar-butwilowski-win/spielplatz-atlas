@@ -1,0 +1,60 @@
+{% extends "public/base_public.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Profile settings" %} – playsafeswiss{% endblock %}
+
+{% block content %}
+<main class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-xl-6">
+            <div class="mb-4 text-center">
+                <div class="section-label mb-2">{% trans "Profile" %}</div>
+                <h1 class="fw-bold mb-2">{% trans "Profile settings" %}</h1>
+                <p class="text-secondary mb-0">{% trans "Change your personal user data and your password." %}</p>
+            </div>
+
+            <div class="content-card p-3 p-lg-4">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">{{ form.first_name.label }}</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="invalid-feedback d-block">{{ form.first_name.errors|striptags }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">{{ form.last_name.label }}</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="invalid-feedback d-block">{{ form.last_name.errors|striptags }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold">{{ form.email.label }}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="invalid-feedback d-block">{{ form.email.errors|striptags }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold">{{ form.password.label }}</label>
+                        {{ form.password }}
+                        <div class="form-text">{{ form.password.help_text }}</div>
+                        {% if form.password.errors %}<div class="invalid-feedback d-block">{{ form.password.errors|striptags }}</div>{% endif %}
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end">
+                        <a href="{% url 'public:index' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
+                        <button type="submit" class="btn btn-atlas-primary">{% trans "Save profile settings" %}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
