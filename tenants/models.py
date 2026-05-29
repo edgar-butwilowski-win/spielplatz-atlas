@@ -6,8 +6,10 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
-from django.db import models
+from datetime import timedelta
+
 from django.core.validators import RegexValidator
+from django.db import models
 
 
 hex_color_validator = RegexValidator(
@@ -42,6 +44,19 @@ class Organization(models.Model):
         related_name="organization_logos",
     )
 
+    workday_monday = models.BooleanField("Montag", default=True)
+    workday_tuesday = models.BooleanField("Dienstag", default=True)
+    workday_wednesday = models.BooleanField("Mittwoch", default=True)
+    workday_thursday = models.BooleanField("Donnerstag", default=True)
+    workday_friday = models.BooleanField("Freitag", default=True)
+    workday_saturday = models.BooleanField("Samstag", default=False)
+    workday_sunday = models.BooleanField("Sonntag", default=False)
+    planning_lead_time_workdays = models.PositiveSmallIntegerField(
+        "Planungsdatum: Arbeitstage vor Fälligkeit",
+        default=7,
+        help_text="Anzahl Arbeitstage, die das Planungsdatum standardmässig vor dem Fälligkeitsdatum liegen soll.",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -51,6 +66,46 @@ class Organization(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_workday_numbers(self):
+        workdays = []
+        if self.workday_monday:
+            workdays.append(0)
+        if self.workday_tuesday:
+            workdays.append(1)
+        if self.workday_wednesday:
+            workdays.append(2)
+        if self.workday_thursday:
+            workdays.append(3)
+        if self.workday_friday:
+            workdays.append(4)
+        if self.workday_saturday:
+            workdays.append(5)
+        if self.workday_sunday:
+            workdays.append(6)
+        return workdays
+
+    def calculate_planned_date_from_due_date(self, due_date):
+        lead_time = self.planning_lead_time_workdays or 0
+
+        if lead_time <= 0:
+            return due_date
+
+        workdays = self.get_workday_numbers()
+
+        if not workdays:
+            return due_date
+
+        planned_date = due_date
+        remaining_days = lead_time
+
+        while remaining_days > 0:
+            planned_date -= timedelta(days=1)
+
+            if planned_date.weekday() in workdays:
+                remaining_days -= 1
+
+        return planned_date
 
 
 class OrganizationRegistrationRequest(models.Model):
