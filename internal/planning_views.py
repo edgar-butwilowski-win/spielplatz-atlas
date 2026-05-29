@@ -21,7 +21,11 @@ from django.views.decorators.http import require_POST
 
 from accounts.models import UserProfile
 from inspections.models import Inspection, InspectionTask
-from inspections.planning import rebuild_planning_for_organization, refresh_task_statuses
+from inspections.planning import (
+    cancel_task_and_create_follow_up_task,
+    rebuild_planning_for_organization,
+    refresh_task_statuses,
+)
 from tenants.models import Organization
 
 from .permissions import (
@@ -118,6 +122,24 @@ class InspectionTaskPlanningForm(forms.ModelForm):
             raise forms.ValidationError("Das geplante Datum darf nicht in der Vergangenheit liegen.")
 
         return planned_date
+
+
+class CancelInspectionTaskForm(forms.Form):
+    cancellation_reason = forms.CharField(
+        label="Abbruchgrund",
+        min_length=3,
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-control form-control-sm",
+                "rows": 2,
+                "placeholder": "Warum kann diese Kontrolle nicht durchgeführt werden?",
+            }
+        ),
+        error_messages={
+            "required": "Bitte geben Sie einen Abbruchgrund an.",
+            "min_length": "Bitte geben Sie einen aussagekräftigen Abbruchgrund an.",
+        },
+    )
 
 
 def get_planning_scope(user):
@@ -229,6 +251,7 @@ def add_planning_forms(tasks, user=None):
             instance=task,
             organization=task.organization,
         )
+        task.cancel_form = CancelInspectionTaskForm(prefix=f"cancel_{task.id}")
         task.can_be_started_by_current_user = user_can_start_inspection_task(task, user) if user else False
         task.planning_can_be_edited = is_task_planning_editable(task)
 
@@ -420,6 +443,50 @@ def update_inspection_task(request, task_id):
         for errors in form.errors.values():
             for error in errors:
                 messages.error(request, error)
+
+    return redirect(planning_redirect_url(task.organization_id))
+
+
+@login_required
+@require_POST
+def cancel_inspection_task(request, task_id):
+    task = get_object_or_404(
+        InspectionTask.objects.select_related("organization", "playground"),
+        id=task_id,
+    )
+
+    require_org_admin_permission(request.user, task.organization)
+
+    if task.status in CLOSED_TASK_STATUSES:
+        messages.error(request, "Erledigte oder bereits abgebrochene Kontrollaufträge können nicht abgebrochen werden.")
+        return redirect(planning_redirect_url(task.organization_id))
+
+    form = CancelInspectionTaskForm(request.POST, prefix=f"cancel_{task.id}")
+
+    if not form.is_valid():
+        for errors in form.errors.values():
+            for error in errors:
+                messages.error(request, error)
+        return redirect(planning_redirect_url(task.organization_id))
+
+    follow_up_task = cancel_task_and_create_follow_up_task(
+        task,
+        form.cleaned_data["cancellation_reason"],
+    )
+
+    if follow_up_task:
+        messages.success(
+            request,
+            (
+                "Der Kontrollauftrag wurde abgebrochen und ein Folgeauftrag wurde angelegt. "
+                f"Nächste Fälligkeit: {follow_up_task.due_date:%d.%m.%Y}."
+            ),
+        )
+    else:
+        messages.success(
+            request,
+            "Der Kontrollauftrag wurde abgebrochen. Es konnte kein Folgeauftrag erzeugt werden, weil keine aktive Kontrollregel vorhanden ist.",
+        )
 
     return redirect(planning_redirect_url(task.organization_id))
 
