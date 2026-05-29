@@ -854,3 +854,21 @@ msgstr "Keine Prüfbereiche vorhanden"
 
 msgid "No inspection areas were generated for this inspection."
 msgstr "Für diese Kontrolle wurden keine Prüfbereiche erzeugt."
+
+msgid "Set result for entire inspection"
+msgstr "Ergebnis für die gesamte Kontrolle setzen"
+
+msgid "Select result"
+msgstr "Ergebnis auswählen"
+
+msgid "Apply to entire inspection"
+msgstr "Auf gesamte Kontrolle anwenden"
+
+msgid "This only changes the form values. Save the inspection answers afterwards."
+msgstr "Dies ändert nur die Formularwerte. Speichern Sie danach die Prüfantworten."
+
+msgid "Set result for this play equipment"
+msgstr "Ergebnis für dieses Spielgerät setzen"
+
+msgid "Apply to play equipment"
+msgstr "Auf Spielgerät anwenden"

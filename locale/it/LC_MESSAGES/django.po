@@ -854,3 +854,21 @@ msgstr "Nessuna area di controllo disponibile"
 
 msgid "No inspection areas were generated for this inspection."
 msgstr "Per questo controllo non sono state generate aree di controllo."
+
+msgid "Set result for entire inspection"
+msgstr "Impostare il risultato per l’intero controllo"
+
+msgid "Select result"
+msgstr "Selezionare un risultato"
+
+msgid "Apply to entire inspection"
+msgstr "Applicare all’intero controllo"
+
+msgid "This only changes the form values. Save the inspection answers afterwards."
+msgstr "Questo modifica solo i valori del modulo. Salvare poi le risposte di controllo."
+
+msgid "Set result for this play equipment"
+msgstr "Impostare il risultato per questa attrezzatura da gioco"
+
+msgid "Apply to play equipment"
+msgstr "Applicare all’attrezzatura da gioco"

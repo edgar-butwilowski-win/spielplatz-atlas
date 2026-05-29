@@ -854,3 +854,21 @@ msgstr "Nagins secturs da controlla disponibels"
 
 msgid "No inspection areas were generated for this inspection."
 msgstr "Per questa controlla n’èn vegnids generads nagins secturs da controlla."
+
+msgid "Set result for entire inspection"
+msgstr "Metter il resultat per l’entira controlla"
+
+msgid "Select result"
+msgstr "Tscherner in resultat"
+
+msgid "Apply to entire inspection"
+msgstr "Applitgar a l’entira controlla"
+
+msgid "This only changes the form values. Save the inspection answers afterwards."
+msgstr "Quai mida mo las valurs dal formular. Memorisai suenter las respostas da controlla."
+
+msgid "Set result for this play equipment"
+msgstr "Metter il resultat per quest indriz da gieu"
+
+msgid "Apply to play equipment"
+msgstr "Applitgar a l’indriz da gieu"
