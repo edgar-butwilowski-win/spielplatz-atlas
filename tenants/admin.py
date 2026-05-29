@@ -36,7 +36,7 @@ def rebuild_inspection_planning_for_organizations(modeladmin, request, queryset)
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
     change_form_template = "admin/tenants/organization/change_form.html"
-    list_display = ("name", "slug", "is_active", "is_public", "primary_color", "secondary_color", "created_at")
+    list_display = ("name", "slug", "is_active", "is_public", "primary_color", "secondary_color", "planning_lead_time_workdays", "created_at")
     list_filter = ("is_active", "is_public")
     search_fields = ("name", "slug")
     actions = (rebuild_inspection_planning_for_organizations,)
@@ -85,9 +85,19 @@ class OrganizationAdmin(admin.ModelAdmin):
         return qs.none()
 
     def get_fields(self, request, obj=None):
+        workday_fields = (
+            "workday_monday",
+            "workday_tuesday",
+            "workday_wednesday",
+            "workday_thursday",
+            "workday_friday",
+            "workday_saturday",
+            "workday_sunday",
+            "planning_lead_time_workdays",
+        )
         if request.user.is_superuser:
-            return ("name", "slug", "is_active", "is_public", "primary_color", "secondary_color", "logo")
-        return ("name", "primary_color", "secondary_color", "logo")
+            return ("name", "slug", "is_active", "is_public", "primary_color", "secondary_color", "logo", *workday_fields)
+        return ("name", "primary_color", "secondary_color", "logo", *workday_fields)
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
