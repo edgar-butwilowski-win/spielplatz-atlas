@@ -135,7 +135,7 @@ def profile_settings(request):
         if form.is_valid():
             form.save()
             update_session_auth_hash(request, request.user)
-            messages.success(request, _("Your profile settings have been saved."))
+            messages.success(request, _("Ihre Profileinstellungen wurden gespeichert."))
             return redirect("accounts:profile_settings")
     else:
         form = ProfileSettingsForm(instance=request.user)
