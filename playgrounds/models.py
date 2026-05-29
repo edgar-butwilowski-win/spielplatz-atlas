@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
@@ -42,6 +43,33 @@ class Playground(models.Model):
     construction_costs = models.FloatField("Erstellungskosten", null=True, blank=True)
     inspection_suspended_from = models.DateField("Inspektion aussetzen von", null=True, blank=True)
     inspection_suspended_until = models.DateField("Inspektion aussetzen bis", null=True, blank=True)
+    default_visual_inspector = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="default_visual_playgrounds",
+        verbose_name="Default-Kontrolleur/in visuell",
+        help_text="Wird bei neuen visuellen Kontrollaufträgen automatisch voreingestellt.",
+    )
+    default_operational_inspector = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="default_operational_playgrounds",
+        verbose_name="Default-Kontrolleur/in operativ",
+        help_text="Wird bei neuen operativen Kontrollaufträgen automatisch voreingestellt.",
+    )
+    default_annual_inspector = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="default_annual_playgrounds",
+        verbose_name="Default-Kontrolleur/in jährlich",
+        help_text="Wird bei neuen jährlichen Kontrollaufträgen automatisch voreingestellt.",
+    )
     photo = models.ForeignKey(
         "media_assets.ImageAsset",
         on_delete=models.SET_NULL,
@@ -74,6 +102,19 @@ class Playground(models.Model):
             raise ValidationError({"longitude": "Bitte einen gültigen LV95-X-Wert erfassen."})
         if self.latitude and not (1000000 <= self.latitude <= 1350000):
             raise ValidationError({"latitude": "Bitte einen gültigen LV95-Y-Wert erfassen."})
+
+        inspector_fields = (
+            "default_visual_inspector",
+            "default_operational_inspector",
+            "default_annual_inspector",
+        )
+        for field_name in inspector_fields:
+            inspector = getattr(self, field_name)
+            if inspector is None or inspector.is_superuser:
+                continue
+            profile = getattr(inspector, "profile", None)
+            if not profile or profile.organization_id != self.organization_id or not profile.may_inspect:
+                raise ValidationError({field_name: "Diese Person darf für diese Organisation keine Kontrollen durchführen."})
 
     def sync_location_from_lv95(self):
         if self.longitude is not None and self.latitude is not None:
@@ -116,6 +157,15 @@ class Playground(models.Model):
         )
         if equipment_with_photo:
             return equipment_with_photo.photo
+        return None
+
+    def get_default_inspector_for_inspection_type(self, inspection_type):
+        if inspection_type == "visual":
+            return self.default_visual_inspector
+        if inspection_type == "operational":
+            return self.default_operational_inspector
+        if inspection_type == "annual":
+            return self.default_annual_inspector
         return None
 
 
@@ -258,131 +308,3 @@ class PlayEquipment(models.Model):
             "nicht geprüft werden, z. B. weil es nicht zugänglich war."
         ),
     )
-    not_inspectable_reason = models.CharField("Grund nicht prüfbar", max_length=500, blank=True)
-    latitude = models.DecimalField("LV95 Y", max_digits=16, decimal_places=8, null=True, blank=True)
-    longitude = models.DecimalField("LV95 X", max_digits=16, decimal_places=8, null=True, blank=True)
-    location = gis_models.PointField(
-        "Lagegeometrie",
-        srid=LV95_SRID,
-        null=True,
-        blank=True,
-        help_text="Aus LV95 X/Y abgeleiteter Punkt für räumliche Abfragen mit SpatiaLite.",
-    )
-    public_visible = models.BooleanField("Öffentlich sichtbar", default=True)
-    is_active = models.BooleanField("Aktiv", default=True)
-    photo = models.ForeignKey(
-        "media_assets.ImageAsset",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="play_equipment",
-        verbose_name="Foto",
-        help_text="Optionales Hauptfoto dieses Spielgeräts.",
-    )
-    created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
-
-    class Meta:
-        ordering = ["playground__name", "sequence_number", "name"]
-        verbose_name = "Spielgerät"
-        verbose_name_plural = "Spielgeräte"
-
-    def __str__(self):
-        return f"{self.name} – {self.playground.name}"
-
-    def clean(self):
-        super().clean()
-        if self.recommended_renovation_year is not None:
-            if self.recommended_renovation_year < 1000 or self.recommended_renovation_year > 9999:
-                raise ValidationError({"recommended_renovation_year": "Bitte eine vierstellige Jahreszahl eingeben."})
-        if self.not_to_inspect and not self.not_to_inspect_reason:
-            raise ValidationError({"not_to_inspect_reason": "Bitte einen Grund angeben, wenn das Spielgerät nicht zu prüfen ist."})
-        if self.not_inspectable and not self.not_inspectable_reason:
-            raise ValidationError({"not_inspectable_reason": "Bitte einen Grund angeben, wenn das Spielgerät nicht prüfbar ist."})
-        if bool(self.longitude) != bool(self.latitude):
-            raise ValidationError("Bitte immer ein vollständiges LV95-Koordinatenpaar mit X und Y erfassen.")
-        if self.longitude and not (2400000 <= self.longitude <= 2900000):
-            raise ValidationError({"longitude": "Bitte einen gültigen LV95-X-Wert erfassen."})
-        if self.latitude and not (1000000 <= self.latitude <= 1350000):
-            raise ValidationError({"latitude": "Bitte einen gültigen LV95-Y-Wert erfassen."})
-
-    def sync_location_from_lv95(self):
-        if self.longitude is not None and self.latitude is not None:
-            self.location = Point(float(self.longitude), float(self.latitude), srid=LV95_SRID)
-        else:
-            self.location = None
-
-    def save(self, *args, **kwargs):
-        self.sync_location_from_lv95()
-        super().save(*args, **kwargs)
-
-    @property
-    def has_pending_renovation(self):
-        return self.recommended_renovation_year is not None
-
-    @property
-    def is_planned(self):
-        return bool(self.year_built and self.year_built > timezone.localdate())
-
-    @property
-    def has_future_demolition(self):
-        return bool(self.demolition_date and self.demolition_date > timezone.localdate())
-
-
-class PlaygroundSurface(models.Model):
-    SURFACE_TYPE_CHOICES = [
-        ("sand", "Sand"),
-        ("gravel", "Rundkies / Fallschutzkies"),
-        ("wood_chips", "Holzschnitzel"),
-        ("bark", "Rindenmulch"),
-        ("rubber", "Fallschutzbelag"),
-        ("grass", "Rasen"),
-        ("other", "Sonstiger Belag"),
-    ]
-    playground = models.ForeignKey(Playground, on_delete=models.CASCADE, related_name="surfaces", verbose_name="Spielplatz")
-    name = models.CharField("Name", max_length=200)
-    surface_type = models.CharField("Belagsart", max_length=50, choices=SURFACE_TYPE_CHOICES, default="other")
-    description = models.TextField("Beschreibung", blank=True)
-    public_visible = models.BooleanField("Öffentlich sichtbar", default=True)
-    is_active = models.BooleanField("Aktiv", default=True)
-    created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
-
-    class Meta:
-        ordering = ["playground__name", "name"]
-        verbose_name = "Fallschutzfläche / Boden"
-        verbose_name_plural = "Fallschutzflächen / Böden"
-
-    def __str__(self):
-        return f"{self.name} – {self.playground.name}"
-
-
-class PlaygroundAccessory(models.Model):
-    ACCESSORY_TYPE_CHOICES = [
-        ("bench", "Sitzbank"),
-        ("waste_bin", "Abfalleimer"),
-        ("fence", "Zaun"),
-        ("gate", "Tor"),
-        ("sign", "Beschilderung"),
-        ("lighting", "Beleuchtung"),
-        ("table", "Tisch"),
-        ("shade", "Sonnenschutz"),
-        ("other", "Sonstige Ausstattung"),
-    ]
-    playground = models.ForeignKey(Playground, on_delete=models.CASCADE, related_name="accessories", verbose_name="Spielplatz")
-    name = models.CharField("Name", max_length=200)
-    accessory_type = models.CharField("Ausstattungsart", max_length=50, choices=ACCESSORY_TYPE_CHOICES, default="other")
-    description = models.TextField("Beschreibung", blank=True)
-    public_visible = models.BooleanField("Öffentlich sichtbar", default=True)
-    is_active = models.BooleanField("Aktiv", default=True)
-    created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
-
-    class Meta:
-        ordering = ["playground__name", "name"]
-        verbose_name = "Zusatzausstattung"
-        verbose_name_plural = "Zusatzausstattung"
-
-    def __str__(self):
-        return f"{self.name} – {self.playground.name}"
-
-
-from .document_models import PlaygroundDocument
-from .quartier_models import Quartier, QuartierImport
