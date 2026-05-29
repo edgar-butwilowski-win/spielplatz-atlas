@@ -48,7 +48,23 @@ CLOSED_TASK_STATUSES = [
 HTML_DATE_FORMAT = "%Y-%m-%d"
 
 
+class PlanningUserChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, user):
+        full_name = user.get_full_name().strip()
+
+        if full_name and user.email:
+            return f"{full_name} ({user.email})"
+
+        return full_name or user.email or "Benutzer ohne E-Mail"
+
+
 class InspectionTaskPlanningForm(forms.ModelForm):
+    assigned_to = PlanningUserChoiceField(
+        queryset=get_user_model().objects.none(),
+        required=False,
+        widget=forms.Select(attrs={"class": "form-select"}),
+    )
+
     class Meta:
         model = InspectionTask
         fields = (
@@ -58,7 +74,6 @@ class InspectionTaskPlanningForm(forms.ModelForm):
         )
         widgets = {
             "planned_date": forms.DateInput(format=HTML_DATE_FORMAT, attrs={"type": "date", "class": "form-control"}),
-            "assigned_to": forms.Select(attrs={"class": "form-select"}),
             "note": forms.Textarea(attrs={"rows": 2, "class": "form-control"}),
         }
 
