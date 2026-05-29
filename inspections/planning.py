@@ -36,6 +36,28 @@ def get_active_inspection_rules(organization):
     ).order_by("inspection_type")
 
 
+def get_default_inspector_for_playground(playground, inspection_type):
+    inspector = playground.get_default_inspector_for_inspection_type(inspection_type)
+
+    if not inspector or not inspector.is_active:
+        return None
+
+    if inspector.is_superuser:
+        return inspector
+
+    profile = getattr(inspector, "profile", None)
+
+    if (
+        profile
+        and profile.organization_id == playground.organization_id
+        and profile.is_active_for_organization
+        and profile.may_inspect
+    ):
+        return inspector
+
+    return None
+
+
 def get_open_task_for(playground, inspection_type):
     return (
         InspectionTask.objects
@@ -91,6 +113,7 @@ def create_or_update_task_for_rule(playground, rule, reference_inspection=None):
             playground=playground,
             inspection_type=rule.inspection_type,
             due_date=due_date,
+            assigned_to=get_default_inspector_for_playground(playground, rule.inspection_type),
             source=InspectionTask.SOURCE_AUTOMATIC,
             created_from_inspection=reference_inspection,
         )
@@ -119,7 +142,15 @@ def rebuild_planning_for_organization(organization):
     playgrounds = Playground.objects.filter(
         organization=organization,
         is_active=True,
-    ).select_related("organization")
+    ).select_related(
+        "organization",
+        "default_visual_inspector",
+        "default_operational_inspector",
+        "default_annual_inspector",
+        "default_visual_inspector__profile",
+        "default_operational_inspector__profile",
+        "default_annual_inspector__profile",
+    )
 
     result = {
         "rules": rules.count(),
@@ -207,6 +238,7 @@ def create_follow_up_task_for_inspection(inspection):
         playground=inspection.playground,
         inspection_type=inspection.inspection_type,
         due_date=due_date,
+        assigned_to=get_default_inspector_for_playground(inspection.playground, inspection.inspection_type),
         source=InspectionTask.SOURCE_AUTOMATIC,
         created_from_inspection=inspection,
     )
@@ -240,6 +272,7 @@ def create_follow_up_task_for_cancelled_task(cancelled_task):
         playground=cancelled_task.playground,
         inspection_type=cancelled_task.inspection_type,
         due_date=due_date,
+        assigned_to=get_default_inspector_for_playground(cancelled_task.playground, cancelled_task.inspection_type),
         source=InspectionTask.SOURCE_AUTOMATIC,
         note=f"Folgeauftrag aus abgebrochenem Auftrag #{cancelled_task.id}.",
     )
