@@ -44,7 +44,6 @@
             <div class="col-md-4 col-xl-3"><label class="form-label" for="inspection_type">{% trans "Inspection type" %}</label><select class="form-select" id="inspection_type" name="inspection_type"><option value="">{% trans "All inspection types" %}</option>{% for key, label in inspection_type_choices %}<option value="{{ key }}" {% if inspection_type_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
             <div class="col-md-4 col-xl-3 d-flex gap-2"><button type="submit" class="btn btn-primary">{% trans "Filter" %}</button><a href="{% url 'internal:inspection_planning' %}" class="btn btn-outline-secondary">{% trans "Reset" %}</a></div>
         </form>
-        {% if can_manage_selected_organization %}<form method="post" action="{% url 'internal:rebuild_inspection_planning' %}" class="mt-3">{% csrf_token %}<input type="hidden" name="organization" value="{{ selected_organization.id }}"><button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Recalculate inspection planning" %}</button></form>{% endif %}
     </section>
     <section class="content-card p-3 p-lg-4">
         <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">{% trans "Inspection tasks" %}</h2><span class="text-secondary small">{% trans "Maximum 100 entries" %}</span></div>
