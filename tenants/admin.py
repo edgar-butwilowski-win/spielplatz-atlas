@@ -13,8 +13,50 @@ from django.utils.crypto import get_random_string
 
 from accounts.models import UserProfile
 from accounts.permissions import get_user_organization, user_may_manage_organization
+from inspections.planning import rebuild_planning_for_organization
 
 from .models import Organization, OrganizationRegistrationRequest
+
+
+@admin.action(
+    description=(
+        "Kontrollplanung neu berechnen – erstellt fehlende und aktualisiert offene "
+        "Kontrollaufträge; abgeschlossene Aufträge bleiben unverändert."
+    )
+)
+def rebuild_inspection_planning_for_organizations(modeladmin, request, queryset):
+    total_created = 0
+    total_updated = 0
+    total_unchanged = 0
+    processed_count = 0
+
+    for organization in queryset:
+        result = rebuild_planning_for_organization(organization)
+        processed_count += 1
+        total_created += result["created"]
+        total_updated += result["updated"]
+        total_unchanged += result["unchanged"]
+
+        modeladmin.message_user(
+            request,
+            (
+                f"Kontrollplanung für '{organization.name}' neu berechnet. "
+                f"Erstellt: {result['created']}, aktualisiert: {result['updated']}, "
+                f"unverändert: {result['unchanged']}."
+            ),
+            level=messages.SUCCESS,
+        )
+
+    if processed_count:
+        modeladmin.message_user(
+            request,
+            (
+                f"{processed_count} Organisation(en) verarbeitet. "
+                f"Gesamt erstellt: {total_created}, aktualisiert: {total_updated}, "
+                f"unverändert: {total_unchanged}."
+            ),
+            level=messages.SUCCESS,
+        )
 
 
 @admin.register(Organization)
@@ -31,6 +73,7 @@ class OrganizationAdmin(admin.ModelAdmin):
     list_filter = ("is_active", "is_public")
     search_fields = ("name", "slug")
     prepopulated_fields = {"slug": ("name",)}
+    actions = (rebuild_inspection_planning_for_organizations,)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
