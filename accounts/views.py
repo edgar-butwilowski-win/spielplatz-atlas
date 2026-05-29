@@ -8,11 +8,16 @@
 
 import hashlib
 
-from django.core.cache import cache
-from django.contrib.auth import logout
+from django.contrib import messages
+from django.contrib.auth import logout, update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
-from django.shortcuts import redirect
+from django.core.cache import cache
+from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext as _
+
+from .forms import ProfileSettingsForm
 
 
 LOGIN_RATE_LIMIT_WINDOW_SECONDS = 15 * 60
@@ -121,6 +126,21 @@ class SpielplatzAtlasLoginView(LoginView):
             increment_rate_limit(key, LOGIN_RATE_LIMIT_WINDOW_SECONDS)
 
         return self.form_invalid(form)
+
+
+@login_required
+def profile_settings(request):
+    if request.method == "POST":
+        form = ProfileSettingsForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, request.user)
+            messages.success(request, _("Your profile settings have been saved."))
+            return redirect("accounts:profile_settings")
+    else:
+        form = ProfileSettingsForm(instance=request.user)
+
+    return render(request, "accounts/profile_settings.html", {"form": form})
 
 
 def logout_view(request):
