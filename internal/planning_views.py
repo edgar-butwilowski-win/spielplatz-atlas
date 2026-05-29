@@ -39,6 +39,11 @@ ACTIVE_TASK_STATUSES = [
     InspectionTask.STATUS_SUSPENDED,
 ]
 
+CLOSED_TASK_STATUSES = [
+    InspectionTask.STATUS_COMPLETED,
+    InspectionTask.STATUS_CANCELLED,
+]
+
 HTML_DATE_FORMAT = "%Y-%m-%d"
 
 
@@ -182,6 +187,10 @@ def user_can_start_inspection_task(task, user):
     return not task.assigned_to_id or task.assigned_to_id == user.id
 
 
+def is_task_planning_editable(task):
+    return task.status not in CLOSED_TASK_STATUSES
+
+
 def choice_count_map(queryset, field_name, choices):
     raw_counts = queryset.values(field_name).annotate(count=Count("id"))
     counts = {entry[field_name]: entry["count"] for entry in raw_counts}
@@ -205,6 +214,7 @@ def add_planning_forms(tasks, user=None):
             organization=task.organization,
         )
         task.can_be_started_by_current_user = user_can_start_inspection_task(task, user) if user else False
+        task.planning_can_be_edited = is_task_planning_editable(task)
 
     return task_list
 
@@ -231,7 +241,7 @@ def inspection_planning(request):
     selected_organization = get_selected_organization(request, scope)
     tasks = get_task_queryset_for_scope(scope, selected_organization)
     refresh_task_statuses(tasks.exclude(
-        status__in=[InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]
+        status__in=CLOSED_TASK_STATUSES
     ))
 
     status_filter = request.GET.get("status") or "active"
@@ -364,6 +374,10 @@ def update_inspection_task(request, task_id):
 
     require_org_admin_permission(request.user, task.organization)
 
+    if not is_task_planning_editable(task):
+        messages.error(request, "Erledigte oder abgebrochene Kontrollaufträge können nicht mehr geplant werden.")
+        return redirect(planning_redirect_url(task.organization_id))
+
     form = InspectionTaskPlanningForm(
         request.POST,
         instance=task,
@@ -373,7 +387,7 @@ def update_inspection_task(request, task_id):
     if form.is_valid():
         task = form.save(commit=False)
 
-        if task.status not in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
+        if task.status not in CLOSED_TASK_STATUSES:
             if task.planned_date or task.assigned_to_id:
                 task.status = InspectionTask.STATUS_PLANNED
             else:
@@ -399,7 +413,7 @@ def update_inspection_task(request, task_id):
 def accept_inspection_task(request, task_id):
     task = get_inspection_task_for_user(task_id, request.user)
 
-    if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
+    if task.status in CLOSED_TASK_STATUSES:
         messages.error(request, "Dieser Kontrollauftrag kann nicht übernommen werden.")
         return redirect("internal:my_inspections")
 
@@ -429,7 +443,7 @@ def start_inspection_from_task(request, task_id):
         messages.error(request, str(error) or "Sie dürfen diesen Kontrollauftrag nicht starten.")
         return redirect("internal:my_inspections")
 
-    if task.status in [InspectionTask.STATUS_COMPLETED, InspectionTask.STATUS_CANCELLED]:
+    if task.status in CLOSED_TASK_STATUSES:
         messages.error(request, "Aus diesem Kontrollauftrag kann keine neue Kontrolle gestartet werden.")
         return redirect("internal:my_inspections")
 
