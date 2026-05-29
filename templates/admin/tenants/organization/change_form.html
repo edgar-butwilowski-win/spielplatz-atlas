@@ -1,0 +1,24 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block after_field_sets %}
+{{ block.super }}
+{% if show_rebuild_inspection_planning %}
+<fieldset class="module aligned">
+    <h2>{% trans "Inspection planning" %}</h2>
+    <div class="form-row">
+        <div>
+            <p class="help">
+                {% trans "Recalculates missing and open inspection tasks for this organization. Completed tasks remain unchanged. Use this after technical imports or rule changes." %}
+            </p>
+            <form method="post" action="{{ rebuild_inspection_planning_url }}">
+                {% csrf_token %}
+                <button type="submit" class="button" onclick="return confirm('{% trans "Recalculate inspection planning for this organization?" %}')">
+                    {% trans "Recalculate inspection planning" %}
+                </button>
+            </form>
+        </div>
+    </div>
+</fieldset>
+{% endif %}
+{% endblock %}
