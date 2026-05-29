@@ -1,16 +1,16 @@
 {% extends "public/base_public.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Profile settings" %} – playsafeswiss{% endblock %}
+{% block title %}{% trans "Profileinstellungen" %} – playsafeswiss{% endblock %}
 
 {% block content %}
 <main class="container py-4 py-lg-5">
     <div class="row justify-content-center">
         <div class="col-lg-7 col-xl-6">
             <div class="mb-4 text-center">
-                <div class="section-label mb-2">{% trans "Profile" %}</div>
-                <h1 class="fw-bold mb-2">{% trans "Profile settings" %}</h1>
-                <p class="text-secondary mb-0">{% trans "Change your personal user data and your password." %}</p>
+                <div class="section-label mb-2">{% trans "Profil" %}</div>
+                <h1 class="fw-bold mb-2">{% trans "Profileinstellungen" %}</h1>
+                <p class="text-secondary mb-0">{% trans "Ändern Sie Ihre persönlichen Benutzerdaten und Ihr Passwort." %}</p>
             </div>
 
             <div class="content-card p-3 p-lg-4">
@@ -49,8 +49,8 @@
                     </div>
 
                     <div class="d-flex flex-column flex-sm-row gap-2 justify-content-end">
-                        <a href="{% url 'public:index' %}" class="btn btn-outline-secondary">{% trans "Cancel" %}</a>
-                        <button type="submit" class="btn btn-atlas-primary">{% trans "Save profile settings" %}</button>
+                        <a href="{% url 'public:index' %}" class="btn btn-outline-secondary">{% trans "Abbrechen" %}</a>
+                        <button type="submit" class="btn btn-atlas-primary">{% trans "Profileinstellungen speichern" %}</button>
                     </div>
                 </form>
             </div>
