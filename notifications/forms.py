@@ -3,10 +3,16 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from accounts.models import UserProfile
+from accounts.utils import display_user
+
+
+class AssignmentUserChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return display_user(obj)
 
 
 class DefectAssignmentForm(forms.Form):
-    assigned_to = forms.ModelChoiceField(
+    assigned_to = AssignmentUserChoiceField(
         label="Zuständige Person",
         queryset=get_user_model().objects.none(),
         required=False,
