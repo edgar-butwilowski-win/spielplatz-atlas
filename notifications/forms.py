@@ -1,9 +1,8 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-
 from django import forms
 from django.contrib.auth import get_user_model
+from django.db.models import Q
+
+from accounts.models import UserProfile
 
 
 class DefectAssignmentForm(forms.Form):
@@ -21,24 +20,21 @@ class DefectAssignmentForm(forms.Form):
         self.current_user = current_user
 
         users = get_user_model().objects.filter(
-            profile__organization=organization,
-            profile__is_active_for_organization=True,
-        ).filter(
-            profile__is_org_admin=True
-        ) | get_user_model().objects.filter(
-            profile__organization=organization,
-            profile__is_active_for_organization=True,
-            profile__can_maintain=True,
-        ) | get_user_model().objects.filter(
-            profile__organization=organization,
-            profile__is_active_for_organization=True,
-            profile__can_inspect=True,
+            Q(is_superuser=True)
+            | Q(
+                profile__organization=organization,
+                profile__is_active_for_organization=True,
+                profile__role__in=[
+                    UserProfile.ROLE_ORG_ADMIN,
+                    UserProfile.ROLE_INSPECTOR,
+                ],
+            )
         )
 
         self.fields["assigned_to"].queryset = users.distinct().order_by(
             "last_name",
             "first_name",
-            "username",
+            "email",
         )
         self.fields["assigned_to"].widget.attrs["class"] = "form-select"
 
