@@ -560,22 +560,22 @@ def user_can_create_defects(user, organization):
 
 def get_allowed_minimum_inspection_types(inspection_type):
     if inspection_type == Inspection.TYPE_VISUAL:
-        return [InspectionCriterionApplicability.MIN_VISUAL]
+        return [InspectionCriterion.MINIMUM_VISUAL]
 
     if inspection_type == Inspection.TYPE_OPERATIONAL:
         return [
-            InspectionCriterionApplicability.MIN_VISUAL,
-            InspectionCriterionApplicability.MIN_OPERATIONAL,
+            InspectionCriterion.MINIMUM_VISUAL,
+            InspectionCriterion.MINIMUM_OPERATIONAL,
         ]
 
-    if inspection_type == Inspection.TYPE_MAIN:
+    if inspection_type == Inspection.TYPE_ANNUAL:
         return [
-            InspectionCriterionApplicability.MIN_VISUAL,
-            InspectionCriterionApplicability.MIN_OPERATIONAL,
-            InspectionCriterionApplicability.MIN_MAIN,
+            InspectionCriterion.MINIMUM_VISUAL,
+            InspectionCriterion.MINIMUM_OPERATIONAL,
+            InspectionCriterion.MINIMUM_ANNUAL,
         ]
 
-    return [InspectionCriterionApplicability.MIN_VISUAL]
+    return [InspectionCriterion.MINIMUM_VISUAL]
 
 
 def get_active_criteria_for_inspection(inspection):
@@ -588,7 +588,7 @@ def get_active_criteria_for_inspection(inspection):
             models.Q(organization=inspection.playground.organization)
             | models.Q(organization__isnull=True, is_standard=True)
         )
-        .filter(applicabilities__minimum_inspection_type__in=minimum_types)
+        .filter(minimum_inspection_type__in=minimum_types)
         .distinct()
     )
 
@@ -653,9 +653,14 @@ def create_default_answers(inspection):
                 applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_PLAYGROUND,
             )
         elif scope.scope_type == InspectionScope.SCOPE_EQUIPMENT and scope.equipment:
-            applicable_criteria = criteria.filter(
-                applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_EQUIPMENT,
-                applicabilities__equipment_type=scope.equipment.equipment_type,
+            applicable_criteria = (
+                criteria
+                .filter(applicabilities__scope_type=InspectionCriterionApplicability.SCOPE_EQUIPMENT)
+                .filter(
+                    models.Q(applicabilities__applies_to_all_equipment=True)
+                    | models.Q(applicabilities__equipment_types=scope.equipment.equipment_type)
+                )
+                .distinct()
             )
         elif scope.scope_type == InspectionScope.SCOPE_SURFACE:
             applicable_criteria = criteria.filter(
