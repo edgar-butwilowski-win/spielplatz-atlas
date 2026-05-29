@@ -55,10 +55,12 @@ def get_open_task_for(playground, inspection_type):
 
 
 def refresh_task_statuses(queryset=None):
-    tasks = queryset or InspectionTask.objects.exclude(
+    base_queryset = queryset or InspectionTask.objects.all()
+    tasks = base_queryset.exclude(
         status__in=[
             InspectionTask.STATUS_COMPLETED,
             InspectionTask.STATUS_CANCELLED,
+            InspectionTask.STATUS_SUSPENDED,
         ]
     ).select_related("playground")
 
