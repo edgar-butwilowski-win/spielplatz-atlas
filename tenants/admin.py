@@ -8,6 +8,9 @@
 
 from django.contrib import admin, messages
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
+from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
@@ -61,6 +64,7 @@ def rebuild_inspection_planning_for_organizations(modeladmin, request, queryset)
 
 @admin.register(Organization)
 class OrganizationAdmin(admin.ModelAdmin):
+    change_form_template = "admin/tenants/organization/change_form.html"
     list_display = (
         "name",
         "slug",
@@ -79,6 +83,72 @@ class OrganizationAdmin(admin.ModelAdmin):
             return {"slug": ("name",)}
 
         return {}
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "<path:object_id>/rebuild-inspection-planning/",
+                self.admin_site.admin_view(self.rebuild_inspection_planning_view),
+                name="tenants_organization_rebuild_planning",
+            ),
+        ]
+        return custom_urls + urls
+
+    def rebuild_inspection_planning_view(self, request, object_id):
+        organization = self.get_object(request, object_id)
+
+        if not organization or not self.has_change_permission(request, organization):
+            raise PermissionDenied
+
+        if request.method != "POST":
+            self.message_user(
+                request,
+                "Die Kontrollplanung kann nur über den Button im Organisationsformular neu berechnet werden.",
+                level=messages.WARNING,
+            )
+            return redirect(
+                reverse(
+                    "admin:tenants_organization_change",
+                    args=[organization.pk],
+                )
+            )
+
+        result = rebuild_planning_for_organization(organization)
+        self.message_user(
+            request,
+            (
+                f"Kontrollplanung für '{organization.name}' neu berechnet. "
+                f"Erstellt: {result['created']}, aktualisiert: {result['updated']}, "
+                f"unverändert: {result['unchanged']}."
+            ),
+            level=messages.SUCCESS,
+        )
+        return redirect(
+            reverse(
+                "admin:tenants_organization_change",
+                args=[organization.pk],
+            )
+        )
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        extra_context = extra_context or {}
+
+        if object_id:
+            organization = self.get_object(request, object_id)
+
+            if organization and self.has_change_permission(request, organization):
+                extra_context.update(
+                    {
+                        "show_rebuild_inspection_planning": True,
+                        "rebuild_inspection_planning_url": reverse(
+                            "admin:tenants_organization_rebuild_planning",
+                            args=[organization.pk],
+                        ),
+                    }
+                )
+
+        return super().changeform_view(request, object_id, form_url, extra_context)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
