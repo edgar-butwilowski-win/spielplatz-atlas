@@ -72,8 +72,13 @@ class OrganizationAdmin(admin.ModelAdmin):
     )
     list_filter = ("is_active", "is_public")
     search_fields = ("name", "slug")
-    prepopulated_fields = {"slug": ("name",)}
     actions = (rebuild_inspection_planning_for_organizations,)
+
+    def get_prepopulated_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return {"slug": ("name",)}
+
+        return {}
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
