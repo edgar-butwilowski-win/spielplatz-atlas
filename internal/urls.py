@@ -44,6 +44,11 @@ urlpatterns = [
         name="update_inspection_task",
     ),
     path(
+        "inspection-tasks/<int:task_id>/cancel/",
+        planning_views.cancel_inspection_task,
+        name="cancel_inspection_task",
+    ),
+    path(
         "inspection-tasks/<int:task_id>/accept/",
         planning_views.accept_inspection_task,
         name="accept_inspection_task",
