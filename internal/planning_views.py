@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
+from accounts.models import UserProfile
 from inspections.models import Inspection, InspectionTask
 from inspections.planning import rebuild_planning_for_organization, refresh_task_statuses
 from tenants.models import Organization
@@ -85,14 +86,14 @@ class InspectionTaskPlanningForm(forms.ModelForm):
                 | (
                     Q(profile__organization=self.organization)
                     & Q(profile__is_active_for_organization=True)
-                    & (
-                        Q(profile__is_org_admin=True)
-                        | Q(profile__can_inspect=True)
-                    )
+                    & Q(profile__role__in=[
+                        UserProfile.ROLE_ORG_ADMIN,
+                        UserProfile.ROLE_INSPECTOR,
+                    ])
                 )
             )
             .distinct()
-            .order_by("last_name", "first_name", "username")
+            .order_by("last_name", "first_name", "email")
         )
 
     def clean_planned_date(self):
