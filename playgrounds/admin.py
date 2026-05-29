@@ -1,8 +1,12 @@
 from django import forms
 from django.contrib import admin
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from PIL import Image as PillowImage
 
 from accounts.admin_utils import OrganizationAdminPermissionMixin, get_user_organization
+from accounts.models import UserProfile
+from accounts.utils import display_user
 from media_assets.models import ImageAsset
 
 from .models import (
@@ -42,16 +46,73 @@ def create_image_asset_from_upload(uploaded_file, organization):
     )
 
 
+class InspectorChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return display_user(obj)
+
+
+def inspector_queryset_for_organization(organization):
+    User = get_user_model()
+
+    if not organization:
+        return User.objects.filter(is_active=True, is_superuser=True).order_by("last_name", "first_name", "email")
+
+    return (
+        User.objects
+        .filter(is_active=True)
+        .filter(
+            Q(is_superuser=True)
+            | Q(
+                profile__organization=organization,
+                profile__is_active_for_organization=True,
+                profile__role__in=[
+                    UserProfile.ROLE_INSPECTOR,
+                    UserProfile.ROLE_ORG_ADMIN,
+                ],
+            )
+        )
+        .distinct()
+        .order_by("last_name", "first_name", "email")
+    )
+
+
 class PlaygroundAdminForm(forms.ModelForm):
     photo_upload = forms.ImageField(
         label="Neues Foto hochladen",
         required=False,
         help_text="Optional. Wenn ein neues Foto hochgeladen wird, ersetzt es das bisherige Hauptfoto.",
     )
+    default_visual_inspector = InspectorChoiceField(label="Default-Kontrolleur/in visuell", queryset=get_user_model().objects.none(), required=False)
+    default_operational_inspector = InspectorChoiceField(label="Default-Kontrolleur/in operativ", queryset=get_user_model().objects.none(), required=False)
+    default_annual_inspector = InspectorChoiceField(label="Default-Kontrolleur/in jährlich", queryset=get_user_model().objects.none(), required=False)
 
     class Meta:
         model = Playground
         fields = "__all__"
+
+    def __init__(self, *args, request=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        organization = None
+
+        if self.instance and self.instance.pk:
+            organization = self.instance.organization
+        elif request and not request.user.is_superuser:
+            organization = get_user_organization(request.user)
+
+        if request and request.user.is_superuser and not organization:
+            queryset = get_user_model().objects.filter(is_active=True).filter(
+                Q(is_superuser=True)
+                | Q(profile__is_active_for_organization=True, profile__role__in=[UserProfile.ROLE_INSPECTOR, UserProfile.ROLE_ORG_ADMIN])
+            ).distinct().order_by("last_name", "first_name", "email")
+        else:
+            queryset = inspector_queryset_for_organization(organization)
+
+        for field_name in (
+            "default_visual_inspector",
+            "default_operational_inspector",
+            "default_annual_inspector",
+        ):
+            self.fields[field_name].queryset = queryset
 
 
 class PlayEquipmentAdminForm(forms.ModelForm):
@@ -103,14 +164,25 @@ class PlaygroundAdmin(OrganizationScopedAdminMixin, admin.ModelAdmin):
         ("Grunddaten", {"fields": ("organization", "uuid", "name", "slug", "number", "description", "construction_costs")}),
         ("Adresse und Lage", {"fields": ("address", "street_name", "house_number", "district", "latitude", "longitude")}),
         ("Inspektionen", {"fields": ("inspection_suspended_from", "inspection_suspended_until")}),
+        ("Default-Kontrolleure", {"fields": ("default_visual_inspector", "default_operational_inspector", "default_annual_inspector"), "description": "Diese Personen werden bei neuen Kontrollaufträgen je Kontrollart automatisch als zuständige Kontrollperson voreingestellt."}),
         ("Foto", {"fields": ("photo", "photo_upload")}),
         ("Sichtbarkeit", {"fields": ("is_active", "public_visible")}),
     )
-    list_display = ("name", "number", "uuid", "organization", "district", "public_visible", "is_active", "created_at")
+    list_display = ("name", "number", "uuid", "organization", "district", "default_visual_inspector", "default_operational_inspector", "default_annual_inspector", "public_visible", "is_active", "created_at")
     list_filter = ("organization", "public_visible", "is_active", "district")
     search_fields = ("name", "uuid", "number", "address", "street_name", "house_number", "district")
     prepopulated_fields = {"slug": ("name",)}
     autocomplete_fields = ("photo",)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+
+        class RequestAwareForm(form):
+            def __init__(self, *args, **inner_kwargs):
+                inner_kwargs["request"] = request
+                super().__init__(*args, **inner_kwargs)
+
+        return RequestAwareForm
 
     def get_queryset(self, request):
         return self.scope_queryset_to_organization(super().get_queryset(request), request)
