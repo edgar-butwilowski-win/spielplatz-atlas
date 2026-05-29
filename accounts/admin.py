@@ -10,6 +10,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied, ValidationError
 
@@ -17,56 +18,46 @@ from tenants.models import Organization
 
 from .models import UserProfile
 from .permissions import get_user_organization, user_may_manage_users
+from .utils import display_user, generate_internal_username, normalize_email
 
 
 User = get_user_model()
 
-ROLE_READER = "reader"
-ROLE_INSPECTOR = "inspector"
-ROLE_ORG_ADMIN = "org_admin"
 ROLE_SUPERADMIN = "superadmin"
 
 ROLE_CHOICES_FOR_SUPERUSER = (
     (ROLE_SUPERADMIN, "Superadmin"),
-    (ROLE_ORG_ADMIN, "Organisations-Admin"),
-    (ROLE_INSPECTOR, "Kontrolleur/in"),
-    (ROLE_READER, "Lesender interner User"),
+    (UserProfile.ROLE_ORG_ADMIN, "Organisations-Admin"),
+    (UserProfile.ROLE_INSPECTOR, "Kontrolleur/in"),
+    (UserProfile.ROLE_READER, "Lesender interner User"),
 )
 
 ROLE_CHOICES_FOR_ORG_ADMIN = (
-    (ROLE_ORG_ADMIN, "Organisations-Admin"),
-    (ROLE_INSPECTOR, "Kontrolleur/in"),
-    (ROLE_READER, "Lesender interner User"),
+    (UserProfile.ROLE_ORG_ADMIN, "Organisations-Admin"),
+    (UserProfile.ROLE_INSPECTOR, "Kontrolleur/in"),
+    (UserProfile.ROLE_READER, "Lesender interner User"),
 )
+
+
+class InternalUserModelChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, obj):
+        return display_user(obj)
 
 
 def organization_for_user(user):
     return None if user.is_superuser else get_user_organization(user)
 
 
-def profile_values_for_role(role):
-    if role == ROLE_ORG_ADMIN:
-        return {
-            "is_org_admin": True,
-            "can_view_internal": True,
-            "can_inspect": True,
-            "can_maintain": True,
-        }
+def user_role(user):
+    if user.is_superuser:
+        return ROLE_SUPERADMIN
 
-    if role == ROLE_INSPECTOR:
-        return {
-            "is_org_admin": False,
-            "can_view_internal": True,
-            "can_inspect": True,
-            "can_maintain": True,
-        }
+    profile = getattr(user, "profile", None)
 
-    return {
-        "is_org_admin": False,
-        "can_view_internal": True,
-        "can_inspect": False,
-        "can_maintain": False,
-    }
+    if not profile:
+        return UserProfile.ROLE_READER
+
+    return profile.role
 
 
 def user_should_have_django_admin_access(user):
@@ -85,19 +76,32 @@ def sync_django_admin_access(user):
         user.save(update_fields=["is_staff"])
 
 
+def sync_user_role(user, role, organization):
+    if role == ROLE_SUPERADMIN:
+        user.is_superuser = True
+        user.is_staff = True
+        UserProfile.objects.filter(user=user).delete()
+        return
+
+    user.is_superuser = False
+    user.is_staff = role == UserProfile.ROLE_ORG_ADMIN
+    UserProfile.objects.update_or_create(
+        user=user,
+        defaults={
+            "organization": organization,
+            "role": role,
+            "is_active_for_organization": True,
+        },
+    )
+
+
 class SpielplatzAtlasUserCreationForm(forms.ModelForm):
     email = forms.EmailField(
         label="E-Mail-Adresse",
         help_text="Diese Adresse wird für die Anmeldung verwendet.",
     )
-    first_name = forms.CharField(
-        label="Vorname",
-        required=False,
-    )
-    last_name = forms.CharField(
-        label="Nachname",
-        required=False,
-    )
+    first_name = forms.CharField(label="Vorname", required=False)
+    last_name = forms.CharField(label="Nachname", required=False)
     organization = forms.ModelChoiceField(
         label="Organisation",
         queryset=Organization.objects.none(),
@@ -107,7 +111,7 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
     role = forms.ChoiceField(
         label="Rolle",
         choices=ROLE_CHOICES_FOR_ORG_ADMIN,
-        help_text="Die Rolle setzt die passenden internen Berechtigungen automatisch.",
+        help_text="Die Rolle ist die Quelle der fachlichen Berechtigungen.",
     )
     password1 = forms.CharField(
         label="Passwort",
@@ -123,11 +127,7 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = (
-            "email",
-            "first_name",
-            "last_name",
-        )
+        fields = ("email", "first_name", "last_name")
 
     def __init__(self, *args, request=None, **kwargs):
         self.request = request
@@ -149,7 +149,7 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
             self.fields["organization"].queryset = Organization.objects.none()
 
     def clean_email(self):
-        email = self.cleaned_data["email"].strip().lower()
+        email = normalize_email(self.cleaned_data["email"])
 
         if User.objects.filter(email__iexact=email).exists():
             raise ValidationError("Es gibt bereits einen Benutzer mit dieser E-Mail-Adresse.")
@@ -189,15 +189,13 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         role = self.cleaned_data["role"]
-        email = self.cleaned_data["email"]
         organization = self.cleaned_data.get("organization")
 
-        user.username = email
-        user.email = email
+        user.username = generate_internal_username()
+        user.email = self.cleaned_data["email"]
         user.is_active = True
-        user.is_superuser = role == ROLE_SUPERADMIN
-        user.is_staff = role in (ROLE_SUPERADMIN, ROLE_ORG_ADMIN)
         user.set_password(self.cleaned_data["password1"])
+        sync_user_role(user, role, organization)
 
         if commit:
             user.save()
@@ -207,8 +205,8 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
                     user=user,
                     defaults={
                         "organization": organization,
+                        "role": role,
                         "is_active_for_organization": True,
-                        **profile_values_for_role(role),
                     },
                 )
 
@@ -217,7 +215,91 @@ class SpielplatzAtlasUserCreationForm(forms.ModelForm):
         return user
 
 
+class SpielplatzAtlasUserChangeForm(forms.ModelForm):
+    password = ReadOnlyPasswordHashField(label="Passwort")
+    email = forms.EmailField(label="E-Mail-Adresse")
+    first_name = forms.CharField(label="Vorname", required=False)
+    last_name = forms.CharField(label="Nachname", required=False)
+    organization = forms.ModelChoiceField(
+        label="Organisation",
+        queryset=Organization.objects.none(),
+        required=False,
+        help_text="Nur für interne Benutzer erforderlich. Superadmins sind mandantenübergreifend.",
+    )
+    role = forms.ChoiceField(
+        label="Rolle",
+        choices=ROLE_CHOICES_FOR_ORG_ADMIN,
+        help_text="Die Rolle ist die Quelle der fachlichen Berechtigungen.",
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "password",
+            "is_active",
+        )
+
+    def __init__(self, *args, request=None, **kwargs):
+        self.request = request
+        super().__init__(*args, **kwargs)
+        profile = getattr(self.instance, "profile", None)
+
+        if request and request.user.is_superuser:
+            self.fields["role"].choices = ROLE_CHOICES_FOR_SUPERUSER
+            self.fields["organization"].queryset = Organization.objects.all()
+        else:
+            organization = organization_for_user(request.user) if request else None
+            self.fields["role"].choices = ROLE_CHOICES_FOR_ORG_ADMIN
+            self.fields["organization"].queryset = Organization.objects.filter(pk=organization.pk) if organization else Organization.objects.none()
+            self.fields["organization"].disabled = True
+
+        self.fields["role"].initial = user_role(self.instance)
+
+        if profile:
+            self.fields["organization"].initial = profile.organization
+        elif not self.instance.is_superuser:
+            self.fields["organization"].initial = organization_for_user(request.user) if request else None
+
+    def clean_email(self):
+        email = normalize_email(self.cleaned_data["email"])
+        qs = User.objects.filter(email__iexact=email)
+
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)
+
+        if qs.exists():
+            raise ValidationError("Es gibt bereits einen Benutzer mit dieser E-Mail-Adresse.")
+
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+        role = cleaned_data.get("role")
+        organization = cleaned_data.get("organization")
+
+        if role == ROLE_SUPERADMIN:
+            if not self.request or not self.request.user.is_superuser:
+                self.add_error("role", "Nur Superadmins dürfen Benutzer zu Superadmins machen.")
+        elif organization is None:
+            self.add_error("organization", "Bitte eine Organisation auswählen.")
+
+        if self.request and not self.request.user.is_superuser:
+            own_organization = organization_for_user(self.request.user)
+
+            if role == ROLE_SUPERADMIN:
+                self.add_error("role", "Organisations-Admins dürfen keine Superadmins verwalten.")
+
+            if organization != own_organization:
+                self.add_error("organization", "Organisations-Admins dürfen nur Benutzer ihrer eigenen Organisation verwalten.")
+
+        return cleaned_data
+
+
 class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
+    form = SpielplatzAtlasUserChangeForm
     add_form = SpielplatzAtlasUserCreationForm
     add_fieldsets = (
         (
@@ -249,13 +331,10 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
         "is_active",
         "is_superuser",
         "profile__organization",
-        "profile__is_org_admin",
-        "profile__can_inspect",
-        "profile__can_view_internal",
+        "profile__role",
     )
     search_fields = (
         "email",
-        "username",
         "first_name",
         "last_name",
         "profile__organization__name",
@@ -269,6 +348,10 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
 
     class Media:
         js = ("accounts/admin_user_password_generator.js",)
+
+    @admin.display(description="Benutzer")
+    def display_user(self, obj):
+        return display_user(obj)
 
     @admin.display(description="Organisation")
     def display_organization(self, obj):
@@ -285,16 +368,7 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
         if not profile:
             return "Keine interne Rolle"
 
-        if profile.is_org_admin:
-            return "Organisations-Admin"
-
-        if profile.can_inspect:
-            return "Kontrolleur/in"
-
-        if profile.can_view_internal:
-            return "Lesender interner User"
-
-        return "Keine interne Rolle"
+        return profile.get_role_display()
 
     @admin.display(boolean=True, description="Django-Admin-Zugang")
     def display_is_django_admin(self, obj):
@@ -304,43 +378,26 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
         if obj is None:
             return self.add_fieldsets
 
-        if request.user.is_superuser:
-            return (
-                ("Login", {"fields": ("username", "email", "password")}),
-                ("Name", {"fields": ("first_name", "last_name")}),
-                ("Status", {"fields": ("is_active", "display_is_django_admin", "is_superuser")}),
-                ("Zeitstempel", {"fields": ("last_login", "date_joined")}),
-            )
-
         return (
-            ("Login", {"fields": ("username", "email", "password")}),
+            ("Login", {"fields": ("email", "password")}),
             ("Name", {"fields": ("first_name", "last_name")}),
+            ("Rolle und Organisation", {"fields": ("organization", "role")}),
             ("Status", {"fields": ("is_active", "display_is_django_admin")}),
+            ("Zeitstempel", {"fields": ("last_login", "date_joined")}),
         )
-
-    def get_readonly_fields(self, request, obj=None):
-        readonly = list(super().get_readonly_fields(request, obj))
-
-        if not request.user.is_superuser:
-            readonly.extend(["username", "email"])
-
-        return tuple(dict.fromkeys(readonly))
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
 
-        if obj is not None:
-            return form
-
-        class RequestAwareUserCreationForm(form):
+        class RequestAwareForm(form):
             def __init__(self, *args, **inner_kwargs):
                 inner_kwargs["request"] = request
                 super().__init__(*args, **inner_kwargs)
 
-        return RequestAwareUserCreationForm
+        return RequestAwareForm
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).select_related("profile", "profile__organization")
 
         if request.user.is_superuser:
             return qs
@@ -397,87 +454,26 @@ class SpielplatzAtlasUserAdmin(DjangoUserAdmin):
         if change and not request.user.is_superuser and obj.is_superuser:
             raise PermissionDenied("Organisations-Admins dürfen keine Superadmins bearbeiten.")
 
+        if not obj.username:
+            obj.username = generate_internal_username()
+
+        obj.email = normalize_email(obj.email)
+        role = form.cleaned_data.get("role")
+        organization = form.cleaned_data.get("organization")
+        sync_user_role(obj, role, organization)
         super().save_model(request, obj, form, change)
+
+        if role != ROLE_SUPERADMIN:
+            UserProfile.objects.update_or_create(
+                user=obj,
+                defaults={
+                    "organization": organization,
+                    "role": role,
+                    "is_active_for_organization": True,
+                },
+            )
+
         sync_django_admin_access(obj)
-
-
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = (
-        "user",
-        "organization",
-        "is_active_for_organization",
-        "is_org_admin",
-        "can_view_internal",
-        "can_inspect",
-        "can_maintain",
-        "display_is_django_admin",
-    )
-    list_filter = (
-        "organization",
-        "is_active_for_organization",
-        "is_org_admin",
-        "can_view_internal",
-        "can_inspect",
-        "can_maintain",
-    )
-    search_fields = (
-        "user__username",
-        "user__email",
-        "user__first_name",
-        "user__last_name",
-        "organization__name",
-    )
-    autocomplete_fields = (
-        "user",
-        "organization",
-    )
-    readonly_fields = ("display_is_django_admin",)
-
-    @admin.display(boolean=True, description="Django-Admin-Zugang")
-    def display_is_django_admin(self, obj):
-        return obj.user.is_staff
-
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-
-        if request.user.is_superuser:
-            return qs
-
-        organization = get_user_organization(request.user)
-
-        if organization:
-            return qs.filter(organization=organization)
-
-        return qs.none()
-
-    def has_module_permission(self, request):
-        return user_may_manage_users(request.user)
-
-    def has_view_permission(self, request, obj=None):
-        return user_may_manage_users(request.user)
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser:
-            return True
-
-        if not user_may_manage_users(request.user):
-            return False
-
-        if obj is None:
-            return True
-
-        return obj.organization == get_user_organization(request.user) and not obj.user.is_superuser
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        sync_django_admin_access(obj.user)
 
 
 try:
@@ -487,6 +483,11 @@ except admin.sites.NotRegistered:
 
 try:
     admin.site.unregister(Group)
+except admin.sites.NotRegistered:
+    pass
+
+try:
+    admin.site.unregister(UserProfile)
 except admin.sites.NotRegistered:
     pass
 
