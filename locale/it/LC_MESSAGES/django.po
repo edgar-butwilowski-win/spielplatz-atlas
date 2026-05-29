@@ -872,3 +872,108 @@ msgstr "Impostare il risultato per questa attrezzatura da gioco"
 
 msgid "Apply to play equipment"
 msgstr "Applicare all’attrezzatura da gioco"
+
+msgid "Overview for %(organization_name)s."
+msgstr "Panoramica per %(organization_name)s."
+
+msgid "Cross-tenant overview for super admins."
+msgstr "Panoramica multi-mandante per super amministratori."
+
+msgid "Checked / completed defects"
+msgstr "Difetti controllati / risolti"
+
+msgid "Defects by status"
+msgstr "Difetti per stato"
+
+msgid "Defects by source"
+msgstr "Difetti per fonte"
+
+msgid "Inspections by type"
+msgstr "Controlli per tipo"
+
+msgid "Inspections by status"
+msgstr "Controlli per stato"
+
+msgid "Defect trend"
+msgstr "Andamento dei difetti"
+
+msgid "Safety-risk defects over time"
+msgstr "Difetti con rischio per la sicurezza nel tempo"
+
+msgid "Inspections per month by type"
+msgstr "Controlli per mese e per tipo"
+
+msgid "Inspection results over time"
+msgstr "Risultati dei controlli nel tempo"
+
+msgid "Inspection tasks by week"
+msgstr "Incarichi di controllo per settimana"
+
+msgid "Maintenance planned versus completed"
+msgstr "Manutenzione pianificata rispetto a quella completata"
+
+msgid "Defect count by supplier"
+msgstr "Numero di difetti per fornitore"
+
+msgid "Top 10 defect rate by supplier"
+msgstr "Top 10 del tasso di difetti per fornitore"
+
+msgid "Defects per 100 play equipment. Suppliers with fewer than 5 play equipment are hidden."
+msgstr "Difetti per 100 attrezzature da gioco. I fornitori con meno di 5 attrezzature da gioco sono nascosti."
+
+msgid "Top 10 safety defect rate by supplier"
+msgstr "Top 10 del tasso di difetti di sicurezza per fornitore"
+
+msgid "Safety-risk defects per 100 play equipment. Suppliers with fewer than 5 play equipment are hidden."
+msgstr "Difetti con rischio per la sicurezza per 100 attrezzature da gioco. I fornitori con meno di 5 attrezzature da gioco sono nascosti."
+
+msgid "Play equipment age and defects"
+msgstr "Età delle attrezzature da gioco e difetti"
+
+msgid "Maintenance by status"
+msgstr "Manutenzione per stato"
+
+msgid "No planned maintenance actions available."
+msgstr "Nessuna misura di manutenzione pianificata disponibile."
+
+msgid "Defects per 100 play equipment"
+msgstr "Difetti per 100 attrezzature da gioco"
+
+msgid "Safety defects per 100 play equipment"
+msgstr "Difetti di sicurezza per 100 attrezzature da gioco"
+
+msgid "New defects"
+msgstr "Nuovi difetti"
+
+msgid "Resolved / checked defects"
+msgstr "Difetti risolti / controllati"
+
+msgid "New safety-risk defects"
+msgstr "Nuovi difetti con rischio per la sicurezza"
+
+msgid "Completed maintenance actions"
+msgstr "Misure di manutenzione completate"
+
+msgid "Unknown supplier"
+msgstr "Fornitore sconosciuto"
+
+msgid "0-5 years"
+msgstr "0–5 anni"
+
+msgid "6-10 years"
+msgstr "6–10 anni"
+
+msgid "11-15 years"
+msgstr "11–15 anni"
+
+msgid "16-20 years"
+msgstr "16–20 anni"
+
+msgid "21-30 years"
+msgstr "21–30 anni"
+
+msgid "Over 30 years"
+msgstr "Oltre 30 anni"
+
+msgid "Unknown age"
+msgstr "Età sconosciuta"

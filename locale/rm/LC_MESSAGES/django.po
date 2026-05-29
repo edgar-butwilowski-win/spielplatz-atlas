@@ -872,3 +872,108 @@ msgstr "Metter il resultat per quest indriz da gieu"
 
 msgid "Apply to play equipment"
 msgstr "Applitgar a l’indriz da gieu"
+
+msgid "Overview for %(organization_name)s."
+msgstr "Survista per %(organization_name)s."
+
+msgid "Cross-tenant overview for super admins."
+msgstr "Survista sur plirs mandants per superadmins."
+
+msgid "Checked / completed defects"
+msgstr "Mangels controllads / eliminads"
+
+msgid "Defects by status"
+msgstr "Mangels tenor status"
+
+msgid "Defects by source"
+msgstr "Mangels tenor funtauna"
+
+msgid "Inspections by type"
+msgstr "Controllas tenor tip"
+
+msgid "Inspections by status"
+msgstr "Controllas tenor status"
+
+msgid "Defect trend"
+msgstr "Svilup dals mangels"
+
+msgid "Safety-risk defects over time"
+msgstr "Mangels cun ristga da segirezza en il decurs dal temp"
+
+msgid "Inspections per month by type"
+msgstr "Controllas per mais e tenor tip"
+
+msgid "Inspection results over time"
+msgstr "Resultats da controlla en il decurs dal temp"
+
+msgid "Inspection tasks by week"
+msgstr "Incumbensas da controlla per emna"
+
+msgid "Maintenance planned versus completed"
+msgstr "Mantegniment planisà en cumparegliaziun cun terminà"
+
+msgid "Defect count by supplier"
+msgstr "Dumber da mangels tenor furnitur"
+
+msgid "Top 10 defect rate by supplier"
+msgstr "Top 10 da la quota da mangels tenor furnitur"
+
+msgid "Defects per 100 play equipment. Suppliers with fewer than 5 play equipment are hidden."
+msgstr "Mangels per 100 indrizs da gieu. Furniturs cun damain che 5 indrizs da gieu vegnan zuppads."
+
+msgid "Top 10 safety defect rate by supplier"
+msgstr "Top 10 da la quota da mangels da segirezza tenor furnitur"
+
+msgid "Safety-risk defects per 100 play equipment. Suppliers with fewer than 5 play equipment are hidden."
+msgstr "Mangels cun ristga da segirezza per 100 indrizs da gieu. Furniturs cun damain che 5 indrizs da gieu vegnan zuppads."
+
+msgid "Play equipment age and defects"
+msgstr "Vegliadetgna dals indrizs da gieu e mangels"
+
+msgid "Maintenance by status"
+msgstr "Mantegniment tenor status"
+
+msgid "No planned maintenance actions available."
+msgstr "Naginas mesiras da mantegniment planisadas disponiblas."
+
+msgid "Defects per 100 play equipment"
+msgstr "Mangels per 100 indrizs da gieu"
+
+msgid "Safety defects per 100 play equipment"
+msgstr "Mangels da segirezza per 100 indrizs da gieu"
+
+msgid "New defects"
+msgstr "Novs mangels"
+
+msgid "Resolved / checked defects"
+msgstr "Mangels eliminads / controllads"
+
+msgid "New safety-risk defects"
+msgstr "Novs mangels cun ristga da segirezza"
+
+msgid "Completed maintenance actions"
+msgstr "Mesiras da mantegniment terminadas"
+
+msgid "Unknown supplier"
+msgstr "Furnitur nunenconuschent"
+
+msgid "0-5 years"
+msgstr "0–5 onns"
+
+msgid "6-10 years"
+msgstr "6–10 onns"
+
+msgid "11-15 years"
+msgstr "11–15 onns"
+
+msgid "16-20 years"
+msgstr "16–20 onns"
+
+msgid "21-30 years"
+msgstr "21–30 onns"
+
+msgid "Over 30 years"
+msgstr "Dapli che 30 onns"
+
+msgid "Unknown age"
+msgstr "Vegliadetgna nunenconuschenta"
