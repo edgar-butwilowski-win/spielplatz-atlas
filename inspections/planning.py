@@ -58,6 +58,13 @@ def get_default_inspector_for_playground(playground, inspection_type):
     return None
 
 
+def calculate_initial_planned_date(organization, due_date):
+    if hasattr(organization, "calculate_planned_date_from_due_date"):
+        return organization.calculate_planned_date_from_due_date(due_date)
+
+    return due_date
+
+
 def get_open_task_for(playground, inspection_type):
     return (
         InspectionTask.objects
@@ -113,6 +120,7 @@ def create_or_update_task_for_rule(playground, rule, reference_inspection=None):
             playground=playground,
             inspection_type=rule.inspection_type,
             due_date=due_date,
+            planned_date=calculate_initial_planned_date(playground.organization, due_date),
             assigned_to=get_default_inspector_for_playground(playground, rule.inspection_type),
             source=InspectionTask.SOURCE_AUTOMATIC,
             created_from_inspection=reference_inspection,
@@ -238,6 +246,7 @@ def create_follow_up_task_for_inspection(inspection):
         playground=inspection.playground,
         inspection_type=inspection.inspection_type,
         due_date=due_date,
+        planned_date=calculate_initial_planned_date(inspection.playground.organization, due_date),
         assigned_to=get_default_inspector_for_playground(inspection.playground, inspection.inspection_type),
         source=InspectionTask.SOURCE_AUTOMATIC,
         created_from_inspection=inspection,
@@ -272,6 +281,7 @@ def create_follow_up_task_for_cancelled_task(cancelled_task):
         playground=cancelled_task.playground,
         inspection_type=cancelled_task.inspection_type,
         due_date=due_date,
+        planned_date=calculate_initial_planned_date(cancelled_task.organization, due_date),
         assigned_to=get_default_inspector_for_playground(cancelled_task.playground, cancelled_task.inspection_type),
         source=InspectionTask.SOURCE_AUTOMATIC,
         note=f"Folgeauftrag aus abgebrochenem Auftrag #{cancelled_task.id}.",
