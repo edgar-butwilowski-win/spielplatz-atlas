@@ -2,7 +2,7 @@ from django import forms
 from django.contrib import admin
 from PIL import Image as PillowImage
 
-from accounts.admin_utils import get_user_organization
+from accounts.admin_utils import OrganizationAdminPermissionMixin, get_user_organization
 from media_assets.models import ImageAsset
 
 from .models import (
@@ -71,8 +71,13 @@ class PlayEquipmentAdminForm(forms.ModelForm):
         }
 
 
-class OrganizationScopedAdminMixin:
+class OrganizationScopedAdminMixin(OrganizationAdminPermissionMixin):
     organization_field = "organization"
+
+    def get_object_organization(self, obj):
+        if obj is None:
+            return None
+        return getattr(obj, self.organization_field, None)
 
     def get_user_organization(self, request):
         if request.user.is_superuser:
@@ -87,7 +92,7 @@ class OrganizationScopedAdminMixin:
         if not organization:
             return qs.none()
 
-        return qs.filter(organization=organization)
+        return qs.filter(**{self.organization_field: organization})
 
 
 @admin.register(Playground)
@@ -143,42 +148,24 @@ class PlaygroundAdmin(OrganizationScopedAdminMixin, admin.ModelAdmin):
 
         super().save_model(request, obj, form, change)
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
 
 @admin.register(EquipmentType)
-class EquipmentTypeAdmin(admin.ModelAdmin):
+class EquipmentTypeAdmin(OrganizationScopedAdminMixin, admin.ModelAdmin):
     list_display = ("name", "code", "organization", "norm_reference", "is_standard", "standard_version", "is_locked", "is_active")
     list_filter = ("organization", "is_standard", "is_locked", "is_active", "standard_version")
     search_fields = ("name", "code", "norm_reference", "standard_version", "source_note")
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        organization = get_user_organization(request.user)
-        if organization:
-            return (qs.filter(organization__isnull=True) | qs.filter(organization=organization)).distinct()
-        return qs.filter(organization__isnull=True)
+        return self.scope_queryset_to_organization(super().get_queryset(request), request)
 
     def get_fields(self, request, obj=None):
         if request.user.is_superuser:
             return ("organization", "name", "code", "norm_reference", "is_standard", "standard_version", "source_note", "is_locked", "is_active")
         return ("name", "code", "norm_reference", "is_active")
 
-    def get_readonly_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return ()
-        if obj and (obj.organization_id is None or obj.is_locked):
-            return ("name", "code", "norm_reference", "is_active")
-        return ()
-
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
             organization = get_user_organization(request.user)
-            if change and obj.organization_id is None:
-                return
             if organization:
                 obj.organization = organization
                 obj.is_standard = False
@@ -187,24 +174,15 @@ class EquipmentTypeAdmin(admin.ModelAdmin):
                 obj.is_locked = False
         super().save_model(request, obj, form, change)
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
 
 @admin.register(EquipmentSupplier)
-class EquipmentSupplierAdmin(admin.ModelAdmin):
+class EquipmentSupplierAdmin(OrganizationScopedAdminMixin, admin.ModelAdmin):
     list_display = ("name", "organization", "tel_nr", "plz_ort", "e_mail", "is_active", "created_at")
     list_filter = ("organization", "is_active")
     search_fields = ("name", "tel_nr", "strasse", "plz_ort", "e_mail", "organization__name")
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        organization = get_user_organization(request.user)
-        if organization:
-            return (qs.filter(organization__isnull=True) | qs.filter(organization=organization)).distinct()
-        return qs.filter(organization__isnull=True)
+        return self.scope_queryset_to_organization(super().get_queryset(request), request)
 
     def get_fields(self, request, obj=None):
         base_fields = ("name", "tel_nr", "strasse", "plz_ort", "e_mail", "is_active")
@@ -212,28 +190,16 @@ class EquipmentSupplierAdmin(admin.ModelAdmin):
             return ("organization", *base_fields)
         return base_fields
 
-    def get_readonly_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return ()
-        if obj and obj.organization_id is None:
-            return ("name", "tel_nr", "strasse", "plz_ort", "e_mail", "is_active")
-        return ()
-
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
             organization = get_user_organization(request.user)
-            if change and obj.organization_id is None:
-                return
             if organization:
                 obj.organization = organization
         super().save_model(request, obj, form, change)
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
 
 @admin.register(PlayEquipment)
-class PlayEquipmentAdmin(admin.ModelAdmin):
+class PlayEquipmentAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     form = PlayEquipmentAdminForm
 
     fieldsets = (
@@ -250,6 +216,9 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
     search_fields = ("name", "inventory_number", "supplier__name", "norm", "playground__name")
     autocomplete_fields = ("playground", "equipment_type", "supplier", "photo")
 
+    def get_object_organization(self, obj):
+        return obj.playground.organization if obj and obj.playground_id else None
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
@@ -265,9 +234,9 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
             if db_field.name == "playground":
                 kwargs["queryset"] = Playground.objects.filter(organization=organization)
             elif db_field.name == "equipment_type":
-                kwargs["queryset"] = (EquipmentType.objects.filter(organization__isnull=True) | EquipmentType.objects.filter(organization=organization)).distinct()
+                kwargs["queryset"] = EquipmentType.objects.filter(organization=organization)
             elif db_field.name == "supplier":
-                kwargs["queryset"] = (EquipmentSupplier.objects.filter(organization__isnull=True) | EquipmentSupplier.objects.filter(organization=organization)).filter(is_active=True).distinct()
+                kwargs["queryset"] = EquipmentSupplier.objects.filter(organization=organization, is_active=True)
             elif db_field.name == "photo":
                 kwargs["queryset"] = db_field.remote_field.model.objects.filter(organization=organization)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
@@ -279,16 +248,16 @@ class PlayEquipmentAdmin(admin.ModelAdmin):
             obj.photo = create_image_asset_from_upload(uploaded_photo, organization)
         super().save_model(request, obj, form, change)
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
 
 @admin.register(PlaygroundSurface)
-class PlaygroundSurfaceAdmin(admin.ModelAdmin):
+class PlaygroundSurfaceAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     list_display = ("name", "playground", "surface_type", "public_visible", "is_active", "created_at")
     list_filter = ("playground__organization", "surface_type", "public_visible", "is_active")
     search_fields = ("name", "description", "playground__name")
 
+    def get_object_organization(self, obj):
+        return obj.playground.organization if obj and obj.playground_id else None
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
@@ -298,16 +267,22 @@ class PlaygroundSurfaceAdmin(admin.ModelAdmin):
             return qs.filter(playground__organization=organization)
         return qs.none()
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        organization = get_user_organization(request.user)
+        if not request.user.is_superuser and organization and db_field.name == "playground":
+            kwargs["queryset"] = Playground.objects.filter(organization=organization)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 @admin.register(PlaygroundAccessory)
-class PlaygroundAccessoryAdmin(admin.ModelAdmin):
+class PlaygroundAccessoryAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     list_display = ("name", "playground", "accessory_type", "public_visible", "is_active", "created_at")
     list_filter = ("playground__organization", "accessory_type", "public_visible", "is_active")
     search_fields = ("name", "description", "playground__name")
 
+    def get_object_organization(self, obj):
+        return obj.playground.organization if obj and obj.playground_id else None
+
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
@@ -317,5 +292,8 @@ class PlaygroundAccessoryAdmin(admin.ModelAdmin):
             return qs.filter(playground__organization=organization)
         return qs.none()
 
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        organization = get_user_organization(request.user)
+        if not request.user.is_superuser and organization and db_field.name == "playground":
+            kwargs["queryset"] = Playground.objects.filter(organization=organization)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
