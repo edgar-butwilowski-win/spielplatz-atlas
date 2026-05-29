@@ -1,10 +1,4 @@
-# Copyright (c) 2026 Fachstelle Geoinformation
-# Author: Edgar Butwilowski
-# All rights reserved.
-#
-# This source code is the property of the copyright holder.
-# Unauthorized copying, modification, distribution, or use is prohibited
-# unless expressly permitted in writing.
+from datetime import timedelta
 
 from django.db import transaction
 from django.utils import timezone
@@ -195,7 +189,6 @@ def create_follow_up_task_for_inspection(inspection):
     if not rule.is_active or not rule.applies_to_all_playgrounds:
         return None
 
-    # Falls bereits ein offener Folgeauftrag existiert, wird kein zweiter Auftrag erzeugt.
     existing_open_task = get_open_task_for(inspection.playground, inspection.inspection_type)
 
     if existing_open_task:
@@ -217,6 +210,54 @@ def create_follow_up_task_for_inspection(inspection):
     )
     task.refresh_status(save=True)
     return task
+
+
+def create_follow_up_task_for_cancelled_task(cancelled_task):
+    rule, _created = InspectionRule.objects.get_or_create(
+        organization=cancelled_task.organization,
+        inspection_type=cancelled_task.inspection_type,
+        defaults={
+            "interval_days": InspectionRule.get_default_interval_days(cancelled_task.inspection_type),
+            "applies_to_all_playgrounds": True,
+            "is_active": True,
+        },
+    )
+
+    if not rule.is_active or not rule.applies_to_all_playgrounds:
+        return None
+
+    existing_open_task = get_open_task_for(cancelled_task.playground, cancelled_task.inspection_type)
+
+    if existing_open_task:
+        return existing_open_task
+
+    due_date = cancelled_task.due_date + timedelta(days=rule.interval_days)
+
+    task = InspectionTask.objects.create(
+        organization=cancelled_task.organization,
+        playground=cancelled_task.playground,
+        inspection_type=cancelled_task.inspection_type,
+        due_date=due_date,
+        source=InspectionTask.SOURCE_AUTOMATIC,
+        note=f"Folgeauftrag aus abgebrochenem Auftrag #{cancelled_task.id}.",
+    )
+    task.refresh_status(save=True)
+    return task
+
+
+def cancel_task_and_create_follow_up_task(task, cancellation_reason):
+    cancellation_reason = cancellation_reason.strip()
+
+    if not cancellation_reason:
+        raise ValueError("Ein Abbruchgrund ist erforderlich.")
+
+    existing_note = task.note.strip()
+    cancellation_note = f"Abbruchgrund: {cancellation_reason}"
+    task.note = f"{existing_note}\n\n{cancellation_note}" if existing_note else cancellation_note
+    task.status = InspectionTask.STATUS_CANCELLED
+    task.save(update_fields=["note", "status", "updated_at"])
+
+    return create_follow_up_task_for_cancelled_task(task)
 
 
 def update_planning_after_completed_inspection(inspection):
