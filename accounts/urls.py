@@ -14,5 +14,6 @@ app_name = "accounts"
 
 urlpatterns = [
     path("login/", views.SpielplatzAtlasLoginView.as_view(), name="login"),
+    path("profil/", views.profile_settings, name="profile_settings"),
     path("logout/", views.logout_view, name="logout"),
 ]
