@@ -3,6 +3,16 @@ from django.db import models
 
 
 class UserProfile(models.Model):
+    ROLE_READER = "reader"
+    ROLE_INSPECTOR = "inspector"
+    ROLE_ORG_ADMIN = "org_admin"
+
+    ROLE_CHOICES = (
+        (ROLE_READER, "Lesender interner User"),
+        (ROLE_INSPECTOR, "Kontrolleur/in"),
+        (ROLE_ORG_ADMIN, "Organisations-Admin"),
+    )
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -17,33 +27,17 @@ class UserProfile(models.Model):
         verbose_name="Organisation",
     )
 
+    role = models.CharField(
+        "Rolle",
+        max_length=30,
+        choices=ROLE_CHOICES,
+        default=ROLE_READER,
+        help_text="Die Rolle ist die Quelle der fachlichen Berechtigungen.",
+    )
+
     is_active_for_organization = models.BooleanField(
         "Aktiv für Organisation",
         default=True,
-    )
-
-    is_org_admin = models.BooleanField(
-        "Organisationsverwaltung",
-        default=False,
-        help_text="Darf Stammdaten und Einstellungen der eigenen Organisation verwalten.",
-    )
-
-    can_view_internal = models.BooleanField(
-        "Interne Ansicht",
-        default=True,
-        help_text="Darf interne Daten der eigenen Organisation ansehen.",
-    )
-
-    can_inspect = models.BooleanField(
-        "Kontrollen durchführen",
-        default=False,
-        help_text="Darf Kontrollen starten, Prüfantworten erfassen und Kontrollen abschliessen.",
-    )
-
-    can_maintain = models.BooleanField(
-        "Mängel und Unterhalt bearbeiten",
-        default=False,
-        help_text="Darf Mängel und Instandhaltungsmassnahmen erfassen und bearbeiten.",
     )
 
     created_at = models.DateTimeField(
@@ -56,32 +50,31 @@ class UserProfile(models.Model):
         verbose_name_plural = "Benutzerprofile"
 
     def __str__(self):
-        return f"{self.user} – {self.organization}"
+        label = self.user.get_full_name().strip() or self.user.email or "Benutzer ohne E-Mail"
+        return f"{label} – {self.organization}"
 
     @property
     def may_manage_organization(self):
-        return self.is_active_for_organization and self.is_org_admin
+        return self.is_active_for_organization and self.role == self.ROLE_ORG_ADMIN
 
     @property
     def may_view_internal(self):
-        return self.is_active_for_organization and (
-            self.is_org_admin
-            or self.can_view_internal
-            or self.can_inspect
-            or self.can_maintain
-        )
+        return self.is_active_for_organization and self.role in {
+            self.ROLE_READER,
+            self.ROLE_INSPECTOR,
+            self.ROLE_ORG_ADMIN,
+        }
 
     @property
     def may_inspect(self):
-        return self.is_active_for_organization and (
-            self.is_org_admin
-            or self.can_inspect
-        )
+        return self.is_active_for_organization and self.role in {
+            self.ROLE_INSPECTOR,
+            self.ROLE_ORG_ADMIN,
+        }
 
     @property
     def may_maintain(self):
-        return self.is_active_for_organization and (
-            self.is_org_admin
-            or self.can_maintain
-            or self.can_inspect
-        )
+        return self.is_active_for_organization and self.role in {
+            self.ROLE_INSPECTOR,
+            self.ROLE_ORG_ADMIN,
+        }
