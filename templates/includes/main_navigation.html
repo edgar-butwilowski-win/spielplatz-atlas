@@ -114,6 +114,7 @@
                     {% if request.user.is_superuser or request.user.profile.may_manage_organization %}
                         <a href="/admin/">{% trans "Admin" %}</a>
                     {% endif %}
+                    <a href="{% url 'accounts:profile_settings' %}">{% trans "Profil" %}</a>
                     <a href="{% url 'accounts:logout' %}">{% trans "Logout" %}</a>
                 {% endif %}
             </div>
