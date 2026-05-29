@@ -17,19 +17,19 @@ UserModel = get_user_model()
 
 class ProfileSettingsForm(forms.ModelForm):
     password = forms.CharField(
-        label=_("Password"),
+        label=_("Passwort"),
         required=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password"}),
-        help_text=_("Enter at least 8 characters. Leave empty to keep your current password."),
+        help_text=_("Mindestens 8 Zeichen eingeben. Leer lassen, um das aktuelle Passwort beizubehalten."),
     )
 
     class Meta:
         model = UserModel
         fields = ("first_name", "last_name", "email")
         labels = {
-            "first_name": _("First name"),
-            "last_name": _("Last name"),
-            "email": _("Email address"),
+            "first_name": _("Vorname"),
+            "last_name": _("Nachname"),
+            "email": _("Mail-Adresse"),
         }
         widgets = {
             "first_name": forms.TextInput(attrs={"autocomplete": "given-name"}),
@@ -48,7 +48,7 @@ class ProfileSettingsForm(forms.ModelForm):
         email = (self.cleaned_data.get("email") or "").strip().lower()
 
         if not email:
-            raise ValidationError(_("Please enter an email address."))
+            raise ValidationError(_("Bitte geben Sie eine Mail-Adresse ein."))
 
         duplicate_exists = (
             UserModel.objects
@@ -58,7 +58,7 @@ class ProfileSettingsForm(forms.ModelForm):
         )
 
         if duplicate_exists:
-            raise ValidationError(_("This email address is already used by another user."))
+            raise ValidationError(_("Diese Mail-Adresse wird bereits von einem anderen Benutzer verwendet."))
 
         return email
 
@@ -69,7 +69,7 @@ class ProfileSettingsForm(forms.ModelForm):
             return password
 
         if len(password) < 8:
-            raise ValidationError(_("The password must contain at least 8 characters."))
+            raise ValidationError(_("Das Passwort muss mindestens 8 Zeichen enthalten."))
 
         password_validation.validate_password(password, self.instance)
 
