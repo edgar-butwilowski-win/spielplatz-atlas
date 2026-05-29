@@ -493,6 +493,30 @@ def cancel_inspection_task(request, task_id):
 
 @login_required
 @require_POST
+def suspend_inspection_task(request, task_id):
+    task = get_object_or_404(
+        InspectionTask.objects.select_related("organization", "playground"),
+        id=task_id,
+    )
+
+    require_org_admin_permission(request.user, task.organization)
+
+    if task.status in CLOSED_TASK_STATUSES:
+        messages.error(request, "Erledigte oder abgebrochene Kontrollaufträge können nicht ausgesetzt werden.")
+        return redirect(planning_redirect_url(task.organization_id))
+
+    if task.status == InspectionTask.STATUS_SUSPENDED:
+        messages.info(request, "Der Kontrollauftrag ist bereits ausgesetzt.")
+        return redirect(planning_redirect_url(task.organization_id))
+
+    task.status = InspectionTask.STATUS_SUSPENDED
+    task.save(update_fields=["status", "updated_at"])
+    messages.success(request, "Der Kontrollauftrag wurde ausgesetzt.")
+    return redirect(planning_redirect_url(task.organization_id))
+
+
+@login_required
+@require_POST
 def accept_inspection_task(request, task_id):
     task = get_inspection_task_for_user(task_id, request.user)
 
