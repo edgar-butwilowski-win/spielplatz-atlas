@@ -27,18 +27,20 @@
         .planning-form .btn { white-space:nowrap; }
         .task-note textarea { min-height:3rem; }
         .task-management-panel { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:.85rem; margin-top:.65rem; padding:.65rem; }
-        .task-management-title,.task-action-group-title { color:#64748B; font-size:.68rem; font-weight:800; letter-spacing:.07em; line-height:1; margin-bottom:.45rem; text-transform:uppercase; }
-        .task-management-grid { display:grid; grid-template-columns:minmax(18rem,1fr) 10rem; gap:.6rem; align-items:end; }
-        .task-management-actions,.task-action-stack { display:grid; gap:.35rem; }
-        .task-management-actions .btn,.task-action-stack .btn { width:100%; font-weight:600; line-height:1.25; white-space:normal; }
-        .cancel-task-form { margin:0; }
+        .task-management-title,.task-action-group-title,.task-management-option-title { color:#64748B; font-size:.68rem; font-weight:800; letter-spacing:.07em; line-height:1; margin-bottom:.45rem; text-transform:uppercase; }
+        .task-management-options { display:grid; grid-template-columns:14rem minmax(18rem,1fr); gap:.65rem; align-items:stretch; }
+        .task-management-option { background:white; border:1px solid #E2E8F0; border-radius:.75rem; padding:.55rem; }
+        .task-management-option-text { color:#64748B; font-size:.82rem; line-height:1.3; margin-bottom:.55rem; }
+        .task-action-stack { display:grid; gap:.35rem; }
+        .task-action-stack .btn,.task-management-option .btn { width:100%; font-weight:600; line-height:1.25; white-space:normal; }
+        .cancel-task-form { display:grid; gap:.45rem; margin:0; }
         .cancel-task-form textarea { min-height:3rem; }
         .task-actions { display:grid; align-content:start; gap:.55rem; }
         .task-action-group { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:.85rem; padding:.55rem; }
         .task-action-form { margin:0; }
         .task-action-hint { color:#64748B; display:block; font-size:.78rem; line-height:1.25; }
         .planning-readonly-note { max-width:48rem; white-space:pre-wrap; }
-        @media (max-width:1199.98px){ .task-card-header{grid-template-columns:1fr 1fr;} .task-card-body{grid-template-columns:1fr;} .planning-form,.task-management-grid{grid-template-columns:1fr;} .planning-form .btn,.task-management-actions .btn{width:100%;} }
+        @media (max-width:1199.98px){ .task-card-header{grid-template-columns:1fr 1fr;} .task-card-body{grid-template-columns:1fr;} .planning-form,.task-management-options{grid-template-columns:1fr;} .planning-form .btn{width:100%;} }
         @media (max-width:575.98px){ .task-card-header{grid-template-columns:1fr;} }
         {% include "includes/main_navigation_styles.html" %}
     </style>
@@ -116,20 +118,27 @@
                                     {% if task.status != 'cancelled' and task.status != 'completed' %}
                                         <div class="task-management-panel">
                                             <div class="task-management-title">{% trans "Auftrag bearbeiten" %}</div>
-                                            <div class="task-management-grid">
-                                                <form method="post" action="{% url 'internal:cancel_inspection_task' task.id %}" id="cancel-task-form-{{ task.id }}" class="cancel-task-form">
-                                                    {% csrf_token %}
-                                                    <label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>
-                                                    {{ task.cancel_form.cancellation_reason }}
-                                                </form>
-                                                <div class="task-management-actions">
+                                            <div class="task-management-options">
+                                                <div class="task-management-option">
+                                                    <div class="task-management-option-title">{% trans "Aussetzen" %}</div>
+                                                    <div class="task-management-option-text">{% trans "Pausiert den Auftrag. Es ist kein Abbruchgrund erforderlich." %}</div>
                                                     {% if task.status != 'suspended' %}
                                                         <form method="post" action="{% url 'internal:suspend_inspection_task' task.id %}" class="task-action-form">
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('{% trans "Kontrollauftrag aussetzen?" %}')">{% trans "Aussetzen" %}</button>
                                                         </form>
+                                                    {% else %}
+                                                        <span class="task-action-hint">{% trans "Der Auftrag ist bereits ausgesetzt." %}</span>
                                                     {% endif %}
-                                                    <button type="submit" form="cancel-task-form-{{ task.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button>
+                                                </div>
+                                                <div class="task-management-option">
+                                                    <div class="task-management-option-title">{% trans "Abbrechen" %}</div>
+                                                    <form method="post" action="{% url 'internal:cancel_inspection_task' task.id %}" class="cancel-task-form">
+                                                        {% csrf_token %}
+                                                        <label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>
+                                                        {{ task.cancel_form.cancellation_reason }}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
