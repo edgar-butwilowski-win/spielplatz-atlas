@@ -159,7 +159,13 @@
                                     {% endif %}
                                 {% else %}
                                     <div>{{ task.planned_date|date:"d.m.Y"|default:"-" }}</div>
-                                    <div class="text-secondary small">{{ task.assigned_to|default:_('Not assigned') }}</div>
+                                    <div class="text-secondary small">
+                                        {% if task.assigned_to %}
+                                            {% if task.assigned_to.get_full_name %}{{ task.assigned_to.get_full_name }}{% elif task.assigned_to.email %}{{ task.assigned_to.email }}{% else %}{% trans "Benutzer ohne E-Mail" %}{% endif %}{% if task.assigned_to.email %} ({{ task.assigned_to.email }}){% endif %}
+                                        {% else %}
+                                            {% trans "Not assigned" %}
+                                        {% endif %}
+                                    </div>
                                     {% if task.note %}<div class="text-secondary small planning-readonly-note mt-1">{{ task.note }}</div>{% endif %}
                                     {% if not task.planning_can_be_edited %}<div class="text-secondary small mt-1">{% trans "Completed or cancelled tasks can no longer be planned." %}</div>{% endif %}
                                 {% endif %}
