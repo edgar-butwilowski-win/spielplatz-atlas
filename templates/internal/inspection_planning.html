@@ -22,15 +22,17 @@
         .task-note textarea { min-height:3rem; }
         .task-action-form { margin:0; }
         .task-actions { display:flex; flex-direction:column; gap:.5rem; }
-        .task-action-group { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:.75rem; padding:.5rem; }
-        .task-action-group-title { color:#64748B; font-size:.68rem; font-weight:800; letter-spacing:.07em; line-height:1; margin-bottom:.4rem; text-transform:uppercase; }
-        .task-action-stack { display:grid; gap:.35rem; }
-        .task-action-stack .btn { width:100%; font-weight:600; line-height:1.25; white-space:normal; }
+        .task-action-group,.task-management-panel { background:#F8FAFC; border:1px solid #E2E8F0; border-radius:.75rem; padding:.5rem; }
+        .task-action-group-title,.task-management-title { color:#64748B; font-size:.68rem; font-weight:800; letter-spacing:.07em; line-height:1; margin-bottom:.4rem; text-transform:uppercase; }
+        .task-action-stack,.task-management-actions { display:grid; gap:.35rem; }
+        .task-action-stack .btn,.task-management-actions .btn { width:100%; font-weight:600; line-height:1.25; white-space:normal; }
         .task-action-hint { color:#64748B; display:block; font-size:.78rem; line-height:1.25; }
-        .cancel-task-form { margin-top:.5rem; }
+        .task-management-panel { margin-top:.6rem; padding:.65rem; }
+        .task-management-grid { display:grid; grid-template-columns:minmax(18rem,1fr) 10rem; gap:.6rem; align-items:end; }
+        .cancel-task-form { margin:0; }
         .cancel-task-form textarea { min-height:3rem; }
         .planning-readonly-note { max-width:32rem; white-space:pre-wrap; }
-        @media (max-width:1199.98px){ .planning-column{min-width:22rem;} .planning-form{grid-template-columns:1fr;} .planning-form .btn{width:100%;} .action-column{min-width:13rem;} }
+        @media (max-width:1199.98px){ .planning-column{min-width:22rem;} .planning-form,.task-management-grid{grid-template-columns:1fr;} .planning-form .btn,.task-management-actions .btn{width:100%;} .action-column{min-width:13rem;} }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
@@ -55,105 +57,34 @@
     <section class="content-card p-3 p-lg-4">
         <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">{% trans "Inspection tasks" %}</h2><span class="text-secondary small">{% trans "Maximum 100 entries" %}</span></div>
         {% if tasks %}
-            <div class="table-responsive">
-                <table class="table table-sm align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>{% trans "Due" %}</th>
-                            <th>{% trans "Playground" %}</th>
-                            {% if is_superadmin %}<th>{% trans "Organization" %}</th>{% endif %}
-                            <th>{% trans "Inspection type" %}</th>
-                            <th>{% trans "Status" %}</th>
-                            <th class="planning-column">{% trans "Planning" %}</th>
-                            <th class="action-column">{% trans "Action" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for task in tasks %}
-                            <tr>
-                                <td><span class="fw-semibold {% if task.status == 'overdue' %}text-danger{% endif %}">{{ task.due_date|date:"d.m.Y" }}</span></td>
-                                <td>{{ task.playground.name }}</td>
-                                {% if is_superadmin %}<td>{{ task.organization.name }}</td>{% endif %}
-                                <td>{{ task.get_inspection_type_display }}</td>
-                                <td>{{ task.get_status_display }}</td>
-                                <td class="planning-column">
-                                    {% if task.planning_can_be_edited and can_manage_selected_organization or task.planning_can_be_edited and can_manage and not is_superadmin %}
-                                        <form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="planning-form">
-                                            {% csrf_token %}
-                                            <div>{{ task.planning_form.planned_date }}</div>
-                                            <div>{{ task.planning_form.assigned_to }}</div>
-                                            <div class="task-note">{{ task.planning_form.note }}</div>
-                                            <div><button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Speichern" %}</button></div>
-                                        </form>
-                                        {% if task.status != 'cancelled' and task.status != 'completed' %}
-                                            <form method="post" action="{% url 'internal:cancel_inspection_task' task.id %}" id="cancel-task-form-{{ task.id }}" class="cancel-task-form">
-                                                {% csrf_token %}
-                                                <label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>
-                                                {{ task.cancel_form.cancellation_reason }}
-                                            </form>
-                                        {% endif %}
-                                    {% else %}
-                                        <div>{{ task.planned_date|date:"d.m.Y"|default:"–" }}</div>
-                                        <div class="text-secondary small">{{ task.assigned_to|default:_('Not assigned') }}</div>
-                                        {% if task.note %}<div class="text-secondary small planning-readonly-note mt-1">{{ task.note }}</div>{% endif %}
-                                        {% if not task.planning_can_be_edited %}<div class="text-secondary small mt-1">{% trans "Completed or cancelled tasks can no longer be planned." %}</div>{% endif %}
-                                    {% endif %}
-                                </td>
-                                <td class="action-column">
-                                    <div class="task-actions">
-                                        <div class="task-action-group">
-                                            <div class="task-action-group-title">{% trans "Bericht" %}</div>
-                                            <div class="task-action-stack">
-                                                {% if task.completed_by_inspection_id %}
-                                                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'internal:inspection_pdf' task.completed_by_inspection_id %}">{% trans "Kontrollbericht PDF" %}</a>
-                                                {% else %}
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary" disabled>{% trans "Kontrollbericht PDF" %}</button>
-                                                {% endif %}
-                                            </div>
+            <div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>{% trans "Due" %}</th><th>{% trans "Playground" %}</th>{% if is_superadmin %}<th>{% trans "Organization" %}</th>{% endif %}<th>{% trans "Inspection type" %}</th><th>{% trans "Status" %}</th><th class="planning-column">{% trans "Planning" %}</th><th class="action-column">{% trans "Action" %}</th></tr></thead><tbody>
+                {% for task in tasks %}
+                    <tr>
+                        <td><span class="fw-semibold {% if task.status == 'overdue' %}text-danger{% endif %}">{{ task.due_date|date:"d.m.Y" }}</span></td>
+                        <td>{{ task.playground.name }}</td>
+                        {% if is_superadmin %}<td>{{ task.organization.name }}</td>{% endif %}
+                        <td>{{ task.get_inspection_type_display }}</td>
+                        <td>{{ task.get_status_display }}</td>
+                        <td class="planning-column">
+                            {% if task.planning_can_be_edited and can_manage_selected_organization or task.planning_can_be_edited and can_manage and not is_superadmin %}
+                                <form method="post" action="{% url 'internal:update_inspection_task' task.id %}" class="planning-form">{% csrf_token %}<div>{{ task.planning_form.planned_date }}</div><div>{{ task.planning_form.assigned_to }}</div><div class="task-note">{{ task.planning_form.note }}</div><div><button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Speichern" %}</button></div></form>
+                                {% if task.status != 'cancelled' and task.status != 'completed' %}
+                                    <div class="task-management-panel"><div class="task-management-title">{% trans "Auftrag bearbeiten" %}</div><div class="task-management-grid">
+                                        <form method="post" action="{% url 'internal:cancel_inspection_task' task.id %}" id="cancel-task-form-{{ task.id }}" class="cancel-task-form">{% csrf_token %}<label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>{{ task.cancel_form.cancellation_reason }}</form>
+                                        <div class="task-management-actions">
+                                            {% if task.status != 'suspended' %}<form method="post" action="{% url 'internal:suspend_inspection_task' task.id %}" class="task-action-form">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('{% trans "Kontrollauftrag aussetzen?" %}')">{% trans "Aussetzen" %}</button></form>{% endif %}
+                                            <button type="submit" form="cancel-task-form-{{ task.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button>
                                         </div>
-
-                                        <div class="task-action-group">
-                                            <div class="task-action-group-title">{% trans "Kontrolle" %}</div>
-                                            <div class="task-action-stack">
-                                                {% if can_inspect and task.status != 'completed' and task.status != 'cancelled' and task.can_be_started_by_current_user %}
-                                                    <form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}" class="task-action-form">
-                                                        {% csrf_token %}
-                                                        <button type="submit" class="btn btn-sm btn-success">{% trans "Kontrolle starten" %}</button>
-                                                    </form>
-                                                {% elif can_inspect and task.assigned_to %}
-                                                    <span class="task-action-hint">{% trans "Anderer Person zugewiesen" %}</span>
-                                                {% else %}
-                                                    <span class="task-action-hint">{% trans "Keine Aktion verfügbar" %}</span>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-
-                                        {% if can_manage_selected_organization or can_manage and not is_superadmin %}
-                                            <div class="task-action-group">
-                                                <div class="task-action-group-title">{% trans "Auftrag" %}</div>
-                                                <div class="task-action-stack">
-                                                    {% if task.status != 'completed' and task.status != 'cancelled' and task.status != 'suspended' %}
-                                                        <form method="post" action="{% url 'internal:suspend_inspection_task' task.id %}" class="task-action-form">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('{% trans "Kontrollauftrag aussetzen?" %}')">{% trans "Aussetzen" %}</button>
-                                                        </form>
-                                                    {% endif %}
-                                                    {% if task.status != 'cancelled' and task.status != 'completed' %}
-                                                        <button type="submit" form="cancel-task-form-{{ task.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button>
-                                                    {% endif %}
-                                                    {% if task.status == 'completed' or task.status == 'cancelled' %}
-                                                        <span class="task-action-hint">{% trans "Keine Aktion verfügbar" %}</span>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                    </div></div>
+                                {% endif %}
+                            {% else %}
+                                <div>{{ task.planned_date|date:"d.m.Y"|default:"–" }}</div><div class="text-secondary small">{{ task.assigned_to|default:_('Not assigned') }}</div>{% if task.note %}<div class="text-secondary small planning-readonly-note mt-1">{{ task.note }}</div>{% endif %}{% if not task.planning_can_be_edited %}<div class="text-secondary small mt-1">{% trans "Completed or cancelled tasks can no longer be planned." %}</div>{% endif %}
+                            {% endif %}
+                        </td>
+                        <td class="action-column"><div class="task-actions"><div class="task-action-group"><div class="task-action-group-title">{% trans "Bericht" %}</div><div class="task-action-stack">{% if task.completed_by_inspection_id %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'internal:inspection_pdf' task.completed_by_inspection_id %}">{% trans "Kontrollbericht PDF" %}</a>{% else %}<button type="button" class="btn btn-sm btn-outline-secondary" disabled>{% trans "Kontrollbericht PDF" %}</button>{% endif %}</div></div><div class="task-action-group"><div class="task-action-group-title">{% trans "Kontrolle" %}</div><div class="task-action-stack">{% if can_inspect and task.status != 'completed' and task.status != 'cancelled' and task.can_be_started_by_current_user %}<form method="post" action="{% url 'internal:start_inspection_from_task' task.id %}" class="task-action-form">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success">{% trans "Kontrolle starten" %}</button></form>{% elif can_inspect and task.assigned_to %}<span class="task-action-hint">{% trans "Anderer Person zugewiesen" %}</span>{% else %}<span class="task-action-hint">{% trans "Keine Aktion verfügbar" %}</span>{% endif %}</div></div></div></td>
+                    </tr>
+                {% endfor %}
+            </tbody></table></div>
         {% else %}
             <div class="text-secondary">{% trans "No inspection tasks available for the current selection." %}</div>
         {% endif %}
