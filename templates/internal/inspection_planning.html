@@ -139,7 +139,7 @@
                                                     {% if task.status != 'suspended' %}
                                                         <form method="post" action="{% url 'internal:suspend_inspection_task' task.id %}" class="task-action-form">
                                                             {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('{% trans "Kontrollauftrag aussetzen?" %}')">{% trans "Aussetzen" %}</button>
+                                                            <button type="submit" class="btn btn-sm btn-outline-warning">{% trans "Aussetzen" %}</button>
                                                         </form>
                                                     {% else %}
                                                         <span class="task-action-hint">{% trans "Der Auftrag ist bereits ausgesetzt." %}</span>
@@ -151,7 +151,7 @@
                                                         {% csrf_token %}
                                                         <label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>
                                                         {{ task.cancel_form.cancellation_reason }}
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">{% trans "Abbrechen" %}</button>
                                                     </form>
                                                 </div>
                                             </div>
