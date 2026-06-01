@@ -27,10 +27,10 @@
         .task-action-stack { display:grid; gap:.35rem; }
         .task-action-stack .btn { width:100%; font-weight:600; line-height:1.25; white-space:normal; }
         .task-action-hint { color:#64748B; display:block; font-size:.78rem; line-height:1.25; }
-        .cancel-task-form { display:grid; grid-template-columns:minmax(12rem,1fr) auto; gap:.5rem; align-items:start; margin-top:.5rem; }
+        .cancel-task-form { margin-top:.5rem; }
         .cancel-task-form textarea { min-height:3rem; }
         .planning-readonly-note { max-width:32rem; white-space:pre-wrap; }
-        @media (max-width:1199.98px){ .planning-column{min-width:22rem;} .planning-form,.cancel-task-form{grid-template-columns:1fr;} .planning-form .btn,.cancel-task-form .btn{width:100%;} .action-column{min-width:13rem;} }
+        @media (max-width:1199.98px){ .planning-column{min-width:22rem;} .planning-form{grid-template-columns:1fr;} .planning-form .btn{width:100%;} .action-column{min-width:13rem;} }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
@@ -86,13 +86,10 @@
                                             <div><button type="submit" class="btn btn-sm btn-outline-primary">{% trans "Speichern" %}</button></div>
                                         </form>
                                         {% if task.status != 'cancelled' and task.status != 'completed' %}
-                                            <form method="post" action="{% url 'internal:cancel_inspection_task' task.id %}" class="cancel-task-form">
+                                            <form method="post" action="{% url 'internal:cancel_inspection_task' task.id %}" id="cancel-task-form-{{ task.id }}" class="cancel-task-form">
                                                 {% csrf_token %}
-                                                <div>
-                                                    <label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>
-                                                    {{ task.cancel_form.cancellation_reason }}
-                                                </div>
-                                                <div class="pt-4"><button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button></div>
+                                                <label class="form-label small fw-semibold" for="{{ task.cancel_form.cancellation_reason.id_for_label }}">{% trans "Abbruchgrund" %}</label>
+                                                {{ task.cancel_form.cancellation_reason }}
                                             </form>
                                         {% endif %}
                                     {% else %}
@@ -140,7 +137,11 @@
                                                             {% csrf_token %}
                                                             <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('{% trans "Kontrollauftrag aussetzen?" %}')">{% trans "Aussetzen" %}</button>
                                                         </form>
-                                                    {% else %}
+                                                    {% endif %}
+                                                    {% if task.status != 'cancelled' and task.status != 'completed' %}
+                                                        <button type="submit" form="cancel-task-form-{{ task.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('{% trans "Kontrollauftrag abbrechen und Folgeauftrag erstellen?" %}')">{% trans "Abbrechen" %}</button>
+                                                    {% endif %}
+                                                    {% if task.status == 'completed' or task.status == 'cancelled' %}
                                                         <span class="task-action-hint">{% trans "Keine Aktion verfügbar" %}</span>
                                                     {% endif %}
                                                 </div>
