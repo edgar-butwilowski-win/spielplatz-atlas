@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -47,6 +47,12 @@ ACTIVE_TASK_STATUSES = [
 CLOSED_TASK_STATUSES = [
     InspectionTask.STATUS_COMPLETED,
     InspectionTask.STATUS_CANCELLED,
+]
+
+OVERDUE_RELEVANT_TASK_STATUSES = [
+    InspectionTask.STATUS_OPEN,
+    InspectionTask.STATUS_PLANNED,
+    InspectionTask.STATUS_OVERDUE,
 ]
 
 HTML_DATE_FORMAT = "%Y-%m-%d"
@@ -229,18 +235,40 @@ def is_task_planning_editable(task):
     return task.status not in CLOSED_TASK_STATUSES
 
 
-def choice_count_map(queryset, field_name, choices):
-    raw_counts = queryset.values(field_name).annotate(count=Count("id"))
-    counts = {entry[field_name]: entry["count"] for entry in raw_counts}
+def task_status_count_map(queryset, choices):
+    """Return operational task status counts for the planning overview.
+
+    The 'overdue' KPI is intentionally derived from due date and only counts
+    still-actionable tasks. Completed, cancelled, and suspended tasks remain in
+    their own buckets and are not counted as overdue even if their due date lies
+    in the past.
+    """
+    today = timezone.localdate()
 
     return [
         {
             "key": key,
             "label": label,
-            "count": counts.get(key, 0),
+            "count": task_status_count(queryset, key, today),
         }
         for key, label in choices
     ]
+
+
+def task_status_count(queryset, status_key, today):
+    if status_key == InspectionTask.STATUS_OVERDUE:
+        return queryset.filter(
+            status__in=OVERDUE_RELEVANT_TASK_STATUSES,
+            due_date__lt=today,
+        ).count()
+
+    if status_key in [InspectionTask.STATUS_OPEN, InspectionTask.STATUS_PLANNED]:
+        return queryset.filter(
+            status=status_key,
+            due_date__gte=today,
+        ).count()
+
+    return queryset.filter(status=status_key).count()
 
 
 def add_planning_forms(tasks, user=None):
@@ -279,9 +307,7 @@ def inspection_planning(request):
 
     selected_organization = get_selected_organization(request, scope)
     tasks = get_task_queryset_for_scope(scope, selected_organization)
-    refresh_task_statuses(tasks.exclude(
-        status__in=CLOSED_TASK_STATUSES
-    ))
+    refresh_task_statuses(tasks.exclude(status__in=CLOSED_TASK_STATUSES))
 
     status_filter = request.GET.get("status") or "active"
     inspection_type_filter = request.GET.get("inspection_type") or ""
@@ -311,7 +337,7 @@ def inspection_planning(request):
             "inspection_type_filter": inspection_type_filter,
             "status_choices": [("active", "Aktive Aufträge")] + list(InspectionTask.STATUS_CHOICES),
             "inspection_type_choices": Inspection.TYPE_CHOICES,
-            "task_counts_by_status": choice_count_map(tasks, "status", InspectionTask.STATUS_CHOICES),
+            "task_counts_by_status": task_status_count_map(tasks, InspectionTask.STATUS_CHOICES),
             "can_manage_selected_organization": can_manage_selected_organization,
             "today": timezone.localdate(),
         },
