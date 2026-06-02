@@ -8,13 +8,16 @@
 
 from django.urls import path
 
-from . import control_status, dashboard, export_views, planning_views, views
+from . import control_status, dashboard, defect_management, export_views, planning_views, views
 
 app_name = "internal"
 
 urlpatterns = [
     path("dashboard/", dashboard.dashboard, name="dashboard"),
     path("control-status/", control_status.control_status, name="control_status"),
+    path("defects/", defect_management.defect_management, name="defect_management"),
+    path("defects/<int:defect_id>/assign/", defect_management.update_defect_assignment, name="update_defect_assignment"),
+    path("defects/<int:defect_id>/status/", defect_management.update_defect_status, name="update_defect_status"),
     path("my-inspections/", planning_views.my_inspections, name="my_inspections"),
     path("inspection-planning/", planning_views.inspection_planning, name="inspection_planning"),
     path("inspection-planning/rebuild/", planning_views.rebuild_inspection_planning, name="rebuild_inspection_planning"),
