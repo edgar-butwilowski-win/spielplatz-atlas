@@ -1,0 +1,30 @@
+{% load i18n %}
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% trans "Mängel verwalten" %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>{% include "includes/main_navigation_styles.html" %}</style>
+</head>
+<body>
+{% include "includes/main_navigation.html" %}
+<main class="container py-4">
+    <h1>{% trans "Mängel verwalten" %}</h1>
+    <p>{% trans "Die operative Mängelverwaltung wird geladen." %}</p>
+    {% for defect in defects %}
+        <section class="border rounded p-3 mb-3 bg-white">
+            <h2 class="h5">{{ defect.management_target }}</h2>
+            <p>{{ defect.playground.name }} · {{ defect.get_status_display }}</p>
+            <p>{{ defect.internal_description|truncatechars:300 }}</p>
+            <p>{{ defect.assignment_display }} · {{ defect.notification_status_display }}</p>
+            <a class="btn btn-sm btn-outline-primary" href="{% url 'internal:edit_defect' defect.id %}">{% trans "Bearbeiten" %}</a>
+        </section>
+    {% empty %}
+        <p>{% trans "Keine Mängel für die aktuelle Auswahl vorhanden." %}</p>
+    {% endfor %}
+</main>
+{% include "includes/main_navigation_script.html" %}
+</body>
+</html>
