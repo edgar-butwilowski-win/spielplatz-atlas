@@ -56,20 +56,13 @@ DEFECT_STATUS_ACTIONS = {
 
 def get_defect_management_scope(user):
     if user.is_superuser:
-        return {
-            "organization": None,
-            "is_superadmin": True,
-            "can_manage": True,
-            "can_view_internal": True,
-        }
+        return {"organization": None, "is_superadmin": True, "can_manage": True, "can_view_internal": True}
 
     profile = getattr(user, "profile", None)
-
     if not profile:
         return None
 
     profile = get_active_profile_for_organization(user, profile.organization)
-
     if not profile or not profile.may_view_internal or not profile.may_manage_organization:
         return None
 
@@ -86,10 +79,8 @@ def get_selected_organization(request, scope):
         return scope["organization"]
 
     organization_id = request.GET.get("organization") or request.POST.get("organization")
-
     if organization_id:
         return get_object_or_404(Organization, id=organization_id, is_active=True)
-
     return None
 
 
@@ -109,52 +100,38 @@ def get_defect_queryset_for_scope(scope, selected_organization):
             defects = defects.filter(playground__organization=selected_organization)
     else:
         defects = defects.filter(playground__organization=scope["organization"])
-
     return defects
 
 
 def defect_management_redirect_url(request, organization_id=None):
     base_url = reverse("internal:defect_management")
     query = request.POST.get("next_query") or ""
-
     if query:
         return f"{base_url}?{query}"
-
     if organization_id:
         return f"{base_url}?organization={organization_id}"
-
     return base_url
 
 
 def format_notification_status(notification):
     if not notification:
         return "Keine Meldung"
-
     if notification.delivery_status == SystemNotification.STATUS_SENT:
-        if notification.read_at:
-            return "Push gesendet, gelesen"
-        return "Push gesendet"
-
+        return "Push gesendet, gelesen" if notification.read_at else "Push gesendet"
     if notification.delivery_status == SystemNotification.STATUS_NO_SUBSCRIPTION:
         return "Kein Push-Gerät"
-
     if notification.delivery_status == SystemNotification.STATUS_FAILED:
         return "Push fehlgeschlagen"
-
     return "Systemnachricht gespeichert"
 
 
-def enrich_defects(defects):
+def enrich_defects(defects, current_user):
     defect_list = list(defects[:100])
     defect_ids = [defect.id for defect in defect_list]
-
     latest_notifications = {}
     notifications = (
         SystemNotification.objects
-        .filter(
-            related_defect_id__in=defect_ids,
-            notification_type=SystemNotification.TYPE_DEFECT_ASSIGNED,
-        )
+        .filter(related_defect_id__in=defect_ids, notification_type=SystemNotification.TYPE_DEFECT_ASSIGNED)
         .select_related("recipient")
         .order_by("related_defect_id", "-created_at")
     )
@@ -166,7 +143,6 @@ def enrich_defects(defects):
         assignment = getattr(defect, "assignment", None)
         notification = latest_notifications.get(defect.id)
         target_parts = []
-
         if defect.equipment:
             target_parts.append(defect.equipment.name)
         if defect.surface:
@@ -176,6 +152,11 @@ def enrich_defects(defects):
 
         defect.management_target = ", ".join(target_parts) or "Allgemeiner Mangel"
         defect.assignment_display = display_user(assignment.assigned_to) if assignment and assignment.assigned_to else "Nicht zugewiesen"
+        defect.assignment_form = DefectAssignmentForm(
+            initial={"assigned_to": assignment.assigned_to if assignment else None},
+            organization=defect.playground.organization,
+            current_user=current_user,
+        )
         defect.latest_assignment_notification = notification
         defect.notification_status_display = format_notification_status(notification)
         defect.is_overdue = bool(
@@ -183,7 +164,6 @@ def enrich_defects(defects):
             and defect.planned_resolution_date < timezone.localdate()
             and defect.status in OPEN_DEFECT_STATUSES
         )
-
     return defect_list
 
 
@@ -191,10 +171,7 @@ def build_status_counts(defects):
     return {
         "open": defects.filter(status__in=OPEN_DEFECT_STATUSES).count(),
         "safety": defects.filter(status__in=OPEN_DEFECT_STATUSES, has_safety_risk=True).count(),
-        "overdue": defects.filter(
-            status__in=OPEN_DEFECT_STATUSES,
-            planned_resolution_date__lt=timezone.localdate(),
-        ).count(),
+        "overdue": defects.filter(status__in=OPEN_DEFECT_STATUSES, planned_resolution_date__lt=timezone.localdate()).count(),
         "done": defects.filter(status=Defect.STATUS_DONE).count(),
         "verified": defects.filter(status=Defect.STATUS_VERIFIED).count(),
     }
@@ -206,7 +183,6 @@ def apply_defect_filters(defects, request):
     playground_filter = request.GET.get("playground") or ""
     source_filter = request.GET.get("source") or ""
     search_query = (request.GET.get("q") or "").strip()
-
     filtered_defects = defects
 
     if status_filter == "open":
@@ -224,13 +200,10 @@ def apply_defect_filters(defects, request):
         filtered_defects = filtered_defects.filter(has_safety_risk=True)
     elif safety_filter == "no":
         filtered_defects = filtered_defects.filter(has_safety_risk=False)
-
     if playground_filter:
         filtered_defects = filtered_defects.filter(playground_id=playground_filter)
-
     if source_filter:
         filtered_defects = filtered_defects.filter(source_type=source_filter)
-
     if search_query:
         filtered_defects = filtered_defects.filter(
             Q(internal_description__icontains=search_query)
@@ -258,18 +231,12 @@ def get_playgrounds_for_filter(defects):
 def user_must_manage_defect(user, defect):
     if not defect.playground:
         raise PermissionDenied("Dieser Mangel ist keinem Spielplatz zugeordnet.")
-
     require_org_admin_permission(user, defect.playground.organization)
 
 
 def get_manageable_defect(defect_id):
     return get_object_or_404(
-        Defect.objects.select_related(
-            "playground",
-            "playground__organization",
-            "assignment",
-            "assignment__assigned_to",
-        ),
+        Defect.objects.select_related("playground", "playground__organization", "assignment", "assignment__assigned_to"),
         id=defect_id,
     )
 
@@ -277,22 +244,15 @@ def get_manageable_defect(defect_id):
 @login_required
 def defect_management(request):
     scope = get_defect_management_scope(request.user)
-
     if not scope:
         raise PermissionDenied("Keine Berechtigung für die operative Mängelverwaltung.")
-
     if scope["organization"]:
         require_internal_view_permission(request.user, scope["organization"])
 
     selected_organization = get_selected_organization(request, scope)
     defects = get_defect_queryset_for_scope(scope, selected_organization)
     filtered_defects, filters = apply_defect_filters(defects, request)
-    filtered_defects = filtered_defects.order_by(
-        "-has_safety_risk",
-        "planned_resolution_date",
-        "-created_at",
-    )
-
+    filtered_defects = filtered_defects.order_by("-has_safety_risk", "planned_resolution_date", "-created_at")
     organizations = Organization.objects.filter(is_active=True).order_by("name") if scope["is_superadmin"] else []
     playgrounds = get_playgrounds_for_filter(defects)
     status_counts = build_status_counts(defects)
@@ -304,7 +264,7 @@ def defect_management(request):
             **scope,
             "selected_organization": selected_organization,
             "organizations": organizations,
-            "defects": enrich_defects(filtered_defects),
+            "defects": enrich_defects(filtered_defects, request.user),
             "filters": filters,
             "defect_filter_choices": DEFECT_FILTER_CHOICES,
             "defect_status_choices": Defect.STATUS_CHOICES,
@@ -321,21 +281,11 @@ def defect_management(request):
 def update_defect_assignment(request, defect_id):
     defect = get_manageable_defect(defect_id)
     user_must_manage_defect(request.user, defect)
-
-    form = DefectAssignmentForm(
-        request.POST,
-        organization=defect.playground.organization,
-        current_user=request.user,
-    )
+    form = DefectAssignmentForm(request.POST, organization=defect.playground.organization, current_user=request.user)
 
     if form.is_valid():
         assigned_to = form.cleaned_data["assigned_to"]
-        _, notification = assign_defect(
-            defect=defect,
-            assigned_to=assigned_to,
-            assigned_by=request.user,
-        )
-
+        _, notification = assign_defect(defect=defect, assigned_to=assigned_to, assigned_by=request.user)
         if assigned_to:
             if notification and notification.delivery_status == SystemNotification.STATUS_SENT:
                 messages.success(request, "Der Mangel wurde zugewiesen. Die Push-Meldung wurde gesendet.")
@@ -349,7 +299,6 @@ def update_defect_assignment(request, defect_id):
         for errors in form.errors.values():
             for error in errors:
                 messages.error(request, error)
-
     return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
 
 
@@ -358,7 +307,6 @@ def update_defect_assignment(request, defect_id):
 def update_defect_status(request, defect_id):
     defect = get_manageable_defect(defect_id)
     user_must_manage_defect(request.user, defect)
-
     status = request.POST.get("status")
 
     if status not in DEFECT_STATUS_ACTIONS:
@@ -374,5 +322,4 @@ def update_defect_status(request, defect_id):
         messages.success(request, "Der Mangel wurde geprüft und abgeschlossen.")
     else:
         messages.success(request, "Der Mangelstatus wurde aktualisiert.")
-
     return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
