@@ -120,7 +120,7 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
     inspection_list = list(inspections)
     action_list = list(maintenance_actions)
     completed_inspections = [item for item in inspection_list if item.status == Inspection.STATUS_COMPLETED]
-    done_defects = [item for item in defect_list if item.status in [Defect.STATUS_DONE, Defect.STATUS_VERIFIED]]
+    verified_defects = [item for item in defect_list if item.status == Defect.STATUS_VERIFIED]
     safety_defects = [item for item in defect_list if item.has_safety_risk]
     week0 = week_start(timezone.localdate())
     weeks = [week0 + timedelta(days=7 * offset) for offset in range(DASHBOARD_WEEKS)]
@@ -132,7 +132,7 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
             task_counts[key][label] += 1
     return {
         "monthLabels": [month_label(month) for month in months],
-        "defectTrend": [chart_series("New defects", monthly_counts(defect_list, months, "reported_at")), chart_series("Resolved / checked defects", monthly_counts(done_defects, months, "updated_at"))],
+        "defectTrend": [chart_series("New defects", monthly_counts(defect_list, months, "reported_at")), chart_series("Geprüfte / abgeschlossene Mängel", monthly_counts(verified_defects, months, "updated_at"))],
         "safetyRiskTrend": [chart_series("New safety-risk defects", monthly_counts(safety_defects, months, "reported_at"))],
         "inspectionTypeTrend": [chart_series(label, monthly_counts([item for item in completed_inspections if item.inspection_type == key], months, "inspected_at")) for key, label in Inspection.TYPE_CHOICES],
         "inspectionResultTrend": [chart_series(label, monthly_counts([item for item in completed_inspections if item.result == key], months, "inspected_at")) for key, label in Inspection.RESULT_CHOICES],
