@@ -9,7 +9,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Q
+from django.db.models import Min, Prefetch, Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -17,7 +17,7 @@ from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
 from accounts.utils import display_user
-from inspections.models import Defect
+from inspections.models import Defect, MaintenanceAction
 from notifications.forms import DefectAssignmentForm
 from notifications.models import SystemNotification
 from notifications.services import assign_defect
@@ -40,6 +40,10 @@ OPEN_DEFECT_STATUSES = [
 LOCKED_PLANNING_STATUSES = [
     Defect.STATUS_DONE,
     Defect.STATUS_VERIFIED,
+]
+ACTIVE_MAINTENANCE_STATUSES = [
+    MaintenanceAction.STATUS_PLANNED,
+    MaintenanceAction.STATUS_IN_PROGRESS,
 ]
 DEFECT_STATUS_OVERDUE = "overdue"
 
@@ -110,15 +114,17 @@ def get_selected_organization(request, scope):
 
 
 def get_defect_queryset_for_scope(scope, selected_organization):
+    maintenance_prefetch = Prefetch(
+        "maintenance_actions",
+        queryset=MaintenanceAction.objects.select_related("assigned_to").order_by("planned_date", "-created_at"),
+    )
     defects = Defect.objects.select_related(
         "playground",
         "playground__organization",
         "equipment",
         "surface",
         "accessory",
-        "assignment",
-        "assignment__assigned_to",
-    )
+    ).prefetch_related(maintenance_prefetch)
 
     if scope["is_superadmin"]:
         if selected_organization:
@@ -152,9 +158,13 @@ def format_notification_status(notification):
     return "Systemnachricht gespeichert"
 
 
+def get_active_maintenance_action(defect):
+    return defect.active_maintenance_action
+
+
 def defect_has_assignment(defect):
-    assignment = getattr(defect, "assignment", None)
-    return bool(assignment and assignment.assigned_to_id)
+    action = get_active_maintenance_action(defect)
+    return bool(action and action.assigned_to_id)
 
 
 def can_defect_be_planned(defect):
@@ -178,9 +188,39 @@ def save_defect_with_planning_status(defect, update_fields=None):
     defect.save(update_fields=update_fields)
 
 
+def cancel_active_maintenance_actions(defect):
+    defect.maintenance_actions.filter(status__in=ACTIVE_MAINTENANCE_STATUSES).update(status=MaintenanceAction.STATUS_CANCELLED, updated_at=timezone.now())
+    if hasattr(defect, "_prefetched_objects_cache"):
+        defect._prefetched_objects_cache.pop("maintenance_actions", None)
+
+
+def build_maintenance_title(defect):
+    if defect.equipment:
+        return f"Mangel beheben: {defect.equipment.name}"
+    if defect.surface:
+        return f"Mangel beheben: {defect.surface.name}"
+    if defect.accessory:
+        return f"Mangel beheben: {defect.accessory.name}"
+    return "Mangel beheben"
+
+
+def upsert_defect_maintenance_action(defect, *, assigned_to=None, planned_date=None):
+    action = get_active_maintenance_action(defect)
+    if not action:
+        action = MaintenanceAction(defect=defect, title=build_maintenance_title(defect), status=MaintenanceAction.STATUS_PLANNED)
+    action.assigned_to = assigned_to
+    action.planned_date = planned_date
+    if action.status not in ACTIVE_MAINTENANCE_STATUSES:
+        action.status = MaintenanceAction.STATUS_PLANNED
+    action.save()
+    if hasattr(defect, "_prefetched_objects_cache"):
+        defect._prefetched_objects_cache.pop("maintenance_actions", None)
+    return action
+
+
 def clear_defect_planning(defect, user=None):
     assign_defect(defect=defect, assigned_to=None, assigned_by=user)
-    defect.planned_resolution_date = None
+    cancel_active_maintenance_actions(defect)
 
 
 def defect_planning_is_locked(defect):
@@ -202,7 +242,7 @@ def enrich_defects(defects, current_user):
         latest_notifications.setdefault(notification.related_defect_id, notification)
 
     for defect in defect_list:
-        assignment = getattr(defect, "assignment", None)
+        action = get_active_maintenance_action(defect)
         notification = latest_notifications.get(defect.id)
         target_parts = []
         if defect.equipment:
@@ -212,10 +252,11 @@ def enrich_defects(defects, current_user):
         if defect.accessory:
             target_parts.append(defect.accessory.name)
 
+        assigned_to = action.assigned_to if action else None
         defect.management_target = ", ".join(target_parts) or "Allgemeiner Mangel"
-        defect.assignment_display = display_user(assignment.assigned_to) if assignment and assignment.assigned_to else "Nicht zugewiesen"
+        defect.assignment_display = display_user(assigned_to) if assigned_to else "Nicht zugewiesen"
         defect.assignment_form = DefectAssignmentForm(
-            initial={"assigned_to": assignment.assigned_to if assignment else None},
+            initial={"assigned_to": assigned_to},
             organization=defect.playground.organization,
             current_user=current_user,
         )
@@ -231,13 +272,14 @@ def enrich_defects(defects, current_user):
 
 
 def build_status_counts(defects):
+    today = timezone.localdate()
     return {
-        "open": defects.filter(status=Defect.STATUS_OPEN).count(),
-        "planned": defects.filter(status=Defect.STATUS_PLANNED).count(),
-        "safety": defects.filter(status=Defect.STATUS_OPEN, has_safety_risk=True).count(),
-        "overdue": defects.filter(status__in=OPEN_DEFECT_STATUSES, planned_resolution_date__lt=timezone.localdate()).count(),
-        "done": defects.filter(status=Defect.STATUS_DONE).count(),
-        "verified": defects.filter(status=Defect.STATUS_VERIFIED).count(),
+        "open": defects.filter(status=Defect.STATUS_OPEN).distinct().count(),
+        "planned": defects.filter(status=Defect.STATUS_PLANNED).distinct().count(),
+        "safety": defects.filter(status=Defect.STATUS_OPEN, has_safety_risk=True).distinct().count(),
+        "overdue": defects.filter(status__in=OPEN_DEFECT_STATUSES, maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES, maintenance_actions__planned_date__lt=today).distinct().count(),
+        "done": defects.filter(status=Defect.STATUS_DONE).distinct().count(),
+        "verified": defects.filter(status=Defect.STATUS_VERIFIED).distinct().count(),
     }
 
 
@@ -253,8 +295,9 @@ def apply_defect_filters(defects, request):
     if status_filter == DEFECT_STATUS_OVERDUE:
         filtered_defects = filtered_defects.filter(
             status__in=OPEN_DEFECT_STATUSES,
-            planned_resolution_date__lt=timezone.localdate(),
-        )
+            maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES,
+            maintenance_actions__planned_date__lt=timezone.localdate(),
+        ).distinct()
     elif status_filter in allowed_status_filters:
         filtered_defects = filtered_defects.filter(status=status_filter)
 
@@ -327,7 +370,9 @@ def user_can_view_defect(user, defect):
 
 def get_manageable_defect(defect_id):
     return get_object_or_404(
-        Defect.objects.select_related("playground", "playground__organization", "assignment", "assignment__assigned_to"),
+        Defect.objects.select_related("playground", "playground__organization").prefetch_related(
+            Prefetch("maintenance_actions", queryset=MaintenanceAction.objects.select_related("assigned_to").order_by("planned_date", "-created_at"))
+        ),
         id=defect_id,
     )
 
@@ -350,7 +395,12 @@ def defect_management(request):
     selected_organization = get_selected_organization(request, scope)
     defects = get_defect_queryset_for_scope(scope, selected_organization)
     filtered_defects, filters = apply_defect_filters(defects, request)
-    filtered_defects = filtered_defects.order_by("-has_safety_risk", "planned_resolution_date", "-created_at")
+    filtered_defects = filtered_defects.annotate(
+        next_planned_date=Min(
+            "maintenance_actions__planned_date",
+            filter=Q(maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES),
+        )
+    ).order_by("-has_safety_risk", "next_planned_date", "-created_at")
     organizations = Organization.objects.filter(is_active=True).order_by("name") if scope["is_superadmin"] else []
     playgrounds = get_playgrounds_for_filter(defects)
     status_counts = build_status_counts(defects)
@@ -387,9 +437,7 @@ def edit_defect(request, defect_id):
             "equipment",
             "surface",
             "accessory",
-            "assignment",
-            "assignment__assigned_to",
-        ).prefetch_related("images", "images__image"),
+        ).prefetch_related("images", "images__image", Prefetch("maintenance_actions", queryset=MaintenanceAction.objects.select_related("assigned_to").order_by("planned_date", "-created_at"))),
         id=defect_id,
     )
 
@@ -404,7 +452,6 @@ def edit_defect(request, defect_id):
 
     can_edit_defect = user_can_manage_defect(request.user, defect)
     can_manage_assignment = user_can_manage_defect(request.user, defect, include_assignment=True)
-    current_planned_resolution_date = defect.planned_resolution_date
 
     if request.method == "POST":
         user_must_manage_defect(request.user, defect)
@@ -418,8 +465,6 @@ def edit_defect(request, defect_id):
         if form.is_valid():
             defect = form.save(commit=False)
             defect.playground = playground
-            if not can_manage_assignment:
-                defect.planned_resolution_date = current_planned_resolution_date
             save_defect_with_planning_status(defect)
 
             if save_defect_images_or_add_error(request, defect):
@@ -431,12 +476,10 @@ def edit_defect(request, defect_id):
     if not can_edit_defect:
         for field in form.fields.values():
             field.disabled = True
-    if not can_manage_assignment and "planned_resolution_date" in form.fields:
-        form.fields["planned_resolution_date"].disabled = True
 
-    current_assignment = getattr(defect, "assignment", None)
+    active_action = get_active_maintenance_action(defect)
     assignment_form = DefectAssignmentForm(
-        initial={"assigned_to": current_assignment.assigned_to if current_assignment else None},
+        initial={"assigned_to": active_action.assigned_to if active_action else None},
         organization=playground.organization,
         current_user=request.user,
     )
@@ -448,7 +491,7 @@ def edit_defect(request, defect_id):
             "defect": defect,
             "form": form,
             "assignment_form": assignment_form,
-            "current_assignment": current_assignment,
+            "current_assignment": active_action,
             "playground": playground,
             "defect_images": defect.images.select_related("image").all(),
             "can_edit_defect": can_edit_defect,
@@ -471,6 +514,11 @@ def update_defect_assignment(request, defect_id):
 
     if form.is_valid():
         assigned_to = form.cleaned_data["assigned_to"]
+        planned_date = defect.planned_resolution_date
+        if assigned_to or planned_date:
+            upsert_defect_maintenance_action(defect, assigned_to=assigned_to, planned_date=planned_date)
+        else:
+            cancel_active_maintenance_actions(defect)
         _, notification = assign_defect(defect=defect, assigned_to=assigned_to, assigned_by=request.user)
         defect = get_manageable_defect(defect_id)
         save_defect_with_planning_status(defect, update_fields=["status", "updated_at"])
@@ -513,10 +561,13 @@ def update_defect_planning(request, defect_id):
 
     if form.is_valid():
         assigned_to = form.cleaned_data["assigned_to"]
+        if assigned_to or planned_resolution_date:
+            upsert_defect_maintenance_action(defect, assigned_to=assigned_to, planned_date=planned_resolution_date)
+        else:
+            cancel_active_maintenance_actions(defect)
         _, notification = assign_defect(defect=defect, assigned_to=assigned_to, assigned_by=request.user)
         defect = get_manageable_defect(defect_id)
-        defect.planned_resolution_date = planned_resolution_date
-        save_defect_with_planning_status(defect, update_fields=["planned_resolution_date", "status", "updated_at"])
+        save_defect_with_planning_status(defect, update_fields=["status", "updated_at"])
 
         if defect.status == Defect.STATUS_PLANNED:
             messages.success(request, "Die Planung wurde gespeichert. Der Mangel ist nun geplant.")
@@ -548,10 +599,21 @@ def update_defect_status(request, defect_id):
     if status == Defect.STATUS_OPEN:
         clear_defect_planning(defect, request.user)
         defect = get_manageable_defect(defect_id)
-        defect.planned_resolution_date = None
+    elif status == Defect.STATUS_DONE:
+        active_action = get_active_maintenance_action(defect)
+        if active_action:
+            active_action.status = MaintenanceAction.STATUS_DONE
+            active_action.completed_date = timezone.localdate()
+            active_action.save(update_fields=["status", "completed_date", "updated_at"])
+    elif status == Defect.STATUS_VERIFIED:
+        active_action = get_active_maintenance_action(defect)
+        if active_action and active_action.status != MaintenanceAction.STATUS_DONE:
+            active_action.status = MaintenanceAction.STATUS_DONE
+            active_action.completed_date = active_action.completed_date or timezone.localdate()
+            active_action.save(update_fields=["status", "completed_date", "updated_at"])
 
     defect.status = status
-    defect.save(update_fields=["status", "planned_resolution_date", "updated_at"] if status == Defect.STATUS_OPEN else ["status", "updated_at"])
+    defect.save(update_fields=["status", "updated_at"])
 
     if status == Defect.STATUS_OPEN:
         messages.success(request, "Der Mangel wurde auf offen gesetzt. Zuweisung und geplantes Behebungsdatum wurden entfernt.")
