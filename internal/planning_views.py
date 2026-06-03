@@ -38,8 +38,8 @@ class InspectionTaskPlanningForm(forms.ModelForm):
 
     class Meta:
         model = InspectionTask
-        fields = ("planned_date", "assigned_to")
-        widgets = {"planned_date": forms.DateInput(format=HTML_DATE_FORMAT, attrs={"type": "date", "class": "form-control"})}
+        fields = ("planned_date", "assigned_to", "note")
+        widgets = {"planned_date": forms.DateInput(format=HTML_DATE_FORMAT, attrs={"type": "date", "class": "form-control"}), "note": forms.Textarea(attrs={"rows": 2, "class": "form-control"})}
 
     def __init__(self, *args, organization=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -48,6 +48,7 @@ class InspectionTaskPlanningForm(forms.ModelForm):
         self.fields["planned_date"].input_formats = [HTML_DATE_FORMAT]
         self.fields["planned_date"].widget.format = HTML_DATE_FORMAT
         self.fields["assigned_to"].required = False
+        self.fields["note"].required = False
         self.fields["assigned_to"].queryset = self.get_assignable_users()
 
     def get_assignable_users(self):
@@ -95,7 +96,7 @@ def get_selected_organization(request, scope):
 
 
 def get_task_queryset_for_scope(scope, selected_organization):
-    tasks = InspectionTask.objects.select_related("organization", "playground", "assigned_to")
+    tasks = InspectionTask.objects.select_related("organization", "playground", "assigned_to", "created_from_inspection", "completed_by_inspection")
     if scope["is_superadmin"]:
         if selected_organization:
             tasks = tasks.filter(organization=selected_organization)
