@@ -19,6 +19,10 @@ DASHBOARD_MONTHS = 12
 DASHBOARD_WEEKS = 12
 MIN_SUPPLIER_EQUIPMENT_COUNT = 5
 SUPPLIER_RATE_LIMIT = 10
+EXCLUDED_DASHBOARD_DEFECT_STATUSES = [
+    Defect.STATUS_IN_PROGRESS,
+    Defect.STATUS_VERIFIED,
+]
 
 
 def dashboard_json(data):
@@ -211,7 +215,11 @@ def build_dashboard_context(scope):
     planned_maintenance_actions = maintenance_actions.exclude(status__in=[MaintenanceAction.STATUS_DONE, MaintenanceAction.STATUS_CANCELLED])
     completed_inspections = inspections.filter(status=Inspection.STATUS_COMPLETED)
     draft_inspections = inspections.filter(status=Inspection.STATUS_DRAFT)
-    defects_by_status = choice_count_map(defects.exclude(status=Defect.STATUS_VERIFIED), "status", [choice for choice in Defect.STATUS_CHOICES if choice[0] != Defect.STATUS_VERIFIED])
+    defects_by_status = choice_count_map(
+        defects.exclude(status__in=EXCLUDED_DASHBOARD_DEFECT_STATUSES),
+        "status",
+        [choice for choice in Defect.STATUS_CHOICES if choice[0] not in EXCLUDED_DASHBOARD_DEFECT_STATUSES],
+    )
     time_charts = build_time_charts(defects, inspections, maintenance_actions, inspection_tasks)
     equipment_charts = build_equipment_charts(defects, equipment)
     organizations_count = Organization.objects.count() if organization is None else 1
