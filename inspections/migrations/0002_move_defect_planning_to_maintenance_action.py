@@ -1,45 +1,107 @@
-# Generated for moving defect planning data to MaintenanceAction
+# Robust transition migration for moving defect planning data to MaintenanceAction.
+# The committed historic migrations are older than the current model state, so this
+# migration intentionally works through database introspection instead of relying on
+# a complete Django migration state for all current models.
 
-import django.db.models.deletion
-from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
 
 
-def build_maintenance_title(defect):
-    if getattr(defect, "equipment_id", None):
-        return "Mangel beheben: Spielgerät"
-    if getattr(defect, "surface_id", None):
-        return "Mangel beheben: Fallschutzfläche"
-    if getattr(defect, "accessory_id", None):
-        return "Mangel beheben: Zusatzausstattung"
-    return "Mangel beheben"
+DEFECT_TABLE = "inspections_defect"
+MAINTENANCE_TABLE = "inspections_maintenanceaction"
+ASSIGNMENT_TABLE = "notifications_defectassignment"
+
+
+def table_exists(connection, table_name):
+    return table_name in connection.introspection.table_names()
+
+
+def column_exists(connection, table_name, column_name):
+    if not table_exists(connection, table_name):
+        return False
+    with connection.cursor() as cursor:
+        columns = connection.introspection.get_table_description(cursor, table_name)
+    return any(column.name == column_name for column in columns)
+
+
+def quote(connection, name):
+    return connection.ops.quote_name(name)
+
+
+def add_column_if_missing(schema_editor, table_name, column_name, ddl_fragment):
+    connection = schema_editor.connection
+    if not table_exists(connection, table_name) or column_exists(connection, table_name, column_name):
+        return
+    with connection.cursor() as cursor:
+        cursor.execute(f"ALTER TABLE {quote(connection, table_name)} ADD COLUMN {quote(connection, column_name)} {ddl_fragment}")
+
+
+def drop_column_if_exists(schema_editor, table_name, column_name):
+    connection = schema_editor.connection
+    if not column_exists(connection, table_name, column_name):
+        return
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(f"ALTER TABLE {quote(connection, table_name)} DROP COLUMN {quote(connection, column_name)}")
+    except Exception:
+        # Keeping the old database column is safe because the Django model no longer
+        # maps it. Some older SQLite versions cannot drop columns in-place.
+        pass
 
 
 def migrate_planning_to_maintenance_actions(apps, schema_editor):
-    Defect = apps.get_model("inspections", "Defect")
-    MaintenanceAction = apps.get_model("inspections", "MaintenanceAction")
-    DefectAssignment = apps.get_model("notifications", "DefectAssignment")
+    connection = schema_editor.connection
+    if not table_exists(connection, DEFECT_TABLE) or not table_exists(connection, MAINTENANCE_TABLE):
+        return
 
-    assignments = {
-        assignment.defect_id: assignment.assigned_to_id
-        for assignment in DefectAssignment.objects.filter(assigned_to_id__isnull=False)
-    }
+    add_column_if_missing(schema_editor, MAINTENANCE_TABLE, "assigned_to_id", "bigint NULL")
 
-    planned_defects = Defect.objects.filter(planned_resolution_date__isnull=False)
-    for defect in planned_defects.iterator():
-        action = (
-            MaintenanceAction.objects
-            .filter(defect_id=defect.id, status__in=["planned", "in_progress"])
-            .order_by("planned_date", "-created_at")
-            .first()
+    if not column_exists(connection, DEFECT_TABLE, "planned_resolution_date"):
+        return
+
+    assignments = {}
+    if table_exists(connection, ASSIGNMENT_TABLE) and column_exists(connection, ASSIGNMENT_TABLE, "assigned_to_id"):
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT defect_id, assigned_to_id FROM {quote(connection, ASSIGNMENT_TABLE)} WHERE assigned_to_id IS NOT NULL"
+            )
+            assignments = {defect_id: assigned_to_id for defect_id, assigned_to_id in cursor.fetchall()}
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            f"SELECT id, planned_resolution_date FROM {quote(connection, DEFECT_TABLE)} WHERE planned_resolution_date IS NOT NULL"
         )
-        if action is None:
-            action = MaintenanceAction(defect_id=defect.id, title=build_maintenance_title(defect), status="planned")
-        if not action.title:
-            action.title = build_maintenance_title(defect)
-        action.planned_date = defect.planned_resolution_date
-        action.assigned_to_id = assignments.get(defect.id)
-        action.save()
+        planned_defects = cursor.fetchall()
+
+    now_sql = "CURRENT_TIMESTAMP"
+    for defect_id, planned_date in planned_defects:
+        assigned_to_id = assignments.get(defect_id)
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT id FROM {quote(connection, MAINTENANCE_TABLE)} "
+                "WHERE defect_id = %s AND status IN (%s, %s) "
+                "ORDER BY planned_date ASC, created_at DESC LIMIT 1",
+                [defect_id, "planned", "in_progress"],
+            )
+            row = cursor.fetchone()
+
+        if row:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    f"UPDATE {quote(connection, MAINTENANCE_TABLE)} "
+                    "SET planned_date = %s, assigned_to_id = %s, updated_at = " + now_sql + " "
+                    "WHERE id = %s",
+                    [planned_date, assigned_to_id, row[0]],
+                )
+        else:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    f"INSERT INTO {quote(connection, MAINTENANCE_TABLE)} "
+                    "(defect_id, title, description, assigned_to_id, planned_date, completed_date, status, public_visible, created_at, updated_at) "
+                    "VALUES (%s, %s, %s, %s, %s, NULL, %s, %s, " + now_sql + ", " + now_sql + ")",
+                    [defect_id, "Mangel beheben", "", assigned_to_id, planned_date, "planned", False],
+                )
+
+    drop_column_if_exists(schema_editor, DEFECT_TABLE, "planned_resolution_date")
 
 
 def reverse_noop(apps, schema_editor):
@@ -51,29 +113,8 @@ class Migration(migrations.Migration):
     dependencies = [
         ("inspections", "0001_initial"),
         ("notifications", "0001_initial"),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="maintenanceaction",
-            name="assigned_to",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="assigned_maintenance_actions",
-                to=settings.AUTH_USER_MODEL,
-                verbose_name="Zuständige Person",
-            ),
-        ),
         migrations.RunPython(migrate_planning_to_maintenance_actions, reverse_noop),
-        migrations.RemoveField(
-            model_name="defect",
-            name="planned_resolution_date",
-        ),
-        migrations.AlterModelOptions(
-            name="defect",
-            options={"ordering": ["-has_safety_risk", "-created_at"], "verbose_name": "Mangel", "verbose_name_plural": "Mängel"},
-        ),
     ]
