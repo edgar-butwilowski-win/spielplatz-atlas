@@ -14,7 +14,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.admin_utils import get_user_organization
 from inspections.models import Defect
-from internal.permissions import require_maintenance_permission
+from internal.permissions import require_org_admin_permission
 
 from .forms import DefectAssignmentForm
 from .models import PushSubscription, SystemNotification
@@ -80,7 +80,7 @@ def assign_defect_view(request, defect_id):
         return redirect("public:index")
 
     organization = defect.playground.organization
-    require_maintenance_permission(request.user, organization)
+    require_org_admin_permission(request.user, organization)
 
     form = DefectAssignmentForm(
         request.POST,
