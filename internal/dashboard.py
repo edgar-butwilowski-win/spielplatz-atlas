@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Count, Max, Q
+from django.db.models import Count, Max, Min, Q
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -19,6 +19,7 @@ DASHBOARD_MONTHS = 12
 DASHBOARD_WEEKS = 12
 MIN_SUPPLIER_EQUIPMENT_COUNT = 5
 SUPPLIER_RATE_LIMIT = 10
+ACTIVE_MAINTENANCE_STATUSES = [MaintenanceAction.STATUS_PLANNED, MaintenanceAction.STATUS_IN_PROGRESS]
 EXCLUDED_DASHBOARD_DEFECT_STATUSES = [
     Defect.STATUS_IN_PROGRESS,
     Defect.STATUS_VERIFIED,
@@ -227,6 +228,7 @@ def build_dashboard_context(scope):
         maintenance_actions = maintenance_actions.filter(defect__playground__organization=organization)
         inspection_tasks = inspection_tasks.filter(organization=organization)
         equipment = equipment.filter(playground__organization=organization)
+
     open_defects = defects.exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED])
     safety_risk_defects = open_defects.filter(has_safety_risk=True)
     planned_maintenance_actions = maintenance_actions.exclude(status__in=[MaintenanceAction.STATUS_DONE, MaintenanceAction.STATUS_CANCELLED])
@@ -241,7 +243,39 @@ def build_dashboard_context(scope):
     time_charts = build_time_charts(defects, inspections, maintenance_actions, inspection_tasks)
     equipment_charts = build_equipment_charts(defects, equipment)
     organizations_count = Organization.objects.count() if organization is None else 1
-    return {**scope, "organizations_count": organizations_count, "playgrounds_count": playgrounds.count(), "active_playgrounds_count": playgrounds.filter(is_active=True).count(), "public_playgrounds_count": playgrounds.filter(is_active=True, public_visible=True).count(), "open_defects_count": open_defects.count(), "verified_defects_count": defects.filter(status=Defect.STATUS_VERIFIED).count(), "safety_risk_defects_count": safety_risk_defects.count(), "planned_maintenance_actions_count": planned_maintenance_actions.count(), "completed_inspections_count": completed_inspections.count(), "draft_inspections_count": draft_inspections.count(), "defects_by_status_json": dashboard_json(defects_by_status), "defects_by_source_json": dashboard_json(choice_count_map(defects, "source_type", Defect.SOURCE_CHOICES)), "maintenance_by_status_json": dashboard_json(choice_count_map(maintenance_actions, "status", MaintenanceAction.STATUS_CHOICES)), "inspections_by_type_json": dashboard_json(choice_count_map(inspections, "inspection_type", Inspection.TYPE_CHOICES)), "inspections_by_status_json": dashboard_json(inspections_by_status), "time_charts_json": dashboard_json(time_charts), "equipment_charts_json": dashboard_json(equipment_charts), "latest_inspections": list(completed_inspections.select_related("playground", "playground__organization", "inspector").order_by("-inspected_at", "-completed_at", "-created_at")[:10]), "open_safety_risk_defects": list(safety_risk_defects.select_related("playground", "playground__organization", "equipment", "surface", "accessory").order_by("planned_resolution_date", "-created_at")[:10]), "planned_maintenance_actions": list(planned_maintenance_actions.select_related("defect", "defect__playground", "defect__playground__organization").order_by("planned_date", "-created_at")[:10]), "defects_by_playground": top_playground_defect_counts(open_defects), "playgrounds_without_recent_completed_inspection": build_playgrounds_without_recent_completed_inspection(playgrounds), "recent_inspection_days": RECENT_INSPECTION_DAYS}
+    ordered_safety_risk_defects = safety_risk_defects.annotate(
+        next_planned_date=Min(
+            "maintenance_actions__planned_date",
+            filter=Q(maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES),
+        )
+    ).order_by("next_planned_date", "-created_at")
+
+    return {
+        **scope,
+        "organizations_count": organizations_count,
+        "playgrounds_count": playgrounds.count(),
+        "active_playgrounds_count": playgrounds.filter(is_active=True).count(),
+        "public_playgrounds_count": playgrounds.filter(is_active=True, public_visible=True).count(),
+        "open_defects_count": open_defects.count(),
+        "verified_defects_count": defects.filter(status=Defect.STATUS_VERIFIED).count(),
+        "safety_risk_defects_count": safety_risk_defects.count(),
+        "planned_maintenance_actions_count": planned_maintenance_actions.count(),
+        "completed_inspections_count": completed_inspections.count(),
+        "draft_inspections_count": draft_inspections.count(),
+        "defects_by_status_json": dashboard_json(defects_by_status),
+        "defects_by_source_json": dashboard_json(choice_count_map(defects, "source_type", Defect.SOURCE_CHOICES)),
+        "maintenance_by_status_json": dashboard_json(choice_count_map(maintenance_actions, "status", MaintenanceAction.STATUS_CHOICES)),
+        "inspections_by_type_json": dashboard_json(choice_count_map(inspections, "inspection_type", Inspection.TYPE_CHOICES)),
+        "inspections_by_status_json": dashboard_json(inspections_by_status),
+        "time_charts_json": dashboard_json(time_charts),
+        "equipment_charts_json": dashboard_json(equipment_charts),
+        "latest_inspections": list(completed_inspections.select_related("playground", "playground__organization", "inspector").order_by("-inspected_at", "-completed_at", "-created_at")[:10]),
+        "open_safety_risk_defects": list(ordered_safety_risk_defects.select_related("playground", "playground__organization", "equipment", "surface", "accessory")[:10]),
+        "planned_maintenance_actions": list(planned_maintenance_actions.select_related("defect", "defect__playground", "defect__playground__organization").order_by("planned_date", "-created_at")[:10]),
+        "defects_by_playground": top_playground_defect_counts(open_defects),
+        "playgrounds_without_recent_completed_inspection": build_playgrounds_without_recent_completed_inspection(playgrounds),
+        "recent_inspection_days": RECENT_INSPECTION_DAYS,
+    }
 
 
 @login_required
