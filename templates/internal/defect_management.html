@@ -17,8 +17,9 @@ body{background:#F8FAFC;color:#0F172A}.atlas-card{background:#fff;border:1px sol
 {% if messages %}<div class="mb-4">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
 {% if not is_superadmin and not organization %}<div class="alert alert-info mb-4">{% trans "Die Mängelverwaltung ist für eingeloggte Benutzer verfügbar. Es ist jedoch keine aktive Organisation mit deinem Konto verknüpft, deshalb werden keine Mängel angezeigt." %}</div>{% endif %}
 <section class="row g-3 mb-4">
-<div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.open }}</div><div class="muted">{% trans "Offen / geplant" %}</div></div></div>
-<div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.safety }}</div><div class="muted">{% trans "Sicherheitsrelevant" %}</div></div></div>
+<div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.open }}</div><div class="muted">{% trans "Offen" %}</div></div></div>
+<div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.planned }}</div><div class="muted">{% trans "Geplant" %}</div></div></div>
+<div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.safety }}</div><div class="muted">{% trans "Offen mit Sicherheitsrisiko" %}</div></div></div>
 <div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.overdue }}</div><div class="muted">{% trans "Überfällig" %}</div></div></div>
 <div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.done }}</div><div class="muted">{% trans "Behoben" %}</div></div></div>
 <div class="col-md"><div class="atlas-card p-3 h-100"><div class="metric">{{ status_counts.verified }}</div><div class="muted">{% trans "Abgeschlossen" %}</div></div></div>
