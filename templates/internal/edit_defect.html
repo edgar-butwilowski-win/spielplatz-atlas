@@ -41,7 +41,7 @@
         </div>
     </div>
     {% if can_manage_assignment %}
-        <form method="post" action="{% url 'notifications:assign_defect' defect.id %}" class="content-card p-3 p-lg-4 mb-4">
+        <form method="post" action="{% url 'internal:update_defect_assignment' defect.id %}" class="content-card p-3 p-lg-4 mb-4">
             {% csrf_token %}
             <h2 class="h5 fw-bold mb-2">{% trans "Assignment and system message" %}</h2>
             <p class="text-secondary mb-3">{% trans "The selected person receives a system message. If push notifications are enabled, a notification is also triggered on the device." %}</p>
