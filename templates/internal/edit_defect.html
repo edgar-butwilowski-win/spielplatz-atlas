@@ -40,19 +40,24 @@
             {% if defect.inspection_answer %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Created from inspection item" %}</div><div class="p-3 rounded-3 bg-light">{% if defect.inspection_answer.scope %}<strong>{{ defect.inspection_answer.scope.label }}</strong><br>{% endif %}{{ defect.inspection_answer.criterion.title }}</div></div>{% endif %}
         </div>
     </div>
-    {% if can_edit_defect %}
+    {% if can_manage_assignment %}
         <form method="post" action="{% url 'notifications:assign_defect' defect.id %}" class="content-card p-3 p-lg-4 mb-4">
             {% csrf_token %}
             <h2 class="h5 fw-bold mb-2">{% trans "Assignment and system message" %}</h2>
             <p class="text-secondary mb-3">{% trans "The selected person receives a system message. If push notifications are enabled, a notification is also triggered on the device." %}</p>
             <div class="row g-3 align-items-end"><div class="col-12 col-lg-8"><label class="form-label fw-semibold" for="{{ assignment_form.assigned_to.id_for_label }}">{{ assignment_form.assigned_to.label }}</label>{{ assignment_form.assigned_to }}{% if assignment_form.assigned_to.help_text %}<div class="form-text">{{ assignment_form.assigned_to.help_text }}</div>{% endif %}</div><div class="col-12 col-lg-4"><button type="submit" class="btn btn-atlas-primary w-100">{% trans "Save assignment" %}</button></div></div>
         </form>
+    {% elif can_edit_defect %}
+        <div class="content-card p-3 p-lg-4 mb-4">
+            <h2 class="h5 fw-bold mb-2">{% trans "Assignment" %}</h2>
+            <p class="text-secondary mb-0">{% trans "You may edit this defect, but your role does not allow changing or saving the assignment." %}</p>
+        </div>
     {% endif %}
     <form method="post" enctype="multipart/form-data" class="content-card p-3 p-lg-4">
         {% csrf_token %}
         <h2 class="h5 fw-bold mb-3">{% trans "Defect details" %}</h2>
         {% include "internal/partials/defect_form_fields.html" %}
-        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4"><a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">{% trans "Back to playground" %}</a>{% if can_edit_defect %}<button type="submit" class="btn btn-atlas-primary">{% trans "Save defect" %}</button>{% endif %}</div>
+        <div class="d-flex flex-column flex-sm-row justify-content-end gap-2 mt-4"><a href="{% url 'internal:defect_management' %}" class="btn btn-outline-secondary">{% trans "Back to defect management" %}</a><a href="{% url 'public:playground_detail' playground.organization.slug playground.slug %}" class="btn btn-outline-secondary">{% trans "Back to playground" %}</a>{% if can_edit_defect %}<button type="submit" class="btn btn-atlas-primary">{% trans "Save defect" %}</button>{% endif %}</div>
     </form>
 </main>
 {% include "includes/main_navigation_script.html" %}
