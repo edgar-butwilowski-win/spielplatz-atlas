@@ -1,979 +1,2139 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: playsafeswiss\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-03 15:31+0000\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "A (immediate)"
-msgstr "A (immediato)"
-
-msgid "A user account already exists for this email address."
-msgstr "Per questo indirizzo e-mail esiste già un account utente."
-
-msgid "About"
-msgstr "Informazioni"
-
-msgid "Accept"
-msgstr "Accettare"
-
-msgid "Acceptance documents"
-msgstr "Documenti di collaudo"
-
-msgid "Action"
-msgstr "Azione"
-
-msgid "Active inspection tasks"
-msgstr "Incarichi di controllo attivi"
-
-msgid "Active playgrounds"
-msgstr "Parchi gioco attivi"
-
-msgid "Additional equipment"
-msgstr "Attrezzatura supplementare"
-
-msgid "Address"
-msgstr "Indirizzo"
-
-msgid "Admin"
-msgstr "Admin"
-
-msgid "Affected object"
-msgstr "Oggetto interessato"
-
-msgid "All assignments"
-msgstr "Tutte le assegnazioni"
-
-msgid "All inspection types"
-msgstr "Tutti i tipi di controllo"
-
-msgid "All organizations"
-msgstr "Tutte le organizzazioni"
-
-msgid "An entry already exists for this organization."
-msgstr "Per questa organizzazione esiste già una voce."
-
-msgid "Analytics and key figures"
-msgstr "Analisi e indicatori"
-
-msgid "Annual main inspection"
-msgstr "Ispezione principale annuale"
-
-msgid "April"
-msgstr "aprile"
-
-msgid "As soon as publicly visible play equipment has been recorded, it will be shown here."
-msgstr "Non appena saranno registrate attrezzature da gioco visibili pubblicamente, saranno mostrate qui."
-
-msgid "Assigned"
-msgstr "Assegnato"
-
-msgid "Assignment and system message"
-msgstr "Assegnazione e messaggio di sistema"
-
-msgid "August"
-msgstr "agosto"
-
-msgid "Automatic"
-msgstr "Automatico"
-
-msgid "B (medium-term)"
-msgstr "B (a medio termine)"
-
-msgid "Back to playground"
-msgstr "Torna al parco giochi"
-
-msgid "Become a playground pro!"
-msgstr "Diventa un professionista dei parchi gioco!"
-
-msgid "Cancel"
-msgstr "Annullare"
-
-msgid "Cancelled"
-msgstr "Annullato"
-
-msgid "Care status"
-msgstr "Stato della manutenzione"
-
-msgid "Certificate documents"
-msgstr "Documenti di certificato"
-
-msgid "Checked / completed"
-msgstr "Controllato / completato"
-
-msgid "Citizen report"
-msgstr "Segnalazione cittadina"
-
-msgid "Comment from inspection"
-msgstr "Commento dal controllo"
-
-msgid "Completed"
-msgstr "Completato"
-
-msgid "Completed inspections"
-msgstr "Controlli completati"
-
-msgid "Count"
-msgstr "Numero"
-
-msgid "Created from inspection item"
-msgstr "Creato dal punto di controllo"
-
-msgid "Dashboard"
-msgstr "Dashboard"
-
-msgid "Date"
-msgstr "Data"
-
-msgid "December"
-msgstr "dicembre"
-
-msgid "Defect"
-msgstr "Difetto"
-
-msgid "Defect details"
-msgstr "Dettagli del difetto"
-
-msgid "Defect photo %(number)s"
-msgstr "Foto del difetto %(number)s"
-
-msgid "Defect with safety risk"
-msgstr "Difetto con rischio per la sicurezza"
-
-msgid "Defect without safety risk"
-msgstr "Difetto senza rischio per la sicurezza"
-
-msgid "Defects"
-msgstr "Difetti"
-
-msgid "Defects found"
-msgstr "Difetti rilevati"
-
-msgid "Defects with safety risk"
-msgstr "Difetti con rischio di sicurezza"
-
-msgid "Delete photo"
-msgstr "Eliminare foto"
-
-msgid "Deployment planning"
-msgstr "Pianificazione degli interventi"
-
-msgid "Deutsch"
-msgstr "Tedesco"
-
-msgid "Die Anfrage konnte nicht verarbeitet werden."
-msgstr "La richiesta non ha potuto essere elaborata."
-
-msgid "Diese URL-Kennung wird bereits verwendet."
-msgstr "Questo identificativo URL è già in uso."
-
-msgid "District"
-msgstr "Quartiere"
-
-msgid "Document not found."
-msgstr "Documento non trovato."
-
-msgid "Documents"
-msgstr "Documenti"
-
-msgid "Done"
-msgstr "Eseguito"
-
-msgid "Due"
-msgstr "Scadenza"
-
-msgid "Due soon"
-msgstr "In scadenza a breve"
-
-msgid "E-Mail-Adresse"
-msgstr "Indirizzo e-mail"
-
-msgid "e.g. City of Winterthur"
-msgstr "ad es. Città di Winterthur"
-
-msgid "e.g. city-winterthur"
-msgstr "ad es. citta-winterthur"
-
-msgid "Edit defect"
-msgstr "Modificare difetto"
-
-msgid "Email address"
-msgstr "Indirizzo e-mail"
-
-msgid "English"
-msgstr "Inglese"
-
-msgid "Equipment on this playground."
-msgstr "Attrezzature presenti in questo parco giochi."
-
-msgid "Existing defects for this inspection item"
-msgstr "Difetti già registrati per questo punto di controllo"
-
-msgid "February"
-msgstr "febbraio"
-
-msgid "Filter"
-msgstr "Filtrare"
-
-msgid "First name"
-msgstr "Nome"
-
-msgid "For example: city-winterthur or municipality-example."
-msgstr "Ad esempio: citta-winterthur o comune-esempio."
-
-msgid "Français"
-msgstr "Francese"
-
-msgid "Für diese E-Mail-Adresse besteht bereits ein Benutzerkonto."
-msgstr "Per questo indirizzo e-mail esiste già un account utente."
-
-msgid "Für diese E-Mail-Adresse liegt bereits eine offene Anfrage vor."
-msgstr "Per questo indirizzo e-mail esiste già una richiesta aperta."
-
-msgid "Für diese Organisation besteht bereits ein Eintrag."
-msgstr "Per questa organizzazione esiste già una voce."
-
-msgid "Für diese Organisation liegt bereits eine offene Anfrage vor."
-msgstr "Per questa organizzazione esiste già una richiesta aperta."
-
-msgid "Für diese URL-Kennung liegt bereits eine offene Anfrage vor."
-msgstr "Per questo identificativo URL esiste già una richiesta aperta."
-
-msgid "General playground defect"
-msgstr "Difetto generale del parco giochi"
-
-msgid "General playground inspection"
-msgstr "Controllo generale del parco giochi"
-
-msgid "Impact protection surface / ground"
-msgstr "Superficie antitrauma / suolo"
-
-msgid "Imprint"
-msgstr "Colophon"
-
-msgid "In operation"
-msgstr "In esercizio"
-
-msgid "In progress"
-msgstr "In corso"
-
-msgid "Inspection"
-msgstr "Controllo"
-
-msgid "Inspection area"
-msgstr "Area di controllo"
-
-msgid "Inspection criterion"
-msgstr "Criterio di controllo"
-
-msgid "Inspection is currently suspended."
-msgstr "L’ispezione è attualmente sospesa."
-
-msgid "Inspection note"
-msgstr "Nota di controllo"
-
-msgid "Inspection tasks"
-msgstr "Incarichi di controllo"
-
-msgid "Inspection type"
-msgstr "Tipo di controllo"
-
-msgid "Inspections in progress"
-msgstr "Controlli in corso"
-
-msgid "Internal"
-msgstr "Interno"
-
-msgid "Internal access"
-msgstr "Accesso interno"
-
-msgid "Internal dashboard"
-msgstr "Dashboard interno"
-
-msgid "Internal deployment planning"
-msgstr "Pianificazione interna degli interventi"
-
-msgid "Internal report"
-msgstr "Segnalazione interna"
-
-msgid "Internally visible"
-msgstr "Visibile internamente"
-
-msgid "Inventory no."
-msgstr "N. inventario"
-
-msgid "is being planned"
-msgstr "in pianificazione"
-
-msgid "Italiano"
-msgstr "Italiano"
-
-msgid "January"
-msgstr "gennaio"
-
-msgid "Join"
-msgstr "Partecipare"
-
-msgid "July"
-msgstr "luglio"
-
-msgid "June"
-msgstr "giugno"
-
-msgid "Key figures"
-msgstr "Indicatori"
-
-msgid "Known defects and planned repairs."
-msgstr "Difetti noti e riparazioni pianificate."
-
-msgid "Kurzname / URL-Kennung"
-msgstr "Nome breve / identificativo URL"
-
-msgid "Language"
-msgstr "Lingua"
-
-msgid "Last inspection"
-msgstr "Ultimo controllo"
-
-msgid "Last name"
-msgstr "Cognome"
-
-msgid "Log in"
-msgstr "Accedere"
-
-msgid "Login"
-msgstr "Accesso"
-
-msgid "Logout"
-msgstr "Logout"
-
-msgid "Maintenance / care"
-msgstr "Manutenzione / cura"
-
-msgid "Manual"
-msgstr "Manuale"
-
-msgid "Map"
-msgstr "Carta"
-
-msgid "March"
-msgstr "marzo"
-
-msgid "Maximum 100 entries"
-msgstr "Massimo 100 voci"
-
-msgid "May"
-msgstr "maggio"
-
-msgid "Message"
-msgstr "Messaggio"
-
-msgid "Messages"
-msgstr "Messaggi"
-
-msgid "My inspections"
-msgstr "I miei controlli"
-
-msgid "Nachname"
-msgstr "Cognome"
-
-msgid "Nachricht"
-msgstr "Messaggio"
-
-msgid "Name der Organisation"
-msgstr "Nome dell’organizzazione"
-
-msgid "Next 30 days"
-msgstr "Prossimi 30 giorni"
-
-msgid "Next inspection:"
-msgstr "Prossimo controllo:"
-
-msgid "Next planned inspection"
-msgstr "Prossimo controllo pianificato"
-
-msgid "No address stored"
-msgstr "Nessun indirizzo registrato"
-
-msgid "No completed inspection yet"
-msgstr "Nessun controllo completato finora"
-
-msgid "No defects known"
-msgstr "Nessun difetto noto"
-
-msgid "No further assigned inspections in the next 30 days."
-msgstr "Nessun altro controllo assegnato nei prossimi 30 giorni."
-
-msgid "No inspection tasks available for the current selection."
-msgstr "Nessun incarico di controllo disponibile per la selezione attuale."
-
-msgid "No inspections are assigned for today."
-msgstr "Per oggi non sono assegnati controlli."
-
-msgid "No open unassigned inspection tasks available."
-msgstr "Nessun incarico di controllo aperto non assegnato disponibile."
-
-msgid "No permission for control status."
-msgstr "Nessuna autorizzazione per lo stato dei controlli."
-
-msgid "No play equipment recorded yet"
-msgstr "Nessuna attrezzatura da gioco registrata finora"
-
-msgid "No renovation planned"
-msgstr "Nessun risanamento pianificato"
-
-msgid "No safety risk"
-msgstr "Nessun rischio per la sicurezza"
-
-msgid "Not applicable"
-msgstr "Non applicabile"
-
-msgid "Not assigned"
-msgstr "Non assegnato"
-
-msgid "Not assigned yet"
-msgstr "Non ancora assegnato"
-
-msgid "Not checked yet"
-msgstr "Non ancora controllato"
-
-msgid "Not planned"
-msgstr "Non pianificato"
-
-msgid "November"
-msgstr "novembre"
-
-msgid "October"
-msgstr "ottobre"
-
-msgid "OK"
-msgstr "OK"
-
-msgid "On time"
-msgstr "Nei termini"
-
-msgid "Only activate this if the notice should appear in the public care status."
-msgstr "Attivare solo se l’avviso deve apparire nello stato pubblico della manutenzione."
-
-msgid "Open"
-msgstr "Aperto"
-
-msgid "Open defect"
-msgstr "Aprire difetto"
-
-msgid "Open defects"
-msgstr "Difetti aperti"
-
-msgid "Open inspections without assignment"
-msgstr "Controlli aperti senza assegnazione"
-
-msgid "Open menu"
-msgstr "Aprire il menu"
-
-msgid "Operational inspection"
-msgstr "Controllo operativo"
-
-msgid "Operational lists"
-msgstr "Elenchi operativi"
-
-msgid "Optional free text, for example citizen hotline, depot or caretaker."
-msgstr "Testo libero facoltativo, ad esempio hotline cittadina, deposito o custodia."
-
-msgid "Optional."
-msgstr "Facoltativo."
-
-msgid "Optional: kurzer Hinweis zur Organisation oder zum geplanten Einsatz."
-msgstr "Facoltativo: breve indicazione sull’organizzazione o sull’uso previsto."
-
-msgid "Optional: short note about the organization or the planned use."
-msgstr "Facoltativo: breve indicazione sull’organizzazione o sull’uso previsto."
-
-msgid "Organization"
-msgstr "Organizzazione"
-
-msgid "Organization name"
-msgstr "Nome dell’organizzazione"
-
-msgid "Organizations"
-msgstr "Organizzazioni"
-
-msgid "Other"
-msgstr "Altro"
-
-msgid "Overdue"
-msgstr "Scaduto"
-
-msgid "Password"
+#: accounts/forms.py:20
+#, fuzzy
+#| msgid "Password"
+msgid "Passwort"
 msgstr "Password"
 
-msgid "Personal inspection list"
-msgstr "Elenco personale dei controlli"
-
-msgid "Photo of %(name)s"
-msgstr "Foto di %(name)s"
-
-msgid "Photos of the defect"
-msgstr "Foto del difetto"
-
-msgid "Plan inspection tasks"
-msgstr "Pianificare incarichi di controllo"
-
-msgid "Planned"
-msgstr "Pianificato"
-
-msgid "Planned maintenance actions"
-msgstr "Interventi di manutenzione pianificati"
-
-msgid "Planning"
-msgstr "Pianificazione"
-
-msgid "Play equipment"
-msgstr "Attrezzature da gioco"
-
-msgid "Playground"
-msgstr "Parco giochi"
-
-msgid "playgrounds"
-msgstr "parchi gioco"
-
-msgid "playsafeswiss home page"
-msgstr "Pagina iniziale playsafeswiss"
-
-msgid "Please check your email address and password."
-msgstr "Controllare indirizzo e-mail e password."
-
-msgid "Please select an organization to edit its planning."
-msgstr "Selezionare un’organizzazione per modificarne la pianificazione."
-
-msgid "Preview image of"
-msgstr "Immagine di anteprima di"
-
-msgid "Preview image of %(name)s"
-msgstr "Immagine di anteprima di %(name)s"
-
-msgid "Public visitors do not need a user account."
-msgstr "I visitatori pubblici non necessitano di un account utente."
-
-msgid "Publicly visible"
-msgstr "Visibile pubblicamente"
-
-msgid "Recalculate inspection planning"
-msgstr "Ricalcolare pianificazione controlli"
-
-msgid "Recommended renovation year"
-msgstr "Anno di risanamento consigliato"
-
-msgid "Record defect"
-msgstr "Registrare difetto"
-
-msgid "Record defect from inspection item"
-msgstr "Registrare difetto da punto di controllo"
-
-msgid "Record new defect"
-msgstr "Registrare nuovo difetto"
-
-msgid "Record new inspection"
-msgstr "Registrare nuovo controllo"
-
-msgid "Renovation comment"
-msgstr "Commento sul risanamento"
-
-msgid "Renovation details"
-msgstr "Dettagli del risanamento"
-
-msgid "Renovation pending"
-msgstr "Risanamento in sospeso"
-
-msgid "Renovation type"
-msgstr "Tipo di risanamento"
-
-msgid "Replace image"
-msgstr "Sostituire immagine"
-
-msgid "Replace playground image"
-msgstr "Sostituire l’immagine del parco giochi"
-
-msgid "Reported on"
-msgstr "Segnalato il"
-
-msgid "reported on"
-msgstr "segnalato il"
-
-msgid "Reset"
-msgstr "Reimpostare"
-
-msgid "Resolved"
-msgstr "Risolto"
-
-msgid "Responsible person"
-msgstr "Persona responsabile"
-
-msgid "Rotate image by 90°"
-msgstr "Ruotare l’immagine di 90°"
-
-msgid "Rumantsch"
-msgstr "Romancio"
-
-msgid "Safety defects"
-msgstr "Difetti di sicurezza"
-
-msgid "Safety risk"
-msgstr "Rischio per la sicurezza"
-
-msgid "Save"
-msgstr "Salvare"
-
-msgid "Save assignment"
-msgstr "Salvare assegnazione"
-
-msgid "Save defect"
-msgstr "Salvare difetto"
-
-msgid "Search playground, address or district"
-msgstr "Cercare parco giochi, indirizzo o quartiere"
-
-msgid "Select a playground on the map and get exciting detailed information."
-msgstr "Seleziona un parco giochi sulla carta e ottieni informazioni dettagliate interessanti."
-
-msgid "Select the inspection type. A new inspection with all active inspection criteria will then be created."
-msgstr "Selezionare il tipo di controllo. Verrà quindi creato un nuovo controllo con tutti i criteri attivi."
-
-msgid "September"
-msgstr "settembre"
-
-msgid "Show details"
-msgstr "Mostrare dettagli"
-
-msgid "Show specialist map"
-msgstr "Mostrare la carta specialistica"
-
-msgid "Sign in with your email address and password."
-msgstr "Accedi con indirizzo e-mail e password."
-
-msgid "Slug / URL key"
-msgstr "Nome breve / identificativo URL"
-
-msgid "Source"
-msgstr "Fonte"
-
-msgid "Standard"
-msgstr "Norma"
-
-msgid "Start inspection"
-msgstr "Avviare controllo"
-
-msgid "Status"
-msgstr "Stato"
-
-msgid "Supplier"
-msgstr "Fornitore"
-
-msgid "Suspended"
-msgstr "Sospeso"
-
-msgid "Swiss coordinates"
-msgstr "Coordinate svizzere"
-
-msgid "Thank you. Your organization request has been submitted and will be reviewed."
-msgstr "Grazie. La richiesta della tua organizzazione è stata inoltrata e sarà esaminata."
-
-msgid "The current preview image comes from a play equipment item. It can be rotated there."
-msgstr "L’immagine di anteprima attuale proviene da un’attrezzatura da gioco. Può essere ruotata lì."
-
-msgid "The inspection is based on the active inspection catalogue according to SN EN 1176/1177 and any local additions made by the organization."
-msgstr "Il controllo si basa sul catalogo attivo secondo SN EN 1176/1177 e su eventuali integrazioni locali dell’organizzazione."
-
-msgid "The request could not be processed."
-msgstr "La richiesta non ha potuto essere elaborata."
-
-msgid "There is already an open request for this email address."
-msgstr "Per questo indirizzo e-mail esiste già una richiesta aperta."
-
-msgid "There is already an open request for this organization."
-msgstr "Per questa organizzazione esiste già una richiesta aperta."
-
-msgid "There is already an open request for this URL key."
-msgstr "Per questo identificativo URL esiste già una richiesta aperta."
-
-msgid "There were too many login attempts. Please try again in a few minutes."
-msgstr "Ci sono stati troppi tentativi di accesso. Riprovare tra alcuni minuti."
-
-msgid "There were too many requests. Please try again later."
-msgstr "Ci sono state troppe richieste. Riprovare più tardi."
-
-msgid "These tasks can be accepted by authorized inspectors."
-msgstr "Questi incarichi possono essere accettati da controllori autorizzati."
-
-msgid "This text may be publicly visible. Do not enter internal details."
-msgstr "Questo testo può essere visibile pubblicamente. Non inserire dettagli interni."
-
-msgid "This URL key is already in use."
-msgstr "Questo identificativo URL è già in uso."
-
-msgid "Title"
-msgstr "Titolo"
-
-msgid "Today"
-msgstr "Oggi"
-
-msgid "Trends"
-msgstr "Andamenti"
-
-msgid "Up to three photos per defect."
-msgstr "Fino a tre foto per difetto."
-
-msgid "Upload image"
-msgstr "Caricare immagine"
-
-msgid "Visual routine inspection"
-msgstr "Controllo visivo di routine"
-
+#: accounts/forms.py:23
+msgid ""
+"Mindestens 8 Zeichen eingeben. Leer lassen, um das aktuelle Passwort "
+"beizubehalten."
+msgstr ""
+
+#: accounts/forms.py:30
 msgid "Vorname"
 msgstr "Nome"
 
-msgid "Website"
-msgstr "Sito web"
+#: accounts/forms.py:31
+msgid "Nachname"
+msgstr "Cognome"
 
-msgid "will be planned"
-msgstr "sarà pianificato"
+#: accounts/forms.py:32
+#, fuzzy
+#| msgid "E-Mail-Adresse"
+msgid "Mail-Adresse"
+msgstr "Indirizzo e-mail"
 
-msgid "Will be removed on %(date)s"
-msgstr "Sarà rimosso il %(date)s"
+#: accounts/forms.py:51
+msgid "Bitte geben Sie eine Mail-Adresse ein."
+msgstr ""
 
+#: accounts/forms.py:61
+#, fuzzy
+#| msgid "Für diese E-Mail-Adresse besteht bereits ein Benutzerkonto."
+msgid "Diese Mail-Adresse wird bereits von einem anderen Benutzer verwendet."
+msgstr "Per questo indirizzo e-mail esiste già un account utente."
+
+#: accounts/forms.py:72
+msgid "Das Passwort muss mindestens 8 Zeichen enthalten."
+msgstr ""
+
+#: accounts/views.py:138
+msgid "Ihre Profileinstellungen wurden gespeichert."
+msgstr ""
+
+#: config/settings.py:171
+msgid "English"
+msgstr "Inglese"
+
+#: config/settings.py:172
+msgid "Deutsch"
+msgstr "Tedesco"
+
+#: config/settings.py:173
+msgid "Français"
+msgstr "Francese"
+
+#: config/settings.py:174
+msgid "Italiano"
+msgstr "Italiano"
+
+#: config/settings.py:175
+msgid "Rumantsch"
+msgstr "Romancio"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:19
+#: inspections/migrations/0019_align_translated_choice_labels.py:48
+#: inspections/migrations/0019_align_translated_choice_labels.py:88
+#: inspections/migrations/0026_sync_inspections_model_state.py:48
+#: inspections/models.py:22 inspections/models.py:72
+#: templates/internal/dashboard.html:67
+msgid "Visual routine inspection"
+msgstr "Controllo visivo di routine"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:20
+#: inspections/migrations/0019_align_translated_choice_labels.py:49
+#: inspections/migrations/0019_align_translated_choice_labels.py:89
+#: inspections/migrations/0026_sync_inspections_model_state.py:48
+#: inspections/models.py:22 inspections/models.py:72
+#: templates/internal/dashboard.html:67
+msgid "Operational inspection"
+msgstr "Controllo operativo"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:21
+#: inspections/migrations/0019_align_translated_choice_labels.py:50
+#: inspections/migrations/0019_align_translated_choice_labels.py:90
+#: inspections/migrations/0026_sync_inspections_model_state.py:48
+#: inspections/models.py:22 inspections/models.py:72
+#: templates/internal/dashboard.html:67
+msgid "Annual main inspection"
+msgstr "Ispezione principale annuale"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:34
+#: inspections/migrations/0019_align_translated_choice_labels.py:131
+#: inspections/models.py:52 inspections/models.py:206
+msgid "General playground inspection"
+msgstr "Controllo generale del parco giochi"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:35
+#: inspections/migrations/0019_align_translated_choice_labels.py:132
+#: inspections/models.py:52 inspections/models.py:206 internal/forms.py:18
+#: templates/internal/dashboard.html:42 templates/internal/dashboard.html:67
+#: templates/internal/partials/defect_form_fields.html:13
+#: templates/public/playground_detail.html:102
+msgid "Play equipment"
+msgstr "Attrezzature da gioco"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:36
+#: inspections/migrations/0019_align_translated_choice_labels.py:133
+#: inspections/models.py:52 inspections/models.py:206 internal/forms.py:19
+#: templates/internal/inspection_detail.html:71
+#: templates/internal/partials/defect_form_fields.html:14
+msgid "Impact protection surface / ground"
+msgstr "Superficie antitrauma / suolo"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:37
+#: inspections/migrations/0019_align_translated_choice_labels.py:134
+#: inspections/models.py:52 inspections/models.py:206 internal/forms.py:20
+#: templates/internal/inspection_detail.html:71
+#: templates/internal/partials/defect_form_fields.html:15
+msgid "Additional equipment"
+msgstr "Attrezzatura supplementare"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:62
+#: inspections/migrations/0019_align_translated_choice_labels.py:146
+#: inspections/models.py:75 inspections/models.py:229
+#: templates/internal/dashboard.html:67
+#: templates/internal/inspection_detail.html:55
+#: templates/internal/inspection_detail.html:73
+#: templates/internal/inspection_detail.html:81
+msgid "OK"
+msgstr "OK"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:63
+#: inspections/models.py:75 templates/internal/dashboard.html:67
+msgid "Defects found"
+msgstr "Difetti rilevati"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:75
+#: inspections/migrations/0019_align_translated_choice_labels.py:177
+#: inspections/migrations/0019_align_translated_choice_labels.py:207
+#: inspections/migrations/0025_align_state_with_current_models.py:151
+#: inspections/models.py:78 inspections/models.py:357
+#: templates/internal/dashboard.html:67
+#: templates/internal/inspection_detail.html:29
+msgid "In progress"
+msgstr "In corso"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:76
+#: inspections/migrations/0019_align_translated_choice_labels.py:208
+#: inspections/migrations/0025_align_state_with_current_models.py:152
+#: inspections/models.py:78 inspections/models.py:357
+#: templates/internal/dashboard.html:67
+#: templates/internal/inspection_detail.html:29
+msgid "Completed"
+msgstr "Completato"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:101
+#: inspections/migrations/0026_sync_inspections_model_state.py:73
+#: inspections/models.py:134
+msgid "Automatic"
+msgstr "Automatico"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:102
+#: inspections/migrations/0026_sync_inspections_model_state.py:73
+#: inspections/models.py:134
+msgid "Manual"
+msgstr "Manuale"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:114
+#: inspections/migrations/0019_align_translated_choice_labels.py:176
+#: inspections/migrations/0025_align_state_with_current_models.py:88
+#: inspections/migrations/0026_sync_inspections_model_state.py:68
+#: inspections/migrations/0026_sync_inspections_model_state.py:144
+#: inspections/models.py:131 inspections/models.py:255 internal/forms.py:24
+#: internal/forms.py:28 templates/internal/dashboard.html:67
+#: templates/notifications/notification_list.html:36
+msgid "Open"
+msgstr "Aperto"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:115
+#: inspections/migrations/0019_align_translated_choice_labels.py:178
+#: inspections/migrations/0019_align_translated_choice_labels.py:206
+#: inspections/migrations/0025_align_state_with_current_models.py:89
+#: inspections/migrations/0025_align_state_with_current_models.py:150
+#: inspections/migrations/0026_sync_inspections_model_state.py:68
+#: inspections/migrations/0026_sync_inspections_model_state.py:144
+#: inspections/models.py:131 inspections/models.py:255
+#: inspections/models.py:357 internal/control_status.py:45
+#: internal/control_status.py:104 templates/internal/control_status.html:36
+#: templates/internal/control_status.html:52
+#: templates/internal/dashboard.html:67
+#: templates/internal/partials/inspection_task_card.html:10
+#: templates/public/playground_detail.html:120
+msgid "Planned"
+msgstr "Pianificato"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:116
+#: inspections/migrations/0026_sync_inspections_model_state.py:68
+#: inspections/models.py:131 internal/control_status.py:48
+#: templates/internal/control_status.html:38
+#: templates/internal/dashboard.html:67
+msgid "Done"
+msgstr "Eseguito"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:117
+#: inspections/migrations/0026_sync_inspections_model_state.py:68
+#: inspections/models.py:131 internal/control_status.py:43
+#: internal/control_status.py:98 templates/internal/control_status.html:33
+#: templates/internal/dashboard.html:67
+#: templates/internal/my_inspections.html:50
+msgid "Overdue"
+msgstr "Scaduto"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:118
+#: inspections/migrations/0026_sync_inspections_model_state.py:68
+#: inspections/models.py:131 internal/control_status.py:47
+#: internal/control_status.py:95 templates/internal/control_status.html:37
+#: templates/internal/dashboard.html:67
+msgid "Suspended"
+msgstr "Sospeso"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:119
+#: inspections/migrations/0019_align_translated_choice_labels.py:209
+#: inspections/migrations/0025_align_state_with_current_models.py:153
+#: inspections/migrations/0026_sync_inspections_model_state.py:68
+#: inspections/models.py:131 inspections/models.py:357
+#: internal/control_status.py:49 templates/internal/dashboard.html:67
+msgid "Cancelled"
+msgstr "Annullato"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:145
+#: inspections/models.py:229 templates/internal/inspection_detail.html:55
+#: templates/internal/inspection_detail.html:73
+#: templates/internal/inspection_detail.html:81
+msgid "Not checked yet"
+msgstr "Non ancora controllato"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:147
+#: inspections/models.py:229 templates/internal/inspection_detail.html:55
+#: templates/internal/inspection_detail.html:73
+#: templates/internal/inspection_detail.html:81
+msgid "Defect"
+msgstr "Difetto"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:148
+#: inspections/models.py:229 templates/internal/inspection_detail.html:55
+#: templates/internal/inspection_detail.html:73
+#: templates/internal/inspection_detail.html:81
+msgid "Not applicable"
+msgstr "Non applicabile"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:160
+#: inspections/models.py:261 templates/internal/dashboard.html:67
+#: templates/internal/inspection_detail.html:8
+#: templates/internal/inspection_detail.html:22
+msgid "Inspection"
+msgstr "Controllo"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:161
+#: inspections/models.py:261 templates/internal/dashboard.html:67
+msgid "Citizen report"
+msgstr "Segnalazione cittadina"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:162
+#: inspections/models.py:261 templates/internal/dashboard.html:67
+msgid "Internal report"
+msgstr "Segnalazione interna"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:163
+#: inspections/models.py:261 templates/internal/dashboard.html:67
+msgid "Maintenance / care"
+msgstr "Manutenzione / cura"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:164
+#: inspections/models.py:261 templates/internal/dashboard.html:67
+msgid "Other"
+msgstr "Altro"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:179
+#: inspections/migrations/0025_align_state_with_current_models.py:90
+#: inspections/migrations/0026_sync_inspections_model_state.py:144
+#: inspections/models.py:255 internal/forms.py:29
+#: templates/internal/dashboard.html:67
+msgid "Resolved"
+msgstr "Risolto"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:180
+#: inspections/migrations/0025_align_state_with_current_models.py:91
+#: inspections/migrations/0026_sync_inspections_model_state.py:144
+#: inspections/models.py:255 internal/forms.py:30
+#: templates/internal/dashboard.html:67
+msgid "Checked / completed"
+msgstr "Controllato / completato"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:193
+#: inspections/migrations/0025_align_state_with_current_models.py:104
+#: inspections/migrations/0026_sync_inspections_model_state.py:149
+msgid "A (immediate)"
+msgstr "A (immediato)"
+
+#: inspections/migrations/0019_align_translated_choice_labels.py:194
+#: inspections/migrations/0025_align_state_with_current_models.py:105
+#: inspections/migrations/0026_sync_inspections_model_state.py:149
+#: inspections/models.py:264
+msgid "B (medium-term)"
+msgstr "B (a medio termine)"
+
+#: inspections/models.py:264
+#, fuzzy
+#| msgid "A (immediate)"
+msgid "A (immediate"
+msgstr "A (immediato)"
+
+#: inspections/models.py:348
+msgid ""
+"A defect with a safety risk is known for this play equipment. Please observe "
+"the notices on site."
+msgstr ""
+"Per questa attrezzatura da gioco è noto un difetto con rischio per la "
+"sicurezza. Si prega di osservare le indicazioni sul posto."
+
+#: inspections/models.py:349
+#, fuzzy
+#| msgid ""
+#| "A defect with a safety risk is known for this play equipment. Please "
+#| "observe the notices on site."
+msgid ""
+"A defect is known for this play equipment. The defect does not pose a safety "
+"risk. Repair is planned."
+msgstr ""
+"Per questa attrezzatura da gioco è noto un difetto con rischio per la "
+"sicurezza. Si prega di osservare le indicazioni sul posto."
+
+#: internal/control_status.py:42 templates/internal/control_status.html:32
+msgid "Active inspection tasks"
+msgstr "Incarichi di controllo attivi"
+
+#: internal/control_status.py:44 internal/control_status.py:101
+msgid "Due soon"
+msgstr "In scadenza a breve"
+
+#: internal/control_status.py:46 internal/control_status.py:144
+#: templates/internal/control_status.html:35
 msgid "Without assignment"
 msgstr "Senza assegnazione"
 
+#: internal/control_status.py:107
+msgid "On time"
+msgstr "Nei termini"
+
+#: internal/control_status.py:120
+msgid "No permission for control status."
+msgstr "Nessuna autorizzazione per lo stato dei controlli."
+
+#: internal/control_status.py:144
+msgid "All assignments"
+msgstr "Tutte le assegnazioni"
+
+#: internal/control_status.py:144
+msgid "Assigned"
+msgstr "Assegnato"
+
+#: internal/forms.py:17 public/views.py:239
+#: templates/internal/edit_defect.html:38
+msgid "General playground defect"
+msgstr "Difetto generale del parco giochi"
+
+#: internal/forms.py:61
+msgid ""
+"Please select at most one affected object: play equipment, impact protection "
+"surface or additional equipment."
+msgstr ""
+
+#: internal/forms.py:79
+#, fuzzy
+#| msgid "Safety defects per 100 play equipment"
+msgid "Please select the affected play equipment."
+msgstr "Difetti di sicurezza per 100 attrezzature da gioco"
+
+#: internal/forms.py:85
+#, fuzzy
+#| msgid "Impact protection surface / ground"
+msgid "Please select the affected impact protection surface or ground."
+msgstr "Superficie antitrauma / suolo"
+
+#: internal/forms.py:91
+msgid "Please select the affected additional equipment."
+msgstr ""
+
+#: internal/forms.py:93
+#, fuzzy
+#| msgid "Please select an organization to edit its planning."
+msgid "Please select a valid object type."
+msgstr "Selezionare un’organizzazione per modificarne la pianificazione."
+
+#: internal/forms.py:109
+msgid "e.g. 2028"
+msgstr ""
+
+#: internal/forms.py:111 templates/internal/inspection_detail.html:81
+msgid "Optional comment"
+msgstr "Commento facoltativo"
+
+#: internal/forms.py:125
+msgid "Please enter a four-digit year."
+msgstr ""
+
+#: internal/forms.py:130 templates/internal/edit_defect.html:38
+msgid "Affected object"
+msgstr "Oggetto interessato"
+
+#: internal/forms.py:130
+msgid ""
+"First select the object type. The matching selection field will then become "
+"active."
+msgstr ""
+
+#: public/views.py:106 public/views.py:169 public/views.py:172
+msgid "is being planned"
+msgstr "in pianificazione"
+
+#: templates/accounts/login.html:8 templates/accounts/login.html:46
+#: templates/accounts/login.html:66 templates/includes/main_navigation.html:102
+msgid "Login"
+msgstr "Accesso"
+
+#: templates/accounts/login.html:35 templates/includes/main_navigation.html:48
+msgid "playsafeswiss home page"
+msgstr "Pagina iniziale playsafeswiss"
+
+#: templates/accounts/login.html:41 templates/includes/main_navigation.html:56
+#: templates/includes/main_navigation.html:92
+msgid "Map"
+msgstr "Carta"
+
+#: templates/accounts/login.html:42 templates/includes/main_navigation.html:57
+#: templates/includes/main_navigation.html:93
+msgid "About"
+msgstr "Informazioni"
+
+#: templates/accounts/login.html:43 templates/includes/main_navigation.html:58
+#: templates/includes/main_navigation.html:94
+msgid "Imprint"
+msgstr "Colophon"
+
+#: templates/accounts/login.html:45
+msgid "Join"
+msgstr "Partecipare"
+
+#: templates/accounts/login.html:50 templates/includes/main_navigation.html:70
+msgid "Open menu"
+msgstr "Aprire il menu"
+
+#: templates/accounts/login.html:52 templates/includes/main_navigation.html:106
+#: templates/internal/dashboard.html:8
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: templates/accounts/login.html:53 templates/includes/main_navigation.html:116
+msgid "Admin"
+msgstr "Admin"
+
+#: templates/accounts/login.html:54 templates/includes/main_navigation.html:119
+msgid "Logout"
+msgstr "Logout"
+
+#: templates/accounts/login.html:65
+msgid "Internal access"
+msgstr "Accesso interno"
+
+#: templates/accounts/login.html:67
+msgid "Sign in with your email address and password."
+msgstr "Accedi con indirizzo e-mail e password."
+
+#: templates/accounts/login.html:71
+msgid "Please check your email address and password."
+msgstr "Controllare indirizzo e-mail e password."
+
+#: templates/accounts/login.html:74
+msgid "Email address"
+msgstr "Indirizzo e-mail"
+
+#: templates/accounts/login.html:75
+msgid "Password"
+msgstr "Password"
+
+#: templates/accounts/login.html:76
+msgid "Log in"
+msgstr "Accedere"
+
+#: templates/accounts/login.html:80
+msgid "Public visitors do not need a user account."
+msgstr "I visitatori pubblici non necessitano di un account utente."
+
+#: templates/accounts/profile_settings.html:4
+#: templates/accounts/profile_settings.html:12
+msgid "Profileinstellungen"
+msgstr ""
+
+#: templates/accounts/profile_settings.html:11
+#: templates/includes/main_navigation.html:118
+#, fuzzy
+#| msgid "Profile"
+msgid "Profil"
+msgstr "Profilo"
+
+#: templates/accounts/profile_settings.html:13
+msgid "Ändern Sie Ihre persönlichen Benutzerdaten und Ihr Passwort."
+msgstr ""
+
+#: templates/accounts/profile_settings.html:52
+#: templates/internal/inspection_planning.html:149
+#: templates/internal/inspection_planning.html:154
+msgid "Abbrechen"
+msgstr "Annullare"
+
+#: templates/accounts/profile_settings.html:53
+#, fuzzy
+#| msgid "Planung speichern"
+msgid "Profileinstellungen speichern"
+msgstr "Salvare la pianificazione"
+
+#: templates/admin/csv_export_period_form.html:6
+msgid "Home"
+msgstr ""
+
+#: templates/admin/tenants/organization/change_form.html:8
+#, fuzzy
+#| msgid "Recalculate inspection planning"
+msgid "Inspection planning"
+msgstr "Ricalcolare pianificazione controlli"
+
+#: templates/admin/tenants/organization/change_form.html:12
+msgid ""
+"Recalculates missing and open inspection tasks for this organization. "
+"Completed tasks remain unchanged. Use this after technical imports or rule "
+"changes."
+msgstr ""
+
+#: templates/admin/tenants/organization/change_form.html:16
+#, fuzzy
+#| msgid "Recalculate inspection planning"
+msgid "Recalculate inspection planning for this organization?"
+msgstr "Ricalcolare pianificazione controlli"
+
+#: templates/admin/tenants/organization/change_form.html:17
+msgid "Recalculate inspection planning"
+msgstr "Ricalcolare pianificazione controlli"
+
+#: templates/includes/main_navigation.html:82
+msgid "Language"
+msgstr "Lingua"
+
+#: templates/includes/main_navigation.html:104
+#: templates/notifications/notification_list.html:8
+#: templates/notifications/notification_list.html:26
+msgid "Messages"
+msgstr "Messaggi"
+
+#: templates/includes/main_navigation.html:108
+#: templates/internal/defect_management.html:28
+msgid "Mängel"
+msgstr ""
+
+#: templates/includes/main_navigation.html:110
+#: templates/internal/my_inspections.html:8
+#: templates/internal/my_inspections.html:33
+msgid "My inspections"
+msgstr "I miei controlli"
+
+#: templates/includes/main_navigation.html:113
+#: templates/internal/inspection_planning.html:8
+msgid "Deployment planning"
+msgstr "Pianificazione degli interventi"
+
+#: templates/internal/control_status.html:8
+#: templates/internal/control_status.html:27
+#, fuzzy
+#| msgid "Care status"
+msgid "Control status"
+msgstr "Stato della manutenzione"
+
+#: templates/internal/control_status.html:28
+msgid "Due dates and deviations"
+msgstr ""
+
+#: templates/internal/control_status.html:29
+#: templates/internal/dashboard.html:35
+#, python-format
+msgid "Overview for %(organization_name)s."
+msgstr "Panoramica per %(organization_name)s."
+
+#: templates/internal/control_status.html:29
+#: templates/internal/dashboard.html:35
+msgid "Cross-tenant overview for super admins."
+msgstr "Panoramica multi-mandante per super amministratori."
+
+#: templates/internal/control_status.html:34
+#, python-format
+msgid "Due soon within %(days)s days"
+msgstr ""
+
+#: templates/internal/control_status.html:39
+#, python-format
+msgid "Completed on time, last %(days)s days"
+msgstr ""
+
+#: templates/internal/control_status.html:43
+#: templates/internal/control_status.html:52
+#: templates/internal/inspection_detail.html:37
+#: templates/internal/inspection_planning.html:69
+msgid "Organization"
+msgstr "Organizzazione"
+
+#: templates/internal/control_status.html:43
+#: templates/internal/inspection_planning.html:69
+msgid "All organizations"
+msgstr "Tutte le organizzazioni"
+
+#: templates/internal/control_status.html:44
+#, fuzzy
+#| msgid "Status"
+msgid "Status view"
+msgstr "Stato"
+
+#: templates/internal/control_status.html:45
+#: templates/internal/control_status.html:52
+#: templates/internal/create_inspection.html:33
+#: templates/internal/inspection_planning.html:71
+#: templates/internal/inspection_planning.html:97
+#: templates/internal/partials/inspection_task_card.html:8
+msgid "Inspection type"
+msgstr "Tipo di controllo"
+
+#: templates/internal/control_status.html:45
+#: templates/internal/inspection_planning.html:71
+msgid "All inspection types"
+msgstr "Tutti i tipi di controllo"
+
+#: templates/internal/control_status.html:46
+#: templates/internal/edit_defect.html:52
+#, fuzzy
+#| msgid "All assignments"
+msgid "Assignment"
+msgstr "Tutte le assegnazioni"
+
+#: templates/internal/control_status.html:47
+#: templates/internal/inspection_planning.html:72
+msgid "Filter"
+msgstr "Filtrare"
+
+#: templates/internal/control_status.html:51
+#: templates/internal/inspection_planning.html:78
+msgid "Inspection tasks"
+msgstr "Incarichi di controllo"
+
+#: templates/internal/control_status.html:51
+#, fuzzy
+#| msgid "Maximum 100 entries"
+msgid "Maximum 150 entries"
+msgstr "Massimo 100 voci"
+
+#: templates/internal/control_status.html:52
+#: templates/internal/dashboard.html:62
+#: templates/internal/defect_management.html:27
+#: templates/internal/inspection_planning.html:70
+#: templates/internal/inspection_planning.html:101
+#: templates/public/playground_detail.html:69
+msgid "Status"
+msgstr "Stato"
+
+#: templates/internal/control_status.html:52
+#: templates/internal/dashboard.html:62
+#: templates/internal/inspection_planning.html:92
+#: templates/public/index.html:62
+msgid "Playground"
+msgstr "Parco giochi"
+
+#: templates/internal/control_status.html:52
+#: templates/internal/inspection_planning.html:88
+#: templates/internal/partials/inspection_task_card.html:9
+msgid "Due"
+msgstr "Scadenza"
+
+#: templates/internal/control_status.html:52
+#, fuzzy
+#| msgid "Assigned"
+msgid "Assigned to"
+msgstr "Assegnato"
+
+#: templates/internal/control_status.html:52
+#, fuzzy
+#| msgid "Overdue"
+msgid "Days overdue"
+msgstr "Scaduto"
+
+#: templates/internal/control_status.html:52
+#: templates/internal/inspection_planning.html:166
+msgid "Not assigned"
+msgstr "Non assegnato"
+
+#: templates/internal/control_status.html:52
+#: templates/internal/inspection_planning.html:191
+msgid "No inspection tasks available for the current selection."
+msgstr "Nessun incarico di controllo disponibile per la selezione attuale."
+
+#: templates/internal/create_defect.html:8
+#: templates/internal/create_defect.html:26
+#: templates/internal/create_defect_from_inspection_answer.html:39
+#: templates/internal/inspection_detail.html:83
+#: templates/public/playground_detail.html:87
+#: templates/public/playground_detail.html:120
+msgid "Record defect"
+msgstr "Registrare difetto"
+
+#: templates/internal/create_defect.html:28
+msgid ""
+"Record a defect independently of an inspection, for example based on a "
+"citizen report, an internal note or a finding by maintenance staff."
+msgstr ""
+
+#: templates/internal/create_defect.html:29
+#, python-format
+msgid "Affected play equipment: <strong>%(equipment_name)s</strong>"
+msgstr ""
+
+#: templates/internal/create_defect.html:35
+#: templates/internal/create_defect_from_inspection_answer.html:39
+#: templates/internal/create_inspection.html:39
+#: templates/public/register_organization.html:32
+msgid "Cancel"
+msgstr "Annullare"
+
+#: templates/internal/create_defect.html:36
+#: templates/internal/edit_defect.html:60
+msgid "Save defect"
+msgstr "Salvare difetto"
+
+#: templates/internal/create_defect_from_inspection_answer.html:8
+#: templates/internal/create_defect_from_inspection_answer.html:25
+msgid "Record defect from inspection item"
+msgstr "Registrare difetto da punto di controllo"
+
+#: templates/internal/create_defect_from_inspection_answer.html:28
+msgid "Inspection area"
+msgstr "Area di controllo"
+
+#: templates/internal/create_defect_from_inspection_answer.html:28
 msgid "Without inspection area"
 msgstr "Senza area di controllo"
 
-msgid "Year built"
-msgstr "Anno di costruzione"
+#: templates/internal/create_defect_from_inspection_answer.html:29
+msgid "Inspection criterion"
+msgstr "Criterio di controllo"
 
-msgid "Your inspections for today, overdue inspections and upcoming inspection tasks."
-msgstr "I controlli di oggi, quelli scaduti e i prossimi incarichi di controllo."
+#: templates/internal/create_defect_from_inspection_answer.html:30
+msgid "Inspection note"
+msgstr "Nota di controllo"
 
-msgid "Your playground. Your information."
-msgstr "Il tuo parco giochi. Le tue informazioni."
+#: templates/internal/create_defect_from_inspection_answer.html:31
+msgid "Comment from inspection"
+msgstr "Commento dal controllo"
 
-msgid "z. B. Stadt Winterthur"
-msgstr "ad es. Città di Winterthur"
+#: templates/internal/create_defect_from_inspection_answer.html:34
+msgid "Existing defects for this inspection item"
+msgstr "Difetti già registrati per questo punto di controllo"
 
-msgid "z. B. stadt-winterthur"
-msgstr "ad es. citta-winterthur"
+#: templates/internal/create_defect_from_inspection_answer.html:34
+#: templates/internal/edit_defect.html:27
+#, fuzzy, python-format
+#| msgid "Defects"
+msgid "Defect #%(id)s"
+msgstr "Difetti"
 
-msgid "Zum Beispiel: stadt-winterthur oder gemeinde-beispiel."
-msgstr "Ad esempio: citta-winterthur o comune-esempio."
+#: templates/internal/create_defect_from_inspection_answer.html:34
+msgid "reported on"
+msgstr "segnalato il"
 
-msgid "%(counter)s defect"
-msgid_plural "%(counter)s defects"
-msgstr[0] "%(counter)s difetto"
-msgstr[1] "%(counter)s difetti"
+#: templates/internal/create_defect_from_inspection_answer.html:34
+#: templates/internal/edit_defect.html:30
+#: templates/public/playground_detail.html:93
+msgid "Safety risk"
+msgstr "Rischio per la sicurezza"
 
-msgid "%(counter)s entry"
-msgid_plural "%(counter)s entries"
-msgstr[0] "%(counter)s voce"
-msgstr[1] "%(counter)s voci"
+#: templates/internal/create_defect_from_inspection_answer.html:37
+msgid "Record new defect"
+msgstr "Registrare nuovo difetto"
 
-msgid "Inspection areas"
-msgstr "Aree di controllo"
+#: templates/internal/create_inspection.html:8
+#: templates/internal/create_inspection.html:25
+#: templates/public/playground_detail.html:86
+msgid "Record new inspection"
+msgstr "Registrare nuovo controllo"
 
-msgid "Result"
-msgstr "Risultato"
+#: templates/internal/create_inspection.html:27
+msgid ""
+"Select the inspection type. A new inspection with all active inspection "
+"criteria will then be created."
+msgstr ""
+"Selezionare il tipo di controllo. Verrà quindi creato un nuovo controllo con "
+"tutti i criteri attivi."
 
-msgid "Inspection ID"
-msgstr "ID del controllo"
+#: templates/internal/create_inspection.html:40
+#: templates/internal/partials/inspection_task_card.html:15
+msgid "Start inspection"
+msgstr "Avviare controllo"
 
-msgid "Inspection report PDF"
-msgstr "Rapporto di controllo PDF"
+#: templates/internal/create_inspection.html:44
+msgid ""
+"The inspection is based on the active inspection catalogue according to SN "
+"EN 1176/1177 and any local additions made by the organization."
+msgstr ""
+"Il controllo si basa sul catalogo attivo secondo SN EN 1176/1177 e su "
+"eventuali integrazioni locali dell’organizzazione."
 
-msgid "Complete inspection"
-msgstr "Concludere il controllo"
+#: templates/internal/dashboard.html:33
+msgid "Internal dashboard"
+msgstr "Dashboard interno"
 
+#: templates/internal/dashboard.html:34
+msgid "Analytics and key figures"
+msgstr "Analisi e indicatori"
+
+#: templates/internal/dashboard.html:39
+msgid "Key figures"
+msgstr "Indicatori"
+
+#: templates/internal/dashboard.html:40
+msgid "Trends"
+msgstr "Andamenti"
+
+#: templates/internal/dashboard.html:41
+#: templates/internal/inspection_planning.html:108
+msgid "Planning"
+msgstr "Pianificazione"
+
+#: templates/internal/dashboard.html:43
+msgid "Operational lists"
+msgstr "Elenchi operativi"
+
+#: templates/internal/dashboard.html:49
+msgid "Organizations"
+msgstr "Organizzazioni"
+
+#: templates/internal/dashboard.html:50
+msgid "Active playgrounds"
+msgstr "Parchi gioco attivi"
+
+#: templates/internal/dashboard.html:51
+msgid "Open defects"
+msgstr "Difetti aperti"
+
+#: templates/internal/dashboard.html:52 templates/internal/dashboard.html:67
+msgid "Geprüfte / abgeschlossene Mängel"
+msgstr ""
+
+#: templates/internal/dashboard.html:53
+msgid "Defects with safety risk"
+msgstr "Difetti con rischio di sicurezza"
+
+#: templates/internal/dashboard.html:54 templates/internal/dashboard.html:62
+msgid "Planned maintenance actions"
+msgstr "Interventi di manutenzione pianificati"
+
+#: templates/internal/dashboard.html:55
+msgid "Inspections in progress"
+msgstr "Controlli in corso"
+
+#: templates/internal/dashboard.html:55
+msgid "Completed inspections"
+msgstr "Controlli completati"
+
+#: templates/internal/dashboard.html:57
+msgid "Defects by status"
+msgstr "Difetti per stato"
+
+#: templates/internal/dashboard.html:57
+msgid "Defects by source"
+msgstr "Difetti per fonte"
+
+#: templates/internal/dashboard.html:57
+msgid "Inspections by type"
+msgstr "Controlli per tipo"
+
+#: templates/internal/dashboard.html:57
+msgid "Inspections by status"
+msgstr "Controlli per stato"
+
+#: templates/internal/dashboard.html:59
+msgid "Defect trend"
+msgstr "Andamento dei difetti"
+
+#: templates/internal/dashboard.html:59
+msgid "Safety-risk defects over time"
+msgstr "Difetti con rischio per la sicurezza nel tempo"
+
+#: templates/internal/dashboard.html:59
+msgid "Inspections per month by type"
+msgstr "Controlli per mese e per tipo"
+
+#: templates/internal/dashboard.html:59
+msgid "Inspection results over time"
+msgstr "Risultati dei controlli nel tempo"
+
+#: templates/internal/dashboard.html:60
+msgid "Inspection tasks by week"
+msgstr "Incarichi di controllo per settimana"
+
+#: templates/internal/dashboard.html:60
+msgid "Maintenance planned versus completed"
+msgstr "Manutenzione pianificata rispetto a quella completata"
+
+#: templates/internal/dashboard.html:61
+msgid "Defect count by supplier"
+msgstr "Numero di difetti per fornitore"
+
+#: templates/internal/dashboard.html:61
+msgid "Top 10 defect rate by supplier"
+msgstr "Top 10 del tasso di difetti per fornitore"
+
+#: templates/internal/dashboard.html:61
+msgid ""
+"Defects per 100 play equipment. Suppliers with fewer than 5 play equipment "
+"are hidden."
+msgstr ""
+"Difetti per 100 attrezzature da gioco. I fornitori con meno di 5 "
+"attrezzature da gioco sono nascosti."
+
+#: templates/internal/dashboard.html:61
+msgid "Top 10 safety defect rate by supplier"
+msgstr "Top 10 del tasso di difetti di sicurezza per fornitore"
+
+#: templates/internal/dashboard.html:61
+msgid ""
+"Safety-risk defects per 100 play equipment. Suppliers with fewer than 5 play "
+"equipment are hidden."
+msgstr ""
+"Difetti con rischio per la sicurezza per 100 attrezzature da gioco. I "
+"fornitori con meno di 5 attrezzature da gioco sono nascosti."
+
+#: templates/internal/dashboard.html:61
+msgid "Play equipment age and defects"
+msgstr "Età delle attrezzature da gioco e difetti"
+
+#: templates/internal/dashboard.html:62
+msgid "Maintenance by status"
+msgstr "Manutenzione per stato"
+
+#: templates/internal/dashboard.html:62
+msgid "Date"
+msgstr "Data"
+
+#: templates/internal/dashboard.html:62
+msgid "Title"
+msgstr "Titolo"
+
+#: templates/internal/dashboard.html:62
+msgid "No planned maintenance actions available."
+msgstr "Nessuna misura di manutenzione pianificata disponibile."
+
+#: templates/internal/dashboard.html:67
+msgid "Count"
+msgstr "Numero"
+
+#: templates/internal/dashboard.html:67
+msgid "Defects"
+msgstr "Difetti"
+
+#: templates/internal/dashboard.html:67
+msgid "Safety defects"
+msgstr "Difetti di sicurezza"
+
+#: templates/internal/dashboard.html:67
+msgid "Defects per 100 play equipment"
+msgstr "Difetti per 100 attrezzature da gioco"
+
+#: templates/internal/dashboard.html:67
+msgid "Safety defects per 100 play equipment"
+msgstr "Difetti di sicurezza per 100 attrezzature da gioco"
+
+#: templates/internal/dashboard.html:67
+msgid "New defects"
+msgstr "Nuovi difetti"
+
+#: templates/internal/dashboard.html:67
+msgid "New safety-risk defects"
+msgstr "Nuovi difetti con rischio per la sicurezza"
+
+#: templates/internal/dashboard.html:67
+msgid "Completed maintenance actions"
+msgstr "Misure di manutenzione completate"
+
+#: templates/internal/dashboard.html:67
+msgid "Unknown supplier"
+msgstr "Fornitore sconosciuto"
+
+#: templates/internal/dashboard.html:67
+msgid "0-5 years"
+msgstr "0–5 anni"
+
+#: templates/internal/dashboard.html:67
+msgid "6-10 years"
+msgstr "6–10 anni"
+
+#: templates/internal/dashboard.html:67
+msgid "11-15 years"
+msgstr "11–15 anni"
+
+#: templates/internal/dashboard.html:67
+msgid "16-20 years"
+msgstr "16–20 anni"
+
+#: templates/internal/dashboard.html:67
+msgid "21-30 years"
+msgstr "21–30 anni"
+
+#: templates/internal/dashboard.html:67
+msgid "Over 30 years"
+msgstr "Oltre 30 anni"
+
+#: templates/internal/dashboard.html:67
+msgid "Unknown age"
+msgstr "Età sconosciuta"
+
+#: templates/internal/defect_management.html:7
+#: templates/internal/defect_management.html:16
+msgid "Mängel verwalten"
+msgstr "Gestire i difetti"
+
+#: templates/internal/defect_management.html:16
+msgid "Operative Mängelverwaltung"
+msgstr "Gestione operativa dei difetti"
+
+#: templates/internal/defect_management.html:16
+#, python-format
+msgid "Offene, zugewiesene und erledigte Mängel für %(organization_name)s."
+msgstr "Difetti aperti, assegnati e risolti per %(organization_name)s."
+
+#: templates/internal/defect_management.html:16
+msgid "Mängelübersicht für die berechtigten Organisationen."
+msgstr "Panoramica dei difetti per le organizzazioni autorizzate."
+
+#: templates/internal/defect_management.html:18
+msgid ""
+"Die Mängelverwaltung ist für eingeloggte Benutzer verfügbar. Es ist jedoch "
+"keine aktive Organisation mit deinem Konto verknüpft, deshalb werden keine "
+"Mängel angezeigt."
+msgstr ""
+"La gestione dei difetti è disponibile per gli utenti connessi. Tuttavia, al "
+"tuo account non è associata alcuna organizzazione attiva; pertanto non "
+"vengono visualizzati difetti."
+
+#: templates/internal/defect_management.html:20
+msgid "Offen"
+msgstr ""
+
+#: templates/internal/defect_management.html:21
+#: templates/internal/defect_management.html:28
+msgid "Geplant"
+msgstr ""
+
+#: templates/internal/defect_management.html:22
+msgid "Offen mit Sicherheitsrisiko"
+msgstr "Aperto con rischio per la sicurezza"
+
+#: templates/internal/defect_management.html:23
+#: templates/internal/defect_management.html:28
+msgid "Überfällig"
+msgstr ""
+
+#: templates/internal/defect_management.html:24
+msgid "Behoben"
+msgstr ""
+
+#: templates/internal/defect_management.html:25
+msgid "Abgeschlossen"
+msgstr "Concluso"
+
+#: templates/internal/defect_management.html:27
+#, fuzzy
+#| msgid "Organization"
+msgid "Organisation"
+msgstr "Organizzazione"
+
+#: templates/internal/defect_management.html:27
+#, fuzzy
+#| msgid "All organizations"
+msgid "Alle Organisationen"
+msgstr "Tutte le organizzazioni"
+
+#: templates/internal/defect_management.html:27
+#: templates/internal/defect_management.html:28
+msgid "Sicherheitsrisiko"
+msgstr "Rischio per la sicurezza"
+
+#: templates/internal/defect_management.html:27
+msgid "Alle"
+msgstr "Tutti"
+
+#: templates/internal/defect_management.html:27
+msgid "Nur sicherheitsrelevant"
+msgstr "Solo rilevanti per la sicurezza"
+
+#: templates/internal/defect_management.html:27
+msgid "Ohne Sicherheitsrisiko"
+msgstr "Senza rischio per la sicurezza"
+
+#: templates/internal/defect_management.html:27
+msgid "Spielplatz"
+msgstr "Parco giochi"
+
+#: templates/internal/defect_management.html:27
+msgid "Alle Spielplätze"
+msgstr "Tutti i parchi gioco"
+
+#: templates/internal/defect_management.html:27
+msgid "Suche"
+msgstr "Ricerca"
+
+#: templates/internal/defect_management.html:27
+msgid "Filtern"
+msgstr "Filtrare"
+
+#: templates/internal/defect_management.html:27
+msgid "Zurücksetzen"
+msgstr "Reimpostare"
+
+#: templates/internal/defect_management.html:28
+msgid "Maximum 100 Einträge"
+msgstr "Massimo 100 voci"
+
+#: templates/internal/defect_management.html:28
+msgid "Dringlichkeit"
+msgstr "Urgenza"
+
+#: templates/internal/defect_management.html:28
+msgid "Beschreibung"
+msgstr "Descrizione"
+
+#: templates/internal/defect_management.html:28
+msgid "Zuweisung und Meldung"
+msgstr "Assegnazione e messaggio"
+
+#: templates/internal/defect_management.html:28
+msgid "Zuständig"
+msgstr "Responsabile"
+
+#: templates/internal/defect_management.html:28
+msgid "Meldestatus"
+msgstr "Stato del messaggio"
+
+#: templates/internal/defect_management.html:28
+msgid "Gemeldet"
+msgstr "Segnalato"
+
+#: templates/internal/defect_management.html:28
+msgid "Planung"
+msgstr "Pianificazione"
+
+#: templates/internal/defect_management.html:28
+msgid "Zuständige Person"
+msgstr "Persona responsabile"
+
+#: templates/internal/defect_management.html:28
+msgid "Geplante Behebung"
+msgstr "Risoluzione pianificata"
+
+#: templates/internal/defect_management.html:28
+msgid "Bei behobenen oder abgeschlossenen Mängeln ist die Planung gesperrt."
+msgstr ""
+
+#: templates/internal/defect_management.html:28
+msgid "Planung speichern"
+msgstr "Salvare la pianificazione"
+
+#: templates/internal/defect_management.html:28
+msgid "Status ändern"
+msgstr "Modificare lo stato"
+
+#: templates/internal/defect_management.html:28
+msgid "Aktionen"
+msgstr "Azioni"
+
+#: templates/internal/defect_management.html:28
+msgid "Bearbeiten"
+msgstr "Modificare"
+
+#: templates/internal/defect_management.html:28
+msgid "Anzeigen"
+msgstr "Visualizzare"
+
+#: templates/internal/defect_management.html:28
+msgid "PDF"
+msgstr ""
+
+#: templates/internal/defect_management.html:28
+msgid "Keine Mängel für die aktuelle Auswahl vorhanden."
+msgstr "Nessun difetto disponibile per la selezione attuale."
+
+#: templates/internal/edit_defect.html:8 templates/internal/edit_defect.html:25
+msgid "Edit defect"
+msgstr "Modificare difetto"
+
+#: templates/internal/edit_defect.html:8 templates/internal/edit_defect.html:25
+#: templates/public/playground_detail.html:93
+msgid "Open defect"
+msgstr "Aprire difetto"
+
+#: templates/internal/edit_defect.html:31
+#: templates/public/playground_detail.html:69
+msgid "Publicly visible"
+msgstr "Visibile pubblicamente"
+
+#: templates/internal/edit_defect.html:31
+msgid "Internal"
+msgstr "Interno"
+
+#: templates/internal/edit_defect.html:34
+msgid ""
+"You have read-only access to this defect. Your role does not allow changes."
+msgstr ""
+
+#: templates/internal/edit_defect.html:36
+msgid "Source"
+msgstr "Fonte"
+
+#: templates/internal/edit_defect.html:37
+msgid "Reported on"
+msgstr "Segnalato il"
+
+#: templates/internal/edit_defect.html:39
+msgid "Responsible person"
+msgstr "Persona responsabile"
+
+#: templates/internal/edit_defect.html:39
+msgid "Not assigned yet"
+msgstr "Non ancora assegnato"
+
+#: templates/internal/edit_defect.html:40
+msgid "Created from inspection item"
+msgstr "Creato dal punto di controllo"
+
+#: templates/internal/edit_defect.html:46
+msgid "Assignment and system message"
+msgstr "Assegnazione e messaggio di sistema"
+
+#: templates/internal/edit_defect.html:47
+msgid ""
+"The selected person receives a system message. If push notifications are "
+"enabled, a notification is also triggered on the device."
+msgstr ""
+
+#: templates/internal/edit_defect.html:48
+msgid "Save assignment"
+msgstr "Salvare assegnazione"
+
+#: templates/internal/edit_defect.html:53
+msgid ""
+"You may edit this defect, but your role does not allow changing or saving "
+"the assignment."
+msgstr ""
+
+#: templates/internal/edit_defect.html:58
+msgid "Defect details"
+msgstr "Dettagli del difetto"
+
+#: templates/internal/edit_defect.html:60
+msgid "Back to defect management"
+msgstr ""
+
+#: templates/internal/edit_defect.html:60
+msgid "Back to playground"
+msgstr "Torna al parco giochi"
+
+#: templates/internal/inspection_detail.html:28
+#: templates/internal/inspection_detail.html:65
+#: templates/internal/inspection_detail.html:71
+#, python-format
 msgid "%(counter)s inspection item"
 msgid_plural "%(counter)s inspection items"
 msgstr[0] "%(counter)s punto di controllo"
 msgstr[1] "%(counter)s punti di controllo"
 
+#: templates/internal/inspection_detail.html:31
+msgid "Inspection report PDF"
+msgstr "Rapporto di controllo PDF"
+
+#: templates/internal/inspection_detail.html:35
+msgid "Inspection areas"
+msgstr "Aree di controllo"
+
+#: templates/internal/inspection_detail.html:36
+#: templates/internal/inspection_detail.html:81
+msgid "Result"
+msgstr "Risultato"
+
+#: templates/internal/inspection_detail.html:38
+msgid "Inspection ID"
+msgstr "ID del controllo"
+
+#: templates/internal/inspection_detail.html:45
+#: templates/internal/inspection_detail.html:46
+msgid "Complete inspection"
+msgstr "Concludere il controllo"
+
+#: templates/internal/inspection_detail.html:45
+#, python-format
 msgid "%(counter)s inspection item is still open."
 msgid_plural "%(counter)s inspection items are still open."
 msgstr[0] "%(counter)s punto di controllo è ancora aperto."
 msgstr[1] "%(counter)s punti di controllo sono ancora aperti."
 
-msgid "All inspection items have been answered. The inspection can be completed."
-msgstr "Tutti i punti di controllo sono stati risposti. Il controllo può essere concluso."
+#: templates/internal/inspection_detail.html:45
+msgid ""
+"All inspection items have been answered. The inspection can be completed."
+msgstr ""
+"Tutti i punti di controllo sono stati risposti. Il controllo può essere "
+"concluso."
 
+#: templates/internal/inspection_detail.html:50
 msgid "Inspection completed"
 msgstr "Controllo concluso"
 
+#: templates/internal/inspection_detail.html:50
 msgid "This inspection has been completed."
 msgstr "Questo controllo è stato concluso."
 
+#: templates/internal/inspection_detail.html:50
 msgid "Completed on"
 msgstr "Concluso il"
 
+#: templates/internal/inspection_detail.html:50
 msgid "by"
 msgstr "da"
 
+#: templates/internal/inspection_detail.html:55
 msgid "Record inspection answers"
 msgstr "Registrare le risposte di controllo"
 
+#: templates/internal/inspection_detail.html:55
 msgid "Set the status for each inspection item and add a comment if needed."
-msgstr "Impostare lo stato per ogni punto di controllo e aggiungere un commento se necessario."
+msgstr ""
+"Impostare lo stato per ogni punto di controllo e aggiungere un commento se "
+"necessario."
 
+#: templates/internal/inspection_detail.html:55
+#: templates/internal/inspection_detail.html:89
 msgid "Save inspection answers"
 msgstr "Salvare le risposte di controllo"
 
-msgid "Playground-related inspection items without assignment to a single play equipment item."
-msgstr "Punti di controllo relativi al parco giochi senza assegnazione a una singola attrezzatura da gioco."
-
-msgid "No inspection items available"
-msgstr "Nessun punto di controllo disponibile"
-
-msgid "No matching inspection items were generated for this inspection area."
-msgstr "Per questa area di controllo non sono stati generati punti di controllo corrispondenti."
-
-msgid "Maintenance note"
-msgstr "Nota di manutenzione"
-
-msgid "Comment"
-msgstr "Commento"
-
-msgid "Optional comment"
-msgstr "Commento facoltativo"
-
-msgid "Recorded defects"
-msgstr "Difetti registrati"
-
-msgid "Maintenance permission is required to record defects."
-msgstr "Per registrare difetti è necessaria un’autorizzazione alla manutenzione."
-
-msgid "No inspection areas available"
-msgstr "Nessuna area di controllo disponibile"
-
-msgid "No inspection areas were generated for this inspection."
-msgstr "Per questo controllo non sono state generate aree di controllo."
-
+#: templates/internal/inspection_detail.html:55
 msgid "Set result for entire inspection"
 msgstr "Impostare il risultato per l’intero controllo"
 
+#: templates/internal/inspection_detail.html:55
+#: templates/internal/inspection_detail.html:73
 msgid "Select result"
 msgstr "Selezionare un risultato"
 
+#: templates/internal/inspection_detail.html:55
 msgid "Apply to entire inspection"
 msgstr "Applicare all’intero controllo"
 
-msgid "This only changes the form values. Save the inspection answers afterwards."
-msgstr "Questo modifica solo i valori del modulo. Salvare poi le risposte di controllo."
+#: templates/internal/inspection_detail.html:55
+msgid ""
+"This only changes the form values. Save the inspection answers afterwards."
+msgstr ""
+"Questo modifica solo i valori del modulo. Salvare poi le risposte di "
+"controllo."
 
+#: templates/internal/inspection_detail.html:66
+#: templates/internal/inspection_detail.html:71
+#: templates/public/playground_detail.html:123
+msgid "Inventory no."
+msgstr "N. inventario"
+
+#: templates/internal/inspection_detail.html:68
+#: templates/public/playground_detail.html:108
+#, python-format
+msgid "Photo of %(name)s"
+msgstr "Foto di %(name)s"
+
+#: templates/internal/inspection_detail.html:71
+msgid ""
+"Playground-related inspection items without assignment to a single play "
+"equipment item."
+msgstr ""
+"Punti di controllo relativi al parco giochi senza assegnazione a una singola "
+"attrezzatura da gioco."
+
+#: templates/internal/inspection_detail.html:73
 msgid "Set result for this play equipment"
 msgstr "Impostare il risultato per questa attrezzatura da gioco"
 
+#: templates/internal/inspection_detail.html:73
 msgid "Apply to play equipment"
 msgstr "Applicare all’attrezzatura da gioco"
 
-msgid "Overview for %(organization_name)s."
+#: templates/internal/inspection_detail.html:80
+msgid "Maintenance note"
+msgstr "Nota di manutenzione"
+
+#: templates/internal/inspection_detail.html:81
+msgid "Comment"
+msgstr "Commento"
+
+#: templates/internal/inspection_detail.html:82
+msgid "Recorded defects"
+msgstr "Difetti registrati"
+
+#: templates/internal/inspection_detail.html:83
+msgid "Maintenance permission is required to record defects."
+msgstr ""
+"Per registrare difetti è necessaria un’autorizzazione alla manutenzione."
+
+#: templates/internal/inspection_detail.html:85
+msgid "No inspection items available"
+msgstr "Nessun punto di controllo disponibile"
+
+#: templates/internal/inspection_detail.html:85
+msgid "No matching inspection items were generated for this inspection area."
+msgstr ""
+"Per questa area di controllo non sono stati generati punti di controllo "
+"corrispondenti."
+
+#: templates/internal/inspection_detail.html:88
+msgid "No inspection areas available"
+msgstr "Nessuna area di controllo disponibile"
+
+#: templates/internal/inspection_detail.html:88
+msgid "No inspection areas were generated for this inspection."
+msgstr "Per questo controllo non sono state generate aree di controllo."
+
+#: templates/internal/inspection_planning.html:52
+msgid "Internal deployment planning"
+msgstr "Pianificazione interna degli interventi"
+
+#: templates/internal/inspection_planning.html:53
+msgid "Plan inspection tasks"
+msgstr "Pianificare incarichi di controllo"
+
+#: templates/internal/inspection_planning.html:54
+#, fuzzy, python-format
+#| msgid "Overview for %(organization_name)s."
+msgid "Due and planned inspections for %(organization_name)s."
 msgstr "Panoramica per %(organization_name)s."
 
-msgid "Cross-tenant overview for super admins."
-msgstr "Panoramica multi-mandante per super amministratori."
+#: templates/internal/inspection_planning.html:54
+msgid "Please select an organization to edit its planning."
+msgstr "Selezionare un’organizzazione per modificarne la pianificazione."
 
-msgid "Checked / completed defects"
-msgstr "Difetti controllati / risolti"
+#: templates/internal/inspection_planning.html:72
+msgid "Reset"
+msgstr "Reimpostare"
 
-msgid "Defects by status"
-msgstr "Difetti per stato"
+#: templates/internal/inspection_planning.html:79
+msgid "Maximum 100 entries"
+msgstr "Massimo 100 voci"
 
-msgid "Defects by source"
-msgstr "Difetti per fonte"
+#: templates/internal/inspection_planning.html:115
+msgid "Speichern"
+msgstr "Salvare"
 
-msgid "Inspections by type"
-msgstr "Controlli per tipo"
+#: templates/internal/inspection_planning.html:120
+msgid "Auftrag bearbeiten"
+msgstr "Modificare l’incarico"
 
-msgid "Inspections by status"
-msgstr "Controlli per stato"
+#: templates/internal/inspection_planning.html:123
+#: templates/internal/inspection_planning.html:128
+msgid "Kontrolle starten"
+msgstr "Avviare il controllo"
 
-msgid "Defect trend"
-msgstr "Andamento dei difetti"
+#: templates/internal/inspection_planning.html:124
+msgid "Startet die Durchführung dieses Kontrollauftrags."
+msgstr "Avvia l’esecuzione di questo incarico di controllo."
 
-msgid "Safety-risk defects over time"
-msgstr "Difetti con rischio per la sicurezza nel tempo"
+#: templates/internal/inspection_planning.html:131
+msgid "Anderer Person zugewiesen"
+msgstr "Assegnato a un’altra persona"
 
-msgid "Inspections per month by type"
-msgstr "Controlli per mese e per tipo"
+#: templates/internal/inspection_planning.html:133
+msgid "Keine Aktion verfügbar"
+msgstr "Nessuna azione disponibile"
 
-msgid "Inspection results over time"
-msgstr "Risultati dei controlli nel tempo"
+#: templates/internal/inspection_planning.html:137
+#: templates/internal/inspection_planning.html:142
+msgid "Aussetzen"
+msgstr "Sospendere"
 
-msgid "Inspection tasks by week"
-msgstr "Incarichi di controllo per settimana"
+#: templates/internal/inspection_planning.html:138
+msgid "Pausiert den Auftrag. Es ist kein Abbruchgrund erforderlich."
+msgstr ""
+"Sospende l’incarico. Non è necessario indicare un motivo di annullamento."
 
-msgid "Maintenance planned versus completed"
-msgstr "Manutenzione pianificata rispetto a quella completata"
+#: templates/internal/inspection_planning.html:145
+msgid "Der Auftrag ist bereits ausgesetzt."
+msgstr "L’incarico è già sospeso."
 
-msgid "Defect count by supplier"
-msgstr "Numero di difetti per fornitore"
+#: templates/internal/inspection_planning.html:152
+msgid "Abbruchgrund"
+msgstr "Motivo dell’annullamento"
 
-msgid "Top 10 defect rate by supplier"
-msgstr "Top 10 del tasso di difetti per fornitore"
+#: templates/internal/inspection_planning.html:164
+msgid "Benutzer ohne E-Mail"
+msgstr "Utente senza e-mail"
 
-msgid "Defects per 100 play equipment. Suppliers with fewer than 5 play equipment are hidden."
-msgstr "Difetti per 100 attrezzature da gioco. I fornitori con meno di 5 attrezzature da gioco sono nascosti."
+#: templates/internal/inspection_planning.html:170
+msgid "Completed or cancelled tasks can no longer be planned."
+msgstr ""
 
-msgid "Top 10 safety defect rate by supplier"
-msgstr "Top 10 del tasso di difetti di sicurezza per fornitore"
+#: templates/internal/inspection_planning.html:176
+msgid "Bericht"
+msgstr "Rapporto"
 
-msgid "Safety-risk defects per 100 play equipment. Suppliers with fewer than 5 play equipment are hidden."
-msgstr "Difetti con rischio per la sicurezza per 100 attrezzature da gioco. I fornitori con meno di 5 attrezzature da gioco sono nascosti."
+#: templates/internal/inspection_planning.html:179
+#: templates/internal/inspection_planning.html:181
+msgid "Kontrollbericht PDF"
+msgstr "Rapporto di controllo PDF"
 
-msgid "Play equipment age and defects"
-msgstr "Età delle attrezzature da gioco e difetti"
+#: templates/internal/my_inspections.html:32
+msgid "Personal inspection list"
+msgstr "Elenco personale dei controlli"
 
-msgid "Maintenance by status"
-msgstr "Manutenzione per stato"
+#: templates/internal/my_inspections.html:34
+msgid ""
+"Your inspections for today, overdue inspections and upcoming inspection "
+"tasks."
+msgstr ""
+"I controlli di oggi, quelli scaduti e i prossimi incarichi di controllo."
 
-msgid "No planned maintenance actions available."
-msgstr "Nessuna misura di manutenzione pianificata disponibile."
+#: templates/internal/my_inspections.html:41
+msgid "Today"
+msgstr "Oggi"
 
-msgid "Defects per 100 play equipment"
-msgstr "Difetti per 100 attrezzature da gioco"
+#: templates/internal/my_inspections.html:44
+msgid "No inspections are assigned for today."
+msgstr "Per oggi non sono assegnati controlli."
 
-msgid "Safety defects per 100 play equipment"
-msgstr "Difetti di sicurezza per 100 attrezzature da gioco"
+#: templates/internal/my_inspections.html:53
+#, fuzzy
+#| msgid "No open unassigned inspection tasks available."
+msgid "No overdue assigned inspections."
+msgstr "Nessun incarico di controllo aperto non assegnato disponibile."
 
-msgid "New defects"
-msgstr "Nuovi difetti"
+#: templates/internal/my_inspections.html:59
+msgid "Next 30 days"
+msgstr "Prossimi 30 giorni"
 
-msgid "Resolved / checked defects"
-msgstr "Difetti risolti / controllati"
+#: templates/internal/my_inspections.html:62
+msgid "No further assigned inspections in the next 30 days."
+msgstr "Nessun altro controllo assegnato nei prossimi 30 giorni."
 
-msgid "New safety-risk defects"
-msgstr "Nuovi difetti con rischio per la sicurezza"
+#: templates/internal/my_inspections.html:67
+msgid "Open inspections without assignment"
+msgstr "Controlli aperti senza assegnazione"
 
-msgid "Completed maintenance actions"
-msgstr "Misure di manutenzione completate"
+#: templates/internal/my_inspections.html:67
+msgid "These tasks can be accepted by authorized inspectors."
+msgstr "Questi incarichi possono essere accettati da controllori autorizzati."
 
-msgid "Unknown supplier"
-msgstr "Fornitore sconosciuto"
+#: templates/internal/my_inspections.html:68
+msgid "No open unassigned inspection tasks available."
+msgstr "Nessun incarico di controllo aperto non assegnato disponibile."
 
-msgid "0-5 years"
-msgstr "0–5 anni"
+#: templates/internal/partials/defect_form_fields.html:13
+#: templates/internal/partials/defect_form_fields.html:14
+#: templates/internal/partials/defect_form_fields.html:15
+msgid "Optional."
+msgstr "Facoltativo."
 
-msgid "6-10 years"
-msgstr "6–10 anni"
+#: templates/internal/partials/defect_form_fields.html:21
+msgid "Optional free text, for example citizen hotline, depot or caretaker."
+msgstr ""
+"Testo libero facoltativo, ad esempio hotline cittadina, deposito o custodia."
 
-msgid "11-15 years"
-msgstr "11–15 anni"
+#: templates/internal/partials/defect_form_fields.html:21
+msgid ""
+"Only activate this if the notice should appear in the public care status."
+msgstr ""
+"Attivare solo se l’avviso deve apparire nello stato pubblico della "
+"manutenzione."
 
-msgid "16-20 years"
-msgstr "16–20 anni"
+#: templates/internal/partials/defect_form_fields.html:21
+msgid "This text may be publicly visible. Do not enter internal details."
+msgstr ""
+"Questo testo può essere visibile pubblicamente. Non inserire dettagli "
+"interni."
 
-msgid "21-30 years"
-msgstr "21–30 anni"
+#: templates/internal/partials/defect_form_fields.html:26
+msgid "Photos of the defect"
+msgstr "Foto del difetto"
 
-msgid "Over 30 years"
-msgstr "Oltre 30 anni"
+#: templates/internal/partials/defect_form_fields.html:26
+msgid "Up to three photos per defect."
+msgstr "Fino a tre foto per difetto."
 
-msgid "Unknown age"
-msgstr "Età sconosciuta"
+#: templates/internal/partials/defect_form_fields.html:26
+#, python-format
+msgid "Defect photo %(number)s"
+msgstr "Foto del difetto %(number)s"
+
+#: templates/internal/partials/defect_form_fields.html:26
+msgid "Delete photo"
+msgstr "Eliminare foto"
+
+#: templates/internal/partials/inspection_task_card.html:10
+msgid "Not planned"
+msgstr "Non pianificato"
+
+#: templates/internal/partials/inspection_task_card.html:14
+msgid "Accept"
+msgstr "Accettare"
+
+#: templates/notifications/notification_list.html:26
+msgid "Internal messages appear here, for example assigned defects."
+msgstr "I messaggi interni appaiono qui, ad esempio i difetti assegnati."
+
+#: templates/notifications/notification_list.html:27
+#: templates/notifications/notification_list.html:46
+msgid "Enable push notifications"
+msgstr "Attivare le notifiche push"
+
+#: templates/notifications/notification_list.html:27
+msgid "Web push is not configured"
+msgstr ""
+
+#: templates/notifications/notification_list.html:29
+#, python-format
+msgid "Active push devices for this account: %(count)s"
+msgstr "Dispositivi push attivi per questo account: %(count)s"
+
+#: templates/notifications/notification_list.html:35
+msgid "Delivery"
+msgstr "Consegna"
+
+#: templates/notifications/notification_list.html:39
+#, fuzzy
+#| msgid "No inspection areas available"
+msgid "No messages are available yet."
+msgstr "Nessuna area di controllo disponibile"
+
+#: templates/notifications/notification_list.html:46
+msgid "Push is being enabled ..."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "The public web push key is configured incorrectly."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Push notifications are being prepared ..."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "This device does not support service workers."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "This device does not support web push notifications."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "This device does not support browser notifications."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Notifications were not allowed."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Service worker is being registered ..."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Push device is being registered ..."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Push device is being saved on the server ..."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Push notifications could not be saved."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid ""
+"Push notifications are enabled for this device. Active push devices for this "
+"account:"
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Push notifications could not be enabled:"
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Existing push subscription could not be removed cleanly."
+msgstr ""
+
+#: templates/notifications/notification_list.html:46
+msgid "Push activation failed"
+msgstr ""
+
+#: templates/public/index.html:43
+msgid "Become a playground pro!"
+msgstr "Diventa un professionista dei parchi gioco!"
+
+#: templates/public/index.html:44
+msgid "Select a playground on the map and get exciting detailed information."
+msgstr ""
+"Seleziona un parco giochi sulla carta e ottieni informazioni dettagliate "
+"interessanti."
+
+#: templates/public/index.html:47
+msgid "Search playground, address or district"
+msgstr "Cercare parco giochi, indirizzo o quartiere"
+
+#: templates/public/index.html:62
+msgid "playgrounds"
+msgstr "parchi gioco"
+
+#: templates/public/index.html:62
+msgid "Preview image of"
+msgstr "Immagine di anteprima di"
+
+#: templates/public/index.html:62
+msgid "Next inspection:"
+msgstr "Prossimo controllo:"
+
+#: templates/public/index.html:62
+msgid "will be planned"
+msgstr "sarà pianificato"
+
+#: templates/public/index.html:62
+msgid "Show details"
+msgstr "Mostrare dettagli"
+
+#: templates/public/playground_detail.html:40
+msgid "Your playground. Your information."
+msgstr "Il tuo parco giochi. Le tue informazioni."
+
+#: templates/public/playground_detail.html:46
+#, python-format
+msgid "Preview image of %(name)s"
+msgstr "Immagine di anteprima di %(name)s"
+
+#: templates/public/playground_detail.html:52
+msgid "Replace playground image"
+msgstr "Sostituire l’immagine del parco giochi"
+
+#: templates/public/playground_detail.html:54
+#: templates/public/playground_detail.html:115
+msgid "Upload image"
+msgstr "Caricare immagine"
+
+#: templates/public/playground_detail.html:59
+#: templates/public/playground_detail.html:117
+msgid "Rotate image by 90°"
+msgstr "Ruotare l’immagine di 90°"
+
+#: templates/public/playground_detail.html:62
+msgid ""
+"The current preview image comes from a play equipment item. It can be "
+"rotated there."
+msgstr ""
+"L’immagine di anteprima attuale proviene da un’attrezzatura da gioco. Può "
+"essere ruotata lì."
+
+#: templates/public/playground_detail.html:67
+msgid "Address"
+msgstr "Indirizzo"
+
+#: templates/public/playground_detail.html:67
+msgid "No address stored"
+msgstr "Nessun indirizzo registrato"
+
+#: templates/public/playground_detail.html:68
+msgid "District"
+msgstr "Quartiere"
+
+#: templates/public/playground_detail.html:69
+msgid "Internally visible"
+msgstr "Visibile internamente"
+
+#: templates/public/playground_detail.html:71
+msgid "Swiss coordinates"
+msgstr "Coordinate svizzere"
+
+#: templates/public/playground_detail.html:72
+msgid "Show specialist map"
+msgstr "Mostrare la carta specialistica"
+
+#: templates/public/playground_detail.html:75
+msgid "Documents"
+msgstr "Documenti"
+
+#: templates/public/playground_detail.html:75
+msgid "Certificate documents"
+msgstr "Documenti di certificato"
+
+#: templates/public/playground_detail.html:75
+msgid "Acceptance documents"
+msgstr "Documenti di collaudo"
+
+#: templates/public/playground_detail.html:82
+msgid "Care status"
+msgstr "Stato della manutenzione"
+
+#: templates/public/playground_detail.html:83
+msgid "Known defects and planned repairs."
+msgstr "Difetti noti e riparazioni pianificate."
+
+#: templates/public/playground_detail.html:89
+msgid "Inspection is currently suspended."
+msgstr "L’ispezione è attualmente sospesa."
+
+#: templates/public/playground_detail.html:91
+msgid "Last inspection"
+msgstr "Ultimo controllo"
+
+#: templates/public/playground_detail.html:91
+msgid "No completed inspection yet"
+msgstr "Nessun controllo completato finora"
+
+#: templates/public/playground_detail.html:92
+msgid "Next planned inspection"
+msgstr "Prossimo controllo pianificato"
+
+#: templates/public/playground_detail.html:93
+#, python-format
+msgid "%(counter)s defect"
+msgid_plural "%(counter)s defects"
+msgstr[0] "%(counter)s difetto"
+msgstr[1] "%(counter)s difetti"
+
+#: templates/public/playground_detail.html:93
+msgid "No safety risk"
+msgstr "Nessun rischio per la sicurezza"
+
+#: templates/public/playground_detail.html:93
+msgid "No defects known"
+msgstr "Nessun difetto noto"
+
+#: templates/public/playground_detail.html:102
+msgid "Equipment on this playground."
+msgstr "Attrezzature presenti in questo parco giochi."
+
+#: templates/public/playground_detail.html:102
+#, python-format
+msgid "%(counter)s entry"
+msgid_plural "%(counter)s entries"
+msgstr[0] "%(counter)s voce"
+msgstr[1] "%(counter)s voci"
+
+#: templates/public/playground_detail.html:113
+msgid "Replace image"
+msgstr "Sostituire immagine"
+
+#: templates/public/playground_detail.html:120
+msgid "Defect with safety risk"
+msgstr "Difetto con rischio per la sicurezza"
+
+#: templates/public/playground_detail.html:120
+msgid "Defect without safety risk"
+msgstr "Difetto senza rischio per la sicurezza"
+
+#: templates/public/playground_detail.html:120
+msgid "In operation"
+msgstr "In esercizio"
+
+#: templates/public/playground_detail.html:121
+msgid "Renovation pending"
+msgstr "Risanamento in sospeso"
+
+#: templates/public/playground_detail.html:121
+msgid "No renovation planned"
+msgstr "Nessun risanamento pianificato"
+
+#: templates/public/playground_detail.html:121
+#, python-format
+msgid "Will be removed on %(date)s"
+msgstr "Sarà rimosso il %(date)s"
+
+#: templates/public/playground_detail.html:122
+msgid "Renovation details"
+msgstr "Dettagli del risanamento"
+
+#: templates/public/playground_detail.html:122
+msgid "Recommended renovation year"
+msgstr "Anno di risanamento consigliato"
+
+#: templates/public/playground_detail.html:122
+msgid "Renovation type"
+msgstr "Tipo di risanamento"
+
+#: templates/public/playground_detail.html:122
+msgid "Renovation comment"
+msgstr "Commento sul risanamento"
+
+#: templates/public/playground_detail.html:123
+msgid "Year built"
+msgstr "Anno di costruzione"
+
+#: templates/public/playground_detail.html:123
+msgid "Supplier"
+msgstr "Fornitore"
+
+#: templates/public/playground_detail.html:123
+msgid "Standard"
+msgstr "Norma"
+
+#: templates/public/playground_detail.html:128
+msgid "No play equipment recorded yet"
+msgstr "Nessuna attrezzatura da gioco registrata finora"
+
+#: templates/public/playground_detail.html:128
+msgid ""
+"As soon as publicly visible play equipment has been recorded, it will be "
+"shown here."
+msgstr ""
+"Non appena saranno registrate attrezzature da gioco visibili pubblicamente, "
+"saranno mostrate qui."
+
+#: templates/public/register_organization.html:3
+#: templates/public/register_organization.html:10
+#, fuzzy
+#| msgid "All organizations"
+msgid "Register organization"
+msgstr "Tutte le organizzazioni"
+
+#: templates/public/register_organization.html:9
+#, fuzzy
+#| msgid "All organizations"
+msgid "New organization"
+msgstr "Tutte le organizzazioni"
+
+#: templates/public/register_organization.html:12
+msgid ""
+"Request your own organization area in playsafeswiss. The request will be "
+"reviewed by a super admin."
+msgstr ""
+
+#: templates/public/register_organization.html:32
+msgid "Submit request"
+msgstr ""
+
+#: templates/public/register_organization.html:36
+msgid ""
+"After review, the organization can be activated and an organization admin "
+"can be created."
+msgstr ""
+
+#: templates/public/register_organization_done.html:3
+#: templates/public/register_organization_done.html:10
+msgid "Request submitted"
+msgstr ""
+
+#: templates/public/register_organization_done.html:11
+#, fuzzy
+#| msgid ""
+#| "Thank you. Your organization request has been submitted and will be "
+#| "reviewed."
+msgid ""
+"Thank you. Your organization request has been saved and will be reviewed."
+msgstr ""
+"Grazie. La richiesta della tua organizzazione è stata inoltrata e sarà "
+"esaminata."
+
+#: templates/public/register_organization_done.html:12
+#, fuzzy
+#| msgid "Back to playground"
+msgid "Back to map"
+msgstr "Torna al parco giochi"
+
+#~ msgid "A user account already exists for this email address."
+#~ msgstr "Per questo indirizzo e-mail esiste già un account utente."
+
+#~ msgid "Action"
+#~ msgstr "Azione"
+
+#~ msgid "An entry already exists for this organization."
+#~ msgstr "Per questa organizzazione esiste già una voce."
+
+#~ msgid "April"
+#~ msgstr "aprile"
+
+#~ msgid "August"
+#~ msgstr "agosto"
+
+#~ msgid "December"
+#~ msgstr "dicembre"
+
+#~ msgid "Die Anfrage konnte nicht verarbeitet werden."
+#~ msgstr "La richiesta non ha potuto essere elaborata."
+
+#~ msgid "Diese URL-Kennung wird bereits verwendet."
+#~ msgstr "Questo identificativo URL è già in uso."
+
+#~ msgid "Document not found."
+#~ msgstr "Documento non trovato."
+
+#~ msgid "e.g. City of Winterthur"
+#~ msgstr "ad es. Città di Winterthur"
+
+#~ msgid "e.g. city-winterthur"
+#~ msgstr "ad es. citta-winterthur"
+
+#~ msgid "February"
+#~ msgstr "febbraio"
+
+#~ msgid "First name"
+#~ msgstr "Nome"
+
+#~ msgid "For example: city-winterthur or municipality-example."
+#~ msgstr "Ad esempio: citta-winterthur o comune-esempio."
+
+#~ msgid "Für diese E-Mail-Adresse liegt bereits eine offene Anfrage vor."
+#~ msgstr "Per questo indirizzo e-mail esiste già una richiesta aperta."
+
+#~ msgid "Für diese Organisation besteht bereits ein Eintrag."
+#~ msgstr "Per questa organizzazione esiste già una voce."
+
+#~ msgid "Für diese Organisation liegt bereits eine offene Anfrage vor."
+#~ msgstr "Per questa organizzazione esiste già una richiesta aperta."
+
+#~ msgid "Für diese URL-Kennung liegt bereits eine offene Anfrage vor."
+#~ msgstr "Per questo identificativo URL esiste già una richiesta aperta."
+
+#~ msgid "January"
+#~ msgstr "gennaio"
+
+#~ msgid "July"
+#~ msgstr "luglio"
+
+#~ msgid "June"
+#~ msgstr "giugno"
+
+#~ msgid "Kurzname / URL-Kennung"
+#~ msgstr "Nome breve / identificativo URL"
+
+#~ msgid "Last name"
+#~ msgstr "Cognome"
+
+#~ msgid "March"
+#~ msgstr "marzo"
+
+#~ msgid "May"
+#~ msgstr "maggio"
+
+#~ msgid "Message"
+#~ msgstr "Messaggio"
+
+#~ msgid "Nachricht"
+#~ msgstr "Messaggio"
+
+#~ msgid "Name der Organisation"
+#~ msgstr "Nome dell’organizzazione"
+
+#~ msgid "November"
+#~ msgstr "novembre"
+
+#~ msgid "October"
+#~ msgstr "ottobre"
+
+#~ msgid ""
+#~ "Optional: kurzer Hinweis zur Organisation oder zum geplanten Einsatz."
+#~ msgstr ""
+#~ "Facoltativo: breve indicazione sull’organizzazione o sull’uso previsto."
+
+#~ msgid "Optional: short note about the organization or the planned use."
+#~ msgstr ""
+#~ "Facoltativo: breve indicazione sull’organizzazione o sull’uso previsto."
+
+#~ msgid "Organization name"
+#~ msgstr "Nome dell’organizzazione"
+
+#~ msgid "Save"
+#~ msgstr "Salvare"
+
+#~ msgid "September"
+#~ msgstr "settembre"
+
+#~ msgid "Slug / URL key"
+#~ msgstr "Nome breve / identificativo URL"
+
+#~ msgid "The request could not be processed."
+#~ msgstr "La richiesta non ha potuto essere elaborata."
+
+#~ msgid "There is already an open request for this email address."
+#~ msgstr "Per questo indirizzo e-mail esiste già una richiesta aperta."
+
+#~ msgid "There is already an open request for this organization."
+#~ msgstr "Per questa organizzazione esiste già una richiesta aperta."
+
+#~ msgid "There is already an open request for this URL key."
+#~ msgstr "Per questo identificativo URL esiste già una richiesta aperta."
+
+#~ msgid ""
+#~ "There were too many login attempts. Please try again in a few minutes."
+#~ msgstr ""
+#~ "Ci sono stati troppi tentativi di accesso. Riprovare tra alcuni minuti."
+
+#~ msgid "There were too many requests. Please try again later."
+#~ msgstr "Ci sono state troppe richieste. Riprovare più tardi."
+
+#~ msgid "This URL key is already in use."
+#~ msgstr "Questo identificativo URL è già in uso."
+
+#~ msgid "Website"
+#~ msgstr "Sito web"
+
+#~ msgid "z. B. Stadt Winterthur"
+#~ msgstr "ad es. Città di Winterthur"
+
+#~ msgid "z. B. stadt-winterthur"
+#~ msgstr "ad es. citta-winterthur"
+
+#~ msgid "Zum Beispiel: stadt-winterthur oder gemeinde-beispiel."
+#~ msgstr "Ad esempio: citta-winterthur o comune-esempio."
+
+#~ msgid "Checked / completed defects"
+#~ msgstr "Difetti controllati / risolti"
+
+#~ msgid "Resolved / checked defects"
+#~ msgstr "Difetti risolti / controllati"
+
+#~ msgid "Open message"
+#~ msgstr "Aprire"
