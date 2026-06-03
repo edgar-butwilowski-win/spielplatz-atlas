@@ -20,6 +20,11 @@ TARGET_TYPE_CHOICES = [
     (TARGET_TYPE_ACCESSORY, _("Additional equipment")),
 ]
 
+MANUAL_STATUS_CHOICES = [
+    choice for choice in Defect.STATUS_CHOICES
+    if choice[0] != Defect.STATUS_PLANNED
+]
+
 
 def apply_bootstrap_classes(form):
     for field in form.fields.values():
@@ -108,18 +113,6 @@ def clean_urgency_by_safety_risk(cleaned_data):
     return cleaned_data
 
 
-def clean_planned_status_requires_date(cleaned_data):
-    if cleaned_data.get("status") == Defect.STATUS_PLANNED and not cleaned_data.get("planned_resolution_date"):
-        raise forms.ValidationError(_("For the status planned, a planned resolution date is required."))
-    return cleaned_data
-
-
-def clean_planned_status_on_create(cleaned_data):
-    if cleaned_data.get("status") == Defect.STATUS_PLANNED:
-        raise forms.ValidationError(_("A new defect cannot be created directly with the status planned. Save the defect first, assign it, and set a planned resolution date."))
-    return cleaned_data
-
-
 class EquipmentRenovationForm(forms.ModelForm):
     class Meta:
         model = PlayEquipment
@@ -166,6 +159,7 @@ class DefectCreateForm(forms.ModelForm):
         apply_bootstrap_classes(self)
         use_html_datetime_input(self.fields["reported_at"])
         use_html_date_input(self.fields["planned_resolution_date"])
+        self.fields["status"].choices = MANUAL_STATUS_CHOICES
         if not self.is_bound:
             if self.initial.get("equipment"):
                 self.initial["target_type"] = TARGET_TYPE_EQUIPMENT
@@ -182,8 +176,7 @@ class DefectCreateForm(forms.ModelForm):
         cleaned_data = super().clean()
         cleaned_data = clean_target_by_type(cleaned_data)
         cleaned_data = clean_single_target(cleaned_data)
-        cleaned_data = clean_urgency_by_safety_risk(cleaned_data)
-        return clean_planned_status_on_create(cleaned_data)
+        return clean_urgency_by_safety_risk(cleaned_data)
 
 
 class DefectFromInspectionAnswerForm(forms.ModelForm):
@@ -197,6 +190,7 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
         self.inspection_answer = inspection_answer
         use_html_datetime_input(self.fields["reported_at"])
         use_html_date_input(self.fields["planned_resolution_date"])
+        self.fields["status"].choices = MANUAL_STATUS_CHOICES
         if not self.is_bound:
             self.initial.setdefault("reported_at", timezone.localtime().strftime(HTML_DATETIME_FORMAT))
             self.initial.setdefault("source_type", Defect.SOURCE_INSPECTION)
@@ -207,8 +201,7 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
             self.fields[name].required = False
 
     def clean(self):
-        cleaned_data = clean_urgency_by_safety_risk(super().clean())
-        return clean_planned_status_on_create(cleaned_data)
+        return clean_urgency_by_safety_risk(super().clean())
 
 
 class DefectEditForm(forms.ModelForm):
@@ -222,10 +215,10 @@ class DefectEditForm(forms.ModelForm):
         self.playground = playground
         use_html_datetime_input(self.fields["reported_at"])
         use_html_date_input(self.fields["planned_resolution_date"])
+        self.fields["status"].choices = MANUAL_STATUS_CHOICES
         apply_bootstrap_classes(self)
         for name in ["reported_by_text", "internal_note", "planned_resolution_date", "public_note"]:
             self.fields[name].required = False
 
     def clean(self):
-        cleaned_data = clean_urgency_by_safety_risk(super().clean())
-        return clean_planned_status_requires_date(cleaned_data)
+        return clean_urgency_by_safety_risk(super().clean())
