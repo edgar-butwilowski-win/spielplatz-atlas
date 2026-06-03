@@ -37,11 +37,13 @@ OPEN_DEFECT_STATUSES = [
     Defect.STATUS_OPEN,
     Defect.STATUS_PLANNED,
 ]
+DEFECT_STATUS_OVERDUE = "overdue"
 
 DEFECT_STATUS_FILTER_CHOICES = [
     ("", "Alle Status"),
     (Defect.STATUS_OPEN, "Offen"),
     (Defect.STATUS_PLANNED, "Geplant"),
+    (DEFECT_STATUS_OVERDUE, "Überfällig"),
     (Defect.STATUS_DONE, "Behoben"),
     (Defect.STATUS_VERIFIED, "Geprüft / abgeschlossen"),
 ]
@@ -221,8 +223,9 @@ def enrich_defects(defects, current_user):
 
 def build_status_counts(defects):
     return {
-        "open": defects.filter(status__in=OPEN_DEFECT_STATUSES).count(),
-        "safety": defects.filter(status__in=OPEN_DEFECT_STATUSES, has_safety_risk=True).count(),
+        "open": defects.filter(status=Defect.STATUS_OPEN).count(),
+        "planned": defects.filter(status=Defect.STATUS_PLANNED).count(),
+        "safety": defects.filter(status=Defect.STATUS_OPEN, has_safety_risk=True).count(),
         "overdue": defects.filter(status__in=OPEN_DEFECT_STATUSES, planned_resolution_date__lt=timezone.localdate()).count(),
         "done": defects.filter(status=Defect.STATUS_DONE).count(),
         "verified": defects.filter(status=Defect.STATUS_VERIFIED).count(),
@@ -238,7 +241,12 @@ def apply_defect_filters(defects, request):
     filtered_defects = defects
 
     allowed_status_filters = {choice[0] for choice in DEFECT_STATUS_FILTER_CHOICES if choice[0]}
-    if status_filter in allowed_status_filters:
+    if status_filter == DEFECT_STATUS_OVERDUE:
+        filtered_defects = filtered_defects.filter(
+            status__in=OPEN_DEFECT_STATUSES,
+            planned_resolution_date__lt=timezone.localdate(),
+        )
+    elif status_filter in allowed_status_filters:
         filtered_defects = filtered_defects.filter(status=status_filter)
 
     if safety_filter == "yes":
