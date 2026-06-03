@@ -235,12 +235,14 @@ class DefectImageInline(admin.TabularInline):
 class MaintenanceActionInline(admin.TabularInline):
     model = MaintenanceAction
     extra = 0
+    autocomplete_fields = ("assigned_to",)
+    fields = ("title", "assigned_to", "planned_date", "completed_date", "status", "public_visible")
 
 
 @admin.register(Defect)
 class DefectAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     list_display = ("id", "playground", "equipment", "surface", "accessory", "source_type", "has_safety_risk", "status", "public_visible", "planned_resolution_date", "created_at")
-    list_filter = ("source_type", "has_safety_risk", "status", "public_visible", "planned_resolution_date", "playground__organization")
+    list_filter = ("source_type", "has_safety_risk", "status", "public_visible", "playground__organization")
     search_fields = ("internal_description", "internal_note", "public_note", "reported_by_text", "playground__name", "equipment__name", "surface__name", "accessory__name")
     autocomplete_fields = ("inspection", "playground", "equipment", "surface", "accessory")
     inlines = (MaintenanceActionInline, DefectImageInline)
@@ -271,10 +273,10 @@ class DefectAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
 
 @admin.register(MaintenanceAction)
 class MaintenanceActionAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
-    list_display = ("title", "defect", "planned_date", "completed_date", "status", "public_visible")
-    list_filter = ("status", "public_visible", "planned_date", "completed_date")
+    list_display = ("title", "defect", "assigned_to", "planned_date", "completed_date", "status", "public_visible")
+    list_filter = ("status", "public_visible", "assigned_to", "planned_date", "completed_date")
     search_fields = ("title", "description", "defect__internal_description")
-    autocomplete_fields = ("defect",)
+    autocomplete_fields = ("defect", "assigned_to")
 
     def get_object_organization(self, obj):
         return object_organization_from_defect_object(obj)
@@ -285,8 +287,11 @@ class MaintenanceActionAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin)
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         organization = get_user_organization(request.user)
 
-        if db_field.name == "defect" and not request.user.is_superuser and organization:
-            kwargs["queryset"] = Defect.objects.filter(playground__organization=organization)
+        if not request.user.is_superuser and organization:
+            if db_field.name == "defect":
+                kwargs["queryset"] = Defect.objects.filter(playground__organization=organization)
+            elif db_field.name == "assigned_to":
+                kwargs["queryset"] = db_field.remote_field.model.objects.filter(profile__organization=organization, profile__may_maintain=True)
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
