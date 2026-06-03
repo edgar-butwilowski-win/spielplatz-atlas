@@ -37,6 +37,10 @@ OPEN_DEFECT_STATUSES = [
     Defect.STATUS_OPEN,
     Defect.STATUS_PLANNED,
 ]
+LOCKED_PLANNING_STATUSES = [
+    Defect.STATUS_DONE,
+    Defect.STATUS_VERIFIED,
+]
 DEFECT_STATUS_OVERDUE = "overdue"
 
 DEFECT_STATUS_FILTER_CHOICES = [
@@ -179,6 +183,10 @@ def clear_defect_planning(defect, user=None):
     defect.planned_resolution_date = None
 
 
+def defect_planning_is_locked(defect):
+    return defect.status in LOCKED_PLANNING_STATUSES
+
+
 def enrich_defects(defects, current_user):
     defect_list = list(defects[:100])
     defect_ids = [defect.id for defect in defect_list]
@@ -213,6 +221,7 @@ def enrich_defects(defects, current_user):
         )
         defect.latest_assignment_notification = notification
         defect.notification_status_display = format_notification_status(notification)
+        defect.planning_locked = defect_planning_is_locked(defect)
         defect.is_overdue = bool(
             defect.planned_resolution_date
             and defect.planned_resolution_date < timezone.localdate()
@@ -453,6 +462,11 @@ def edit_defect(request, defect_id):
 def update_defect_assignment(request, defect_id):
     defect = get_manageable_defect(defect_id)
     user_must_manage_defect(request.user, defect, include_assignment=True)
+
+    if defect_planning_is_locked(defect):
+        messages.error(request, "Bei behobenen oder abgeschlossenen Mängeln kann die Planung nicht mehr geändert werden.")
+        return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
+
     form = DefectAssignmentForm(request.POST, organization=defect.playground.organization, current_user=request.user)
 
     if form.is_valid():
@@ -481,6 +495,11 @@ def update_defect_assignment(request, defect_id):
 def update_defect_planning(request, defect_id):
     defect = get_manageable_defect(defect_id)
     user_must_manage_defect(request.user, defect, include_assignment=True)
+
+    if defect_planning_is_locked(defect):
+        messages.error(request, "Bei behobenen oder abgeschlossenen Mängeln kann die Planung nicht mehr geändert werden.")
+        return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
+
     form = DefectAssignmentForm(request.POST, organization=defect.playground.organization, current_user=request.user)
     raw_date = (request.POST.get("planned_resolution_date") or "").strip()
 
