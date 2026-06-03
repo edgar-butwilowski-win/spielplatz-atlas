@@ -119,6 +119,16 @@ Organisationen können zusätzlich lokale Ergänzungen erfassen. Globale Standar
 
 ---
 
+## Zentrales Übersetzungskonzept
+
+SpielplatzAtlas verwendet für die gesamte WebApp das zentrale Internationalisierungs- und Übersetzungskonzept von Django. Übersetzbare Texte werden im Code explizit markiert und anschliessend über die Django-Sprachkataloge gepflegt.
+
+In Templates werden dafür `{% trans %}` und `{% blocktrans %}` verwendet. In Python-Code werden übersetzbare Texte mit `_()` beziehungsweise `gettext_lazy()` markiert, insbesondere bei Model-Choices, Formularlabels, Meldungen und statischen Anzeige-Texten.
+
+Andere parallele Übersetzungskonzepte sind in diesem Projekt nicht erwünscht. Insbesondere sollen keine separaten Mapping-Tabellen, manuellen Sprachumschalter, dynamischen Template-Übersetzungen bereits berechneter Werte oder eigene Übersetzungs-Hilfsfunktionen neben Django i18n aufgebaut werden. Neue übersetzbare Texte sollen so eingeführt werden, dass sie mit `makemessages` gefunden und in den bestehenden `locale/*/LC_MESSAGES/django.po`-Katalogen gepflegt werden können.
+
+---
+
 ## Lokales Setup
 
 ### 1. Repository klonen
@@ -258,8 +268,6 @@ Vorteile:
 * im Git-Diff lesbar
 * reproduzierbarer Import
 * geeignet für lokale Entwicklung, CI/CD und spätere Deployments
-
-### Import des Standardkatalogs
 
 Nach der Datenbankmigration kann der Standardkatalog importiert werden:
 
