@@ -261,7 +261,7 @@ class Defect(models.Model):
     SOURCE_CHOICES = [(SOURCE_INSPECTION, _("Inspection")), (SOURCE_CITIZEN_REPORT, _("Citizen report")), (SOURCE_INTERNAL_REPORT, _("Internal report")), (SOURCE_MAINTENANCE, _("Maintenance / care")), (SOURCE_OTHER, _("Other"))]
     URGENCY_A = "a_immediate"
     URGENCY_B = "b_medium_term"
-    URGENCY_CHOICES = [(URGENCY_A, _("A (immediate")), (URGENCY_B, _("B (medium-term)"))]
+    URGENCY_CHOICES = [(URGENCY_A, _("A (immediate)")), (URGENCY_B, _("B (medium-term)"))]
     inspection = models.ForeignKey(Inspection, on_delete=models.SET_NULL, related_name="defects", null=True, blank=True, verbose_name="Kontrolle", help_text="Optional. Ein Mangel kann aus einer Kontrolle stammen, muss aber nicht.")
     inspection_answer = models.ForeignKey(InspectionAnswer, on_delete=models.SET_NULL, related_name="defects", null=True, blank=True, verbose_name="Prüfantwort", help_text="Optionale Prüfantwort, aus der dieser Mangel entstanden ist.")
     playground = models.ForeignKey("playgrounds.Playground", on_delete=models.CASCADE, related_name="defects", null=True, blank=True, verbose_name="Spielplatz")
