@@ -35,23 +35,31 @@ from .permissions import get_active_profile_for_organization
 
 OPEN_DEFECT_STATUSES = [
     Defect.STATUS_OPEN,
-    Defect.STATUS_IN_PROGRESS,
     Defect.STATUS_PLANNED,
 ]
 
-DEFECT_STATUS_FILTER_CHOICES = [("", "Alle Status")] + list(Defect.STATUS_CHOICES)
+DEFECT_STATUS_FILTER_CHOICES = [
+    ("", "Alle Status"),
+    (Defect.STATUS_OPEN, "Offen"),
+    (Defect.STATUS_PLANNED, "Geplant"),
+    (Defect.STATUS_DONE, "Behoben"),
+    (Defect.STATUS_VERIFIED, "Geprüft / abgeschlossen"),
+]
+
+DEFECT_MANUAL_STATUS_CHOICES = [
+    (Defect.STATUS_OPEN, "Offen"),
+    (Defect.STATUS_DONE, "Behoben"),
+    (Defect.STATUS_VERIFIED, "Geprüft / abgeschlossen"),
+]
 
 DEFECT_STATUS_ACTIONS = {
     Defect.STATUS_OPEN,
-    Defect.STATUS_IN_PROGRESS,
     Defect.STATUS_DONE,
     Defect.STATUS_VERIFIED,
 }
 
-
 AUTO_PLANNED_SOURCE_STATUSES = {
     Defect.STATUS_OPEN,
-    Defect.STATUS_IN_PROGRESS,
     Defect.STATUS_PLANNED,
 }
 
@@ -152,7 +160,7 @@ def sync_defect_planning_status(defect):
         defect.status = Defect.STATUS_PLANNED
         return True
     if defect.status == Defect.STATUS_PLANNED and not can_defect_be_planned(defect):
-        defect.status = Defect.STATUS_IN_PROGRESS
+        defect.status = Defect.STATUS_OPEN
         return True
     return False
 
@@ -162,6 +170,11 @@ def save_defect_with_planning_status(defect, update_fields=None):
     if update_fields is not None and status_changed and "status" not in update_fields:
         update_fields = [*update_fields, "status"]
     defect.save(update_fields=update_fields)
+
+
+def clear_defect_planning(defect, user=None):
+    assign_defect(defect=defect, assigned_to=None, assigned_by=user)
+    defect.planned_resolution_date = None
 
 
 def enrich_defects(defects, current_user):
@@ -224,7 +237,8 @@ def apply_defect_filters(defects, request):
     search_query = (request.GET.get("q") or "").strip()
     filtered_defects = defects
 
-    if status_filter in dict(Defect.STATUS_CHOICES):
+    allowed_status_filters = {choice[0] for choice in DEFECT_STATUS_FILTER_CHOICES if choice[0]}
+    if status_filter in allowed_status_filters:
         filtered_defects = filtered_defects.filter(status=status_filter)
 
     if safety_filter == "yes":
@@ -334,7 +348,7 @@ def defect_management(request):
             "defects": enrich_defects(filtered_defects, request.user),
             "filters": filters,
             "defect_status_filter_choices": DEFECT_STATUS_FILTER_CHOICES,
-            "defect_status_choices": Defect.STATUS_CHOICES,
+            "defect_manual_status_choices": DEFECT_MANUAL_STATUS_CHOICES,
             "defect_source_choices": Defect.SOURCE_CHOICES,
             "playgrounds": playgrounds,
             "status_counts": status_counts,
@@ -456,9 +470,10 @@ def update_defect_assignment(request, defect_id):
 
 @login_required
 @require_POST
-def update_defect_planned_resolution_date(request, defect_id):
+def update_defect_planning(request, defect_id):
     defect = get_manageable_defect(defect_id)
     user_must_manage_defect(request.user, defect, include_assignment=True)
+    form = DefectAssignmentForm(request.POST, organization=defect.playground.organization, current_user=request.user)
     raw_date = (request.POST.get("planned_resolution_date") or "").strip()
 
     if raw_date:
@@ -469,15 +484,26 @@ def update_defect_planned_resolution_date(request, defect_id):
     else:
         planned_resolution_date = None
 
-    defect.planned_resolution_date = planned_resolution_date
-    save_defect_with_planning_status(defect, update_fields=["planned_resolution_date", "status", "updated_at"])
+    if form.is_valid():
+        assigned_to = form.cleaned_data["assigned_to"]
+        _, notification = assign_defect(defect=defect, assigned_to=assigned_to, assigned_by=request.user)
+        defect = get_manageable_defect(defect_id)
+        defect.planned_resolution_date = planned_resolution_date
+        save_defect_with_planning_status(defect, update_fields=["planned_resolution_date", "status", "updated_at"])
 
-    if defect.status == Defect.STATUS_PLANNED:
-        messages.success(request, "Das geplante Behebungsdatum wurde gespeichert. Der Mangel ist nun geplant.")
-    elif planned_resolution_date:
-        messages.info(request, "Das geplante Behebungsdatum wurde gespeichert. Für den Status «Geplant» fehlt noch eine Zuweisung.")
+        if defect.status == Defect.STATUS_PLANNED:
+            messages.success(request, "Die Planung wurde gespeichert. Der Mangel ist nun geplant.")
+        elif assigned_to or planned_resolution_date:
+            messages.info(request, "Die Planung wurde gespeichert. Für den Status «Geplant» braucht es Zuweisung und geplantes Behebungsdatum.")
+        else:
+            messages.success(request, "Die Planung wurde entfernt.")
+
+        if assigned_to and notification and notification.delivery_status == SystemNotification.STATUS_NO_SUBSCRIPTION:
+            messages.info(request, "Die zuständige Person hat noch kein Push-Gerät registriert.")
     else:
-        messages.success(request, "Das geplante Behebungsdatum wurde entfernt.")
+        for errors in form.errors.values():
+            for error in errors:
+                messages.error(request, error)
     return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
 
 
@@ -492,15 +518,19 @@ def update_defect_status(request, defect_id):
         messages.error(request, "Dieser Mangelstatus ist nicht zulässig.")
         return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
 
-    defect.status = status
-    save_defect_with_planning_status(defect, update_fields=["status", "updated_at"])
+    if status == Defect.STATUS_OPEN:
+        user_must_manage_defect(request.user, defect, include_assignment=True)
+        clear_defect_planning(defect, request.user)
+        defect = get_manageable_defect(defect_id)
+        defect.planned_resolution_date = None
 
-    if defect.status == Defect.STATUS_PLANNED:
-        messages.success(request, "Der Mangelstatus wurde aktualisiert. Aufgrund von Zuweisung und geplantem Behebungsdatum bleibt der Mangel geplant.")
+    defect.status = status
+    defect.save(update_fields=["status", "planned_resolution_date", "updated_at"] if status == Defect.STATUS_OPEN else ["status", "updated_at"])
+
+    if status == Defect.STATUS_OPEN:
+        messages.success(request, "Der Mangel wurde auf offen gesetzt. Zuweisung und geplantes Behebungsdatum wurden entfernt.")
     elif status == Defect.STATUS_DONE:
-        messages.success(request, "Der Mangelstatus wurde auf erledigt gesetzt.")
+        messages.success(request, "Der Mangelstatus wurde auf behoben gesetzt.")
     elif status == Defect.STATUS_VERIFIED:
         messages.success(request, "Der Mangel wurde geprüft und abgeschlossen.")
-    else:
-        messages.success(request, "Der Mangelstatus wurde aktualisiert.")
     return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
