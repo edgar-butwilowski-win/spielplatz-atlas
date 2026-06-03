@@ -20,9 +20,14 @@ TARGET_TYPE_CHOICES = [
     (TARGET_TYPE_ACCESSORY, _("Additional equipment")),
 ]
 
+CREATE_STATUS_CHOICES = [
+    (Defect.STATUS_OPEN, _("Open")),
+]
+
 MANUAL_STATUS_CHOICES = [
-    choice for choice in Defect.STATUS_CHOICES
-    if choice[0] != Defect.STATUS_PLANNED
+    (Defect.STATUS_OPEN, _("Open")),
+    (Defect.STATUS_DONE, _("Resolved")),
+    (Defect.STATUS_VERIFIED, _("Checked / completed")),
 ]
 
 
@@ -159,7 +164,9 @@ class DefectCreateForm(forms.ModelForm):
         apply_bootstrap_classes(self)
         use_html_datetime_input(self.fields["reported_at"])
         use_html_date_input(self.fields["planned_resolution_date"])
-        self.fields["status"].choices = MANUAL_STATUS_CHOICES
+        self.fields["status"].choices = CREATE_STATUS_CHOICES
+        self.fields["status"].initial = Defect.STATUS_OPEN
+        self.fields["status"].disabled = True
         if not self.is_bound:
             if self.initial.get("equipment"):
                 self.initial["target_type"] = TARGET_TYPE_EQUIPMENT
@@ -174,6 +181,7 @@ class DefectCreateForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        cleaned_data["status"] = Defect.STATUS_OPEN
         cleaned_data = clean_target_by_type(cleaned_data)
         cleaned_data = clean_single_target(cleaned_data)
         return clean_urgency_by_safety_risk(cleaned_data)
@@ -190,7 +198,9 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
         self.inspection_answer = inspection_answer
         use_html_datetime_input(self.fields["reported_at"])
         use_html_date_input(self.fields["planned_resolution_date"])
-        self.fields["status"].choices = MANUAL_STATUS_CHOICES
+        self.fields["status"].choices = CREATE_STATUS_CHOICES
+        self.fields["status"].initial = Defect.STATUS_OPEN
+        self.fields["status"].disabled = True
         if not self.is_bound:
             self.initial.setdefault("reported_at", timezone.localtime().strftime(HTML_DATETIME_FORMAT))
             self.initial.setdefault("source_type", Defect.SOURCE_INSPECTION)
@@ -201,7 +211,9 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
             self.fields[name].required = False
 
     def clean(self):
-        return clean_urgency_by_safety_risk(super().clean())
+        cleaned_data = super().clean()
+        cleaned_data["status"] = Defect.STATUS_OPEN
+        return clean_urgency_by_safety_risk(cleaned_data)
 
 
 class DefectEditForm(forms.ModelForm):
