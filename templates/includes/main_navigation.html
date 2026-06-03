@@ -53,9 +53,7 @@
         </a>
 
         <div class="d-flex align-items-center gap-2 atlas-menu">
-            {% if request.resolver_match.url_name != 'index' or request.resolver_match.app_name != 'public' %}
-                <a href="{% url 'public:index' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">{% trans "Map" %}</a>
-            {% endif %}
+            <a href="{% url 'public:index' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">{% trans "Map" %}</a>
             <a href="{% url 'public:about' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">{% trans "About" %}</a>
             <a href="{% url 'public:imprint' %}" class="btn btn-sm btn-outline-secondary atlas-direct-link">{% trans "Imprint" %}</a>
             {% comment %}
@@ -90,9 +88,7 @@
                     </select>
                 </form>
 
-                {% if request.resolver_match.url_name != 'index' or request.resolver_match.app_name != 'public' %}
-                    <a class="atlas-menu-only-mobile" href="{% url 'public:index' %}">{% trans "Map" %}</a>
-                {% endif %}
+                <a class="atlas-menu-only-mobile" href="{% url 'public:index' %}">{% trans "Map" %}</a>
                 <a class="atlas-menu-only-mobile" href="{% url 'public:about' %}">{% trans "About" %}</a>
                 <a class="atlas-menu-only-mobile" href="{% url 'public:imprint' %}">{% trans "Imprint" %}</a>
 
