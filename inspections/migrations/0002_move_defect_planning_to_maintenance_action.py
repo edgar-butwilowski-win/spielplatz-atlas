@@ -111,7 +111,7 @@ def reverse_noop(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("inspections", "0001_initial"),
+        ("inspections", "0021_remove_defect_in_progress_status"),
         ("notifications", "0001_initial"),
     ]
 
