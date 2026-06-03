@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_date
 from django.views.decorators.http import require_POST
 
 from accounts.utils import display_user
@@ -43,9 +44,15 @@ DEFECT_STATUS_FILTER_CHOICES = [("", "Alle Status")] + list(Defect.STATUS_CHOICE
 DEFECT_STATUS_ACTIONS = {
     Defect.STATUS_OPEN,
     Defect.STATUS_IN_PROGRESS,
-    Defect.STATUS_PLANNED,
     Defect.STATUS_DONE,
     Defect.STATUS_VERIFIED,
+}
+
+
+AUTO_PLANNED_SOURCE_STATUSES = {
+    Defect.STATUS_OPEN,
+    Defect.STATUS_IN_PROGRESS,
+    Defect.STATUS_PLANNED,
 }
 
 
@@ -140,15 +147,21 @@ def can_defect_be_planned(defect):
     return bool(defect.planned_resolution_date and defect_has_assignment(defect))
 
 
-def get_planned_status_error(defect):
-    missing = []
-    if not defect.planned_resolution_date:
-        missing.append("ein geplantes Behebungsdatum")
-    if not defect_has_assignment(defect):
-        missing.append("eine Zuweisung")
-    if not missing:
-        return ""
-    return "Der Status «Geplant» kann nur gesetzt werden, wenn " + " und ".join(missing) + " vorhanden ist."
+def sync_defect_planning_status(defect):
+    if can_defect_be_planned(defect) and defect.status in AUTO_PLANNED_SOURCE_STATUSES:
+        defect.status = Defect.STATUS_PLANNED
+        return True
+    if defect.status == Defect.STATUS_PLANNED and not can_defect_be_planned(defect):
+        defect.status = Defect.STATUS_IN_PROGRESS
+        return True
+    return False
+
+
+def save_defect_with_planning_status(defect, update_fields=None):
+    status_changed = sync_defect_planning_status(defect)
+    if update_fields is not None and status_changed and "status" not in update_fields:
+        update_fields = [*update_fields, "status"]
+    defect.save(update_fields=update_fields)
 
 
 def enrich_defects(defects, current_user):
@@ -360,6 +373,7 @@ def edit_defect(request, defect_id):
 
     can_edit_defect = user_can_manage_defect(request.user, defect)
     can_manage_assignment = user_can_manage_defect(request.user, defect, include_assignment=True)
+    current_planned_resolution_date = defect.planned_resolution_date
 
     if request.method == "POST":
         user_must_manage_defect(request.user, defect)
@@ -373,21 +387,21 @@ def edit_defect(request, defect_id):
         if form.is_valid():
             defect = form.save(commit=False)
             defect.playground = playground
+            if not can_manage_assignment:
+                defect.planned_resolution_date = current_planned_resolution_date
+            save_defect_with_planning_status(defect)
 
-            if defect.status == Defect.STATUS_PLANNED and not can_defect_be_planned(defect):
-                messages.error(request, get_planned_status_error(defect))
-            else:
-                defect.save()
-
-                if save_defect_images_or_add_error(request, defect):
-                    messages.success(request, "Der Mangel wurde gespeichert.")
-                    return redirect("internal:edit_defect", defect_id=defect.id)
+            if save_defect_images_or_add_error(request, defect):
+                messages.success(request, "Der Mangel wurde gespeichert.")
+                return redirect("internal:edit_defect", defect_id=defect.id)
     else:
         form = DefectEditForm(instance=defect, playground=playground)
 
     if not can_edit_defect:
         for field in form.fields.values():
             field.disabled = True
+    if not can_manage_assignment and "planned_resolution_date" in form.fields:
+        form.fields["planned_resolution_date"].disabled = True
 
     current_assignment = getattr(defect, "assignment", None)
     assignment_form = DefectAssignmentForm(
@@ -421,11 +435,9 @@ def update_defect_assignment(request, defect_id):
 
     if form.is_valid():
         assigned_to = form.cleaned_data["assigned_to"]
-        if not assigned_to and defect.status == Defect.STATUS_PLANNED:
-            messages.error(request, "Die Zuweisung kann nicht entfernt werden, solange der Mangel den Status «Geplant» hat.")
-            return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
-
         _, notification = assign_defect(defect=defect, assigned_to=assigned_to, assigned_by=request.user)
+        defect = get_manageable_defect(defect_id)
+        save_defect_with_planning_status(defect, update_fields=["status", "updated_at"])
         if assigned_to:
             if notification and notification.delivery_status == SystemNotification.STATUS_SENT:
                 messages.success(request, "Der Mangel wurde zugewiesen. Die Push-Meldung wurde gesendet.")
@@ -444,6 +456,33 @@ def update_defect_assignment(request, defect_id):
 
 @login_required
 @require_POST
+def update_defect_planned_resolution_date(request, defect_id):
+    defect = get_manageable_defect(defect_id)
+    user_must_manage_defect(request.user, defect, include_assignment=True)
+    raw_date = (request.POST.get("planned_resolution_date") or "").strip()
+
+    if raw_date:
+        planned_resolution_date = parse_date(raw_date)
+        if planned_resolution_date is None:
+            messages.error(request, "Bitte ein gültiges geplantes Behebungsdatum erfassen.")
+            return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
+    else:
+        planned_resolution_date = None
+
+    defect.planned_resolution_date = planned_resolution_date
+    save_defect_with_planning_status(defect, update_fields=["planned_resolution_date", "status", "updated_at"])
+
+    if defect.status == Defect.STATUS_PLANNED:
+        messages.success(request, "Das geplante Behebungsdatum wurde gespeichert. Der Mangel ist nun geplant.")
+    elif planned_resolution_date:
+        messages.info(request, "Das geplante Behebungsdatum wurde gespeichert. Für den Status «Geplant» fehlt noch eine Zuweisung.")
+    else:
+        messages.success(request, "Das geplante Behebungsdatum wurde entfernt.")
+    return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
+
+
+@login_required
+@require_POST
 def update_defect_status(request, defect_id):
     defect = get_manageable_defect(defect_id)
     user_must_manage_defect(request.user, defect)
@@ -453,19 +492,15 @@ def update_defect_status(request, defect_id):
         messages.error(request, "Dieser Mangelstatus ist nicht zulässig.")
         return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
 
-    if status == Defect.STATUS_PLANNED and not can_defect_be_planned(defect):
-        messages.error(request, get_planned_status_error(defect))
-        return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
-
     defect.status = status
-    defect.save(update_fields=["status", "updated_at"])
+    save_defect_with_planning_status(defect, update_fields=["status", "updated_at"])
 
-    if status == Defect.STATUS_DONE:
+    if defect.status == Defect.STATUS_PLANNED:
+        messages.success(request, "Der Mangelstatus wurde aktualisiert. Aufgrund von Zuweisung und geplantem Behebungsdatum bleibt der Mangel geplant.")
+    elif status == Defect.STATUS_DONE:
         messages.success(request, "Der Mangelstatus wurde auf erledigt gesetzt.")
     elif status == Defect.STATUS_VERIFIED:
         messages.success(request, "Der Mangel wurde geprüft und abgeschlossen.")
-    elif status == Defect.STATUS_PLANNED:
-        messages.success(request, "Der Mangel wurde als geplant markiert.")
     else:
         messages.success(request, "Der Mangelstatus wurde aktualisiert.")
     return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
