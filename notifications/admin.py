@@ -52,6 +52,22 @@ class OrganizationNotificationAdminMixin(OrganizationAdminPermissionMixin):
         super().save_model(request, obj, form, change)
 
 
+def format_user_with_email(user):
+    if not user:
+        return "-"
+
+    full_name = user.get_full_name().strip()
+    email = (user.email or "").strip()
+
+    if full_name and email:
+        return f"{full_name} ({email})"
+    if email:
+        return email
+    if full_name:
+        return full_name
+    return user.get_username()
+
+
 @admin.register(SystemNotification)
 class SystemNotificationAdmin(OrganizationNotificationAdminMixin, admin.ModelAdmin):
     list_display = (
@@ -102,14 +118,14 @@ class DefectAssignmentAdmin(OrganizationNotificationAdminMixin, admin.ModelAdmin
 @admin.register(PushSubscription)
 class PushSubscriptionAdmin(OrganizationNotificationAdminMixin, admin.ModelAdmin):
     list_display = (
-        "user",
+        "user_display",
         "organization",
         "is_active",
         "created_at",
         "last_seen_at",
     )
     list_filter = ("organization", "is_active", "created_at", "last_seen_at")
-    search_fields = ("user__email", "endpoint", "user_agent")
+    search_fields = ("user__first_name", "user__last_name", "user__email", "endpoint", "user_agent")
     autocomplete_fields = ("user", "organization")
     readonly_fields = (
         "endpoint",
@@ -119,6 +135,10 @@ class PushSubscriptionAdmin(OrganizationNotificationAdminMixin, admin.ModelAdmin
         "created_at",
         "last_seen_at",
     )
+
+    @admin.display(description="Benutzer", ordering="user__last_name")
+    def user_display(self, obj):
+        return format_user_with_email(obj.user)
 
     def has_add_permission(self, request):
         return request.user.is_superuser
