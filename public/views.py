@@ -10,7 +10,7 @@ import hashlib
 
 from django.contrib import messages
 from django.core.cache import cache
-from django.db.models import Prefetch, Q
+from django.db.models import Min, Prefetch, Q
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -23,7 +23,7 @@ from accounts.permissions import (
     user_may_maintain,
     user_may_view_internal,
 )
-from inspections.models import Defect, Inspection
+from inspections.models import Defect, Inspection, MaintenanceAction
 from inspections.planning import get_next_public_task_for_playground
 from playgrounds.document_models import PlaygroundDocument
 from playgrounds.document_permissions import (
@@ -52,6 +52,7 @@ MONTH_MSGIDS = {
 REGISTRATION_RATE_LIMIT_WINDOW_SECONDS = 60 * 60
 REGISTRATION_MAX_ATTEMPTS_PER_IP = 6
 REGISTRATION_MAX_ATTEMPTS_PER_EMAIL = 3
+ACTIVE_MAINTENANCE_STATUSES = [MaintenanceAction.STATUS_PLANNED, MaintenanceAction.STATUS_IN_PROGRESS]
 
 
 def get_client_ip(request):
@@ -283,10 +284,16 @@ def playground_detail(request, organization_slug, playground_slug):
     inspection_is_suspended = playground.is_inspection_suspended
     can_start_inspection = can_create_inspection and not inspection_is_suspended
     next_public_inspection = get_public_next_inspection_context(playground)
-    visible_defects = Defect.objects.select_related("equipment", "surface", "accessory", "inspection").filter(playground=playground).exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED])
+    visible_defects = (
+        Defect.objects
+        .select_related("equipment", "surface", "accessory", "inspection")
+        .filter(playground=playground)
+        .exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED])
+        .annotate(next_planned_date=Min("maintenance_actions__planned_date", filter=Q(maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES)))
+    )
     if not can_open_defect:
         visible_defects = visible_defects.filter(public_visible=True)
-    visible_defects = list(visible_defects.order_by("public_visible", "-has_safety_risk", "planned_resolution_date", "-created_at"))
+    visible_defects = list(visible_defects.order_by("public_visible", "-has_safety_risk", "next_planned_date", "-created_at"))
     defect_groups = build_defect_groups(visible_defects)
     latest_completed_inspection = Inspection.objects.filter(playground=playground, status=Inspection.STATUS_COMPLETED).select_related("inspector", "completed_by").order_by("-inspected_at", "-completed_at", "-created_at").first()
     defects_by_equipment_id = {}
