@@ -14,6 +14,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.admin_utils import get_user_organization
 from inspections.models import Defect
+from internal.defect_management import save_defect_with_planning_status
 from internal.permissions import require_org_admin_permission
 
 from .forms import DefectAssignmentForm
@@ -92,15 +93,16 @@ def assign_defect_view(request, defect_id):
 
     if form.is_valid():
         assigned_to = form.cleaned_data["assigned_to"]
-        if not assigned_to and defect.status == Defect.STATUS_PLANNED:
-            messages.error(request, "Die Zuweisung kann nicht entfernt werden, solange der Mangel den Status «Geplant» hat.")
-            return redirect("internal:edit_defect", defect_id=defect.id)
-
         _, notification = assign_defect(
             defect=defect,
             assigned_to=assigned_to,
             assigned_by=request.user,
         )
+        defect = get_object_or_404(
+            Defect.objects.select_related("playground", "playground__organization", "assignment", "assignment__assigned_to"),
+            id=defect_id,
+        )
+        save_defect_with_planning_status(defect, update_fields=["status", "updated_at"])
 
         if assigned_to:
             if notification and notification.delivery_status == SystemNotification.STATUS_SENT:
