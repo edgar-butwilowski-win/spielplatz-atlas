@@ -19,37 +19,14 @@ class InspectionCriterion(models.Model):
     MINIMUM_VISUAL = "visual"
     MINIMUM_OPERATIONAL = "operational"
     MINIMUM_ANNUAL = "annual"
-
-    MINIMUM_INSPECTION_TYPE_CHOICES = [
-        (MINIMUM_VISUAL, _("Visual routine inspection")),
-        (MINIMUM_OPERATIONAL, _("Operational inspection")),
-        (MINIMUM_ANNUAL, _("Annual main inspection")),
-    ]
-
-    organization = models.ForeignKey(
-        "tenants.Organization",
-        on_delete=models.CASCADE,
-        related_name="inspection_criteria",
-        null=True,
-        blank=True,
-        verbose_name="Organisation",
-        help_text="Leer lassen für globale Anbieter-Standards.",
-    )
+    MINIMUM_INSPECTION_TYPE_CHOICES = [(MINIMUM_VISUAL, _("Visual routine inspection")), (MINIMUM_OPERATIONAL, _("Operational inspection")), (MINIMUM_ANNUAL, _("Annual main inspection"))]
+    organization = models.ForeignKey("tenants.Organization", on_delete=models.CASCADE, related_name="inspection_criteria", null=True, blank=True, verbose_name="Organisation", help_text="Leer lassen für globale Anbieter-Standards.")
     area = models.CharField("Bereich", max_length=255, blank=True)
     title = models.CharField("Titel", max_length=255)
     inspection_text = models.TextField("Prüfhinweis", blank=True)
     maintenance_text = models.TextField("Wartungshinweis", blank=True)
     norm_reference = models.CharField("Norm-/Quellenhinweis", max_length=255, blank=True)
-    minimum_inspection_type = models.CharField(
-        "Mindest-Kontrollart",
-        max_length=30,
-        choices=MINIMUM_INSPECTION_TYPE_CHOICES,
-        default=MINIMUM_OPERATIONAL,
-        help_text=(
-            "Legt fest, ab welcher Kontrollart dieses Prüfkriterium berücksichtigt wird. "
-            "Visuelle Kriterien erscheinen auch bei operativen und jährlichen Kontrollen."
-        ),
-    )
+    minimum_inspection_type = models.CharField("Mindest-Kontrollart", max_length=30, choices=MINIMUM_INSPECTION_TYPE_CHOICES, default=MINIMUM_OPERATIONAL, help_text="Legt fest, ab welcher Kontrollart dieses Prüfkriterium berücksichtigt wird. Visuelle Kriterien erscheinen auch bei operativen und jährlichen Kontrollen.")
     is_standard = models.BooleanField("Standardkriterium", default=False)
     standard_version = models.CharField("Standardversion", max_length=100, blank=True)
     source_note = models.TextField("Quellen-/Bearbeitungshinweis", blank=True)
@@ -64,9 +41,7 @@ class InspectionCriterion(models.Model):
         verbose_name_plural = "Prüfkriterien"
 
     def __str__(self):
-        if self.area:
-            return f"{self.area} – {self.title}"
-        return self.title
+        return f"{self.area} – {self.title}" if self.area else self.title
 
 
 class InspectionCriterionApplicability(models.Model):
@@ -74,24 +49,11 @@ class InspectionCriterionApplicability(models.Model):
     SCOPE_EQUIPMENT = "equipment"
     SCOPE_SURFACE = "surface"
     SCOPE_ACCESSORY = "accessory"
-
-    SCOPE_CHOICES = [
-        (SCOPE_PLAYGROUND, _("General playground inspection")),
-        (SCOPE_EQUIPMENT, _("Play equipment")),
-        (SCOPE_SURFACE, _("Impact protection surface / ground")),
-        (SCOPE_ACCESSORY, _("Additional equipment")),
-    ]
-
+    SCOPE_CHOICES = [(SCOPE_PLAYGROUND, _("General playground inspection")), (SCOPE_EQUIPMENT, _("Play equipment")), (SCOPE_SURFACE, _("Impact protection surface / ground")), (SCOPE_ACCESSORY, _("Additional equipment"))]
     criterion = models.ForeignKey(InspectionCriterion, on_delete=models.CASCADE, related_name="applicabilities", verbose_name="Prüfkriterium")
     scope_type = models.CharField("Geltungsbereich", max_length=30, choices=SCOPE_CHOICES)
     applies_to_all_equipment = models.BooleanField("Gilt für alle Spielgerätearten", default=False, help_text="Nur relevant, wenn der Geltungsbereich «Spielgerät» ist.")
-    equipment_types = models.ManyToManyField(
-        "playgrounds.EquipmentType",
-        blank=True,
-        related_name="criterion_applicabilities",
-        verbose_name="Nur für diese Spielgerätearten",
-        help_text="Nur relevant, wenn der Geltungsbereich «Spielgerät» ist und das Prüfkriterium nicht für alle Spielgerätearten gilt.",
-    )
+    equipment_types = models.ManyToManyField("playgrounds.EquipmentType", blank=True, related_name="criterion_applicabilities", verbose_name="Nur für diese Spielgerätearten", help_text="Nur relevant, wenn der Geltungsbereich «Spielgerät» ist und das Prüfkriterium nicht für alle Spielgerätearten gilt.")
 
     class Meta:
         unique_together = [("criterion", "scope_type")]
@@ -114,7 +76,6 @@ class Inspection(models.Model):
     STATUS_DRAFT = "draft"
     STATUS_COMPLETED = "completed"
     STATUS_CHOICES = [(STATUS_DRAFT, _("In progress")), (STATUS_COMPLETED, _("Completed"))]
-
     playground = models.ForeignKey("playgrounds.Playground", on_delete=models.CASCADE, related_name="inspections", verbose_name="Spielplatz")
     inspection_type = models.CharField("Kontrollart", max_length=30, choices=TYPE_CHOICES, default=TYPE_VISUAL)
     inspected_at = models.DateField("Kontrolldatum", default=timezone.localdate)
@@ -171,7 +132,6 @@ class InspectionTask(models.Model):
     SOURCE_AUTOMATIC = "automatic"
     SOURCE_MANUAL = "manual"
     SOURCE_CHOICES = [(SOURCE_AUTOMATIC, _("Automatic")), (SOURCE_MANUAL, _("Manual"))]
-
     organization = models.ForeignKey("tenants.Organization", on_delete=models.CASCADE, related_name="inspection_tasks", verbose_name="Organisation")
     playground = models.ForeignKey("playgrounds.Playground", on_delete=models.CASCADE, related_name="inspection_tasks", verbose_name="Spielplatz")
     inspection_type = models.CharField("Kontrollart", max_length=30, choices=Inspection.TYPE_CHOICES)
@@ -180,7 +140,10 @@ class InspectionTask(models.Model):
     assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name="assigned_inspection_tasks", null=True, blank=True, verbose_name="Zuständige Person")
     status = models.CharField("Status", max_length=30, choices=STATUS_CHOICES, default=STATUS_OPEN)
     source = models.CharField("Quelle", max_length=30, choices=SOURCE_CHOICES, default=SOURCE_AUTOMATIC)
-    generated_from_inspection = models.ForeignKey(Inspection, on_delete=models.SET_NULL, related_name="generated_tasks", null=True, blank=True, verbose_name="Aus Kontrolle erzeugt")
+    note = models.TextField("Interne Notiz", blank=True)
+    created_from_inspection = models.ForeignKey(Inspection, on_delete=models.SET_NULL, related_name="created_tasks", null=True, blank=True, verbose_name="Aus Kontrolle erzeugt")
+    completed_by_inspection = models.ForeignKey(Inspection, on_delete=models.SET_NULL, related_name="completed_tasks", null=True, blank=True, verbose_name="Durch Kontrolle abgeschlossen")
+    generated_from_inspection = models.ForeignKey(Inspection, on_delete=models.SET_NULL, related_name="generated_tasks", null=True, blank=True, verbose_name="Aus Kontrolle erzeugt (alt)")
     created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
     updated_at = models.DateTimeField("Aktualisiert am", auto_now=True)
 
@@ -299,7 +262,6 @@ class Defect(models.Model):
     URGENCY_A = "a_immediate"
     URGENCY_B = "b_medium_term"
     URGENCY_CHOICES = [(URGENCY_A, _("A (immediate)")), (URGENCY_B, _("B (medium-term)"))]
-
     inspection = models.ForeignKey(Inspection, on_delete=models.SET_NULL, related_name="defects", null=True, blank=True, verbose_name="Kontrolle", help_text="Optional. Ein Mangel kann aus einer Kontrolle stammen, muss aber nicht.")
     inspection_answer = models.ForeignKey(InspectionAnswer, on_delete=models.SET_NULL, related_name="defects", null=True, blank=True, verbose_name="Prüfantwort", help_text="Optionale Prüfantwort, aus der dieser Mangel entstanden ist.")
     playground = models.ForeignKey("playgrounds.Playground", on_delete=models.CASCADE, related_name="defects", null=True, blank=True, verbose_name="Spielplatz")
@@ -326,9 +288,7 @@ class Defect(models.Model):
 
     def __str__(self):
         target = self.playground or self.equipment or self.surface or self.accessory
-        if target:
-            return f"Mangel: {target}"
-        return f"Mangel #{self.id}"
+        return f"Mangel: {target}" if target else f"Mangel #{self.id}"
 
     def _maintenance_action_list(self):
         if hasattr(self, "_prefetched_objects_cache") and "maintenance_actions" in self._prefetched_objects_cache:
@@ -395,7 +355,6 @@ class MaintenanceAction(models.Model):
     STATUS_DONE = "done"
     STATUS_CANCELLED = "cancelled"
     STATUS_CHOICES = [(STATUS_PLANNED, _("Planned")), (STATUS_IN_PROGRESS, _("In progress")), (STATUS_DONE, _("Completed")), (STATUS_CANCELLED, _("Cancelled"))]
-
     defect = models.ForeignKey(Defect, on_delete=models.CASCADE, related_name="maintenance_actions", verbose_name="Mangel")
     title = models.CharField("Titel", max_length=255)
     description = models.TextField("Beschreibung", blank=True)
