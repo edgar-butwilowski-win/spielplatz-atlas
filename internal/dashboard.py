@@ -1,6 +1,7 @@
 import json
 from datetime import date, timedelta
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
@@ -17,6 +18,7 @@ from .permissions import get_active_profile_for_organization
 RECENT_INSPECTION_DAYS = 365
 DASHBOARD_MONTHS = 12
 DASHBOARD_WEEKS = 12
+ACTIVE_USER_DAYS = 365
 MIN_SUPPLIER_EQUIPMENT_COUNT = 5
 SUPPLIER_RATE_LIMIT = 10
 ACTIVE_MAINTENANCE_STATUSES = [MaintenanceAction.STATUS_PLANNED, MaintenanceAction.STATUS_IN_PROGRESS]
@@ -143,6 +145,15 @@ def build_time_charts(defects, inspections, maintenance_actions, inspection_task
     }
 
 
+def build_usage_charts(users):
+    months = month_starts()
+    user_list = list(users)
+    return {
+        "monthLabels": [month_label(month) for month in months],
+        "newUsersTrend": [chart_series("Neue Nutzende", monthly_counts(user_list, months, "date_joined"))],
+    }
+
+
 def supplier_rate_chart(rows, value_key):
     visible_rows = [row for row in rows if row["equipment_count"] >= MIN_SUPPLIER_EQUIPMENT_COUNT]
     visible_rows = sorted(visible_rows, key=lambda row: (-row[value_key], row["supplier_name"]))[:SUPPLIER_RATE_LIMIT]
@@ -221,6 +232,7 @@ def build_dashboard_context(scope):
     maintenance_actions = MaintenanceAction.objects.select_related("defect", "defect__playground", "defect__playground__organization")
     inspection_tasks = InspectionTask.objects.select_related("playground", "organization")
     equipment = PlayEquipment.objects.select_related("playground", "playground__organization", "supplier")
+    users = get_user_model().objects.all()
     if organization is not None:
         playgrounds = playgrounds.filter(organization=organization)
         defects = defects.filter(playground__organization=organization)
@@ -243,6 +255,9 @@ def build_dashboard_context(scope):
     time_charts = build_time_charts(defects, inspections, maintenance_actions, inspection_tasks)
     equipment_charts = build_equipment_charts(defects, equipment)
     organizations_count = Organization.objects.count() if organization is None else 1
+    users_count = users.count() if organization is None else 0
+    active_users_count = users.filter(last_login__gte=timezone.now() - timedelta(days=ACTIVE_USER_DAYS)).count() if organization is None else 0
+    usage_charts = build_usage_charts(users) if organization is None else {"monthLabels": [], "newUsersTrend": []}
     ordered_safety_risk_defects = safety_risk_defects.annotate(
         next_planned_date=Min(
             "maintenance_actions__planned_date",
@@ -253,6 +268,8 @@ def build_dashboard_context(scope):
     return {
         **scope,
         "organizations_count": organizations_count,
+        "users_count": users_count,
+        "active_users_count": active_users_count,
         "playgrounds_count": playgrounds.count(),
         "active_playgrounds_count": playgrounds.filter(is_active=True).count(),
         "public_playgrounds_count": playgrounds.filter(is_active=True, public_visible=True).count(),
@@ -269,6 +286,7 @@ def build_dashboard_context(scope):
         "inspections_by_status_json": dashboard_json(inspections_by_status),
         "time_charts_json": dashboard_json(time_charts),
         "equipment_charts_json": dashboard_json(equipment_charts),
+        "usage_charts_json": dashboard_json(usage_charts),
         "latest_inspections": list(completed_inspections.select_related("playground", "playground__organization", "inspector").order_by("-inspected_at", "-completed_at", "-created_at")[:10]),
         "open_safety_risk_defects": list(ordered_safety_risk_defects.select_related("playground", "playground__organization", "equipment", "surface", "accessory")[:10]),
         "planned_maintenance_actions": list(planned_maintenance_actions.select_related("defect", "defect__playground", "defect__playground__organization").order_by("planned_date", "-created_at")[:10]),
