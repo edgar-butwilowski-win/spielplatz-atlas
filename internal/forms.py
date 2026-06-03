@@ -42,11 +42,6 @@ def apply_bootstrap_classes(form):
             field.widget.attrs["class"] = "form-select" if isinstance(field.widget, forms.Select) else "form-control"
 
 
-def use_html_date_input(field):
-    field.input_formats = [HTML_DATE_FORMAT]
-    field.widget.format = HTML_DATE_FORMAT
-
-
 def use_html_datetime_input(field):
     field.input_formats = [HTML_DATETIME_FORMAT]
     field.widget.format = HTML_DATETIME_FORMAT
@@ -58,18 +53,6 @@ def restrict_target_fields_to_playground(form, playground):
     form.fields["equipment"].queryset = PlayEquipment.objects.filter(playground=playground, is_active=True).order_by("name")
     form.fields["surface"].queryset = PlaygroundSurface.objects.filter(playground=playground, is_active=True).order_by("name")
     form.fields["accessory"].queryset = PlaygroundAccessory.objects.filter(playground=playground, is_active=True).order_by("name")
-
-
-def get_initial_target_type(instance):
-    if not instance:
-        return TARGET_TYPE_NONE
-    if getattr(instance, "equipment_id", None):
-        return TARGET_TYPE_EQUIPMENT
-    if getattr(instance, "surface_id", None):
-        return TARGET_TYPE_SURFACE
-    if getattr(instance, "accessory_id", None):
-        return TARGET_TYPE_ACCESSORY
-    return TARGET_TYPE_NONE
 
 
 def clean_single_target(cleaned_data):
@@ -148,10 +131,9 @@ class DefectCreateForm(forms.ModelForm):
 
     class Meta:
         model = Defect
-        fields = ("target_type", "equipment", "surface", "accessory", "source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "planned_resolution_date", "public_visible", "public_note")
+        fields = ("target_type", "equipment", "surface", "accessory", "source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "public_visible", "public_note")
         widgets = {
             "reported_at": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}, format=HTML_DATETIME_FORMAT),
-            "planned_resolution_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}, format=HTML_DATE_FORMAT),
             "internal_description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
             "internal_note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
             "public_note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
@@ -163,7 +145,6 @@ class DefectCreateForm(forms.ModelForm):
         restrict_target_fields_to_playground(self, playground)
         apply_bootstrap_classes(self)
         use_html_datetime_input(self.fields["reported_at"])
-        use_html_date_input(self.fields["planned_resolution_date"])
         self.fields["status"].choices = CREATE_STATUS_CHOICES
         self.fields["status"].initial = Defect.STATUS_OPEN
         self.fields["status"].disabled = True
@@ -176,7 +157,7 @@ class DefectCreateForm(forms.ModelForm):
                 self.initial["target_type"] = TARGET_TYPE_ACCESSORY
             else:
                 self.initial["target_type"] = TARGET_TYPE_NONE
-        for name in ["equipment", "surface", "accessory", "reported_by_text", "internal_note", "planned_resolution_date", "public_note"]:
+        for name in ["equipment", "surface", "accessory", "reported_by_text", "internal_note", "public_note"]:
             self.fields[name].required = False
 
     def clean(self):
@@ -190,14 +171,13 @@ class DefectCreateForm(forms.ModelForm):
 class DefectFromInspectionAnswerForm(forms.ModelForm):
     class Meta:
         model = Defect
-        fields = ("reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "planned_resolution_date", "public_visible", "public_note")
+        fields = ("reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "public_visible", "public_note")
         widgets = DefectCreateForm.Meta.widgets
 
     def __init__(self, *args, inspection_answer=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.inspection_answer = inspection_answer
         use_html_datetime_input(self.fields["reported_at"])
-        use_html_date_input(self.fields["planned_resolution_date"])
         self.fields["status"].choices = CREATE_STATUS_CHOICES
         self.fields["status"].initial = Defect.STATUS_OPEN
         self.fields["status"].disabled = True
@@ -207,7 +187,7 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
             if inspection_answer and inspection_answer.comment:
                 self.initial.setdefault("internal_description", inspection_answer.comment)
         apply_bootstrap_classes(self)
-        for name in ["reported_by_text", "internal_note", "planned_resolution_date", "public_note"]:
+        for name in ["reported_by_text", "internal_note", "public_note"]:
             self.fields[name].required = False
 
     def clean(self):
@@ -219,17 +199,16 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
 class DefectEditForm(forms.ModelForm):
     class Meta:
         model = Defect
-        fields = ("source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "planned_resolution_date", "public_visible", "public_note")
+        fields = ("source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "public_visible", "public_note")
         widgets = DefectCreateForm.Meta.widgets
 
     def __init__(self, *args, playground=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.playground = playground
         use_html_datetime_input(self.fields["reported_at"])
-        use_html_date_input(self.fields["planned_resolution_date"])
         self.fields["status"].choices = MANUAL_STATUS_CHOICES
         apply_bootstrap_classes(self)
-        for name in ["reported_by_text", "internal_note", "planned_resolution_date", "public_note"]:
+        for name in ["reported_by_text", "internal_note", "public_note"]:
             self.fields[name].required = False
 
     def clean(self):
