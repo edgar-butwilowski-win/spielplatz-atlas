@@ -71,6 +71,8 @@ def assign_defect_view(request, defect_id):
             "equipment",
             "surface",
             "accessory",
+            "assignment",
+            "assignment__assigned_to",
         ),
         id=defect_id,
     )
@@ -90,6 +92,10 @@ def assign_defect_view(request, defect_id):
 
     if form.is_valid():
         assigned_to = form.cleaned_data["assigned_to"]
+        if not assigned_to and defect.status == Defect.STATUS_PLANNED:
+            messages.error(request, "Die Zuweisung kann nicht entfernt werden, solange der Mangel den Status «Geplant» hat.")
+            return redirect("internal:edit_defect", defect_id=defect.id)
+
         _, notification = assign_defect(
             defect=defect,
             assigned_to=assigned_to,
