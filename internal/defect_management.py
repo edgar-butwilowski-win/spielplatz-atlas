@@ -8,14 +8,13 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.db.models import Count, Q
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from accounts.models import UserProfile
 from accounts.utils import display_user
 from inspections.models import Defect
 from notifications.forms import DefectAssignmentForm
@@ -24,11 +23,13 @@ from notifications.services import assign_defect
 from playgrounds.models import Playground
 from tenants.models import Organization
 
-from .permissions import (
-    get_active_profile_for_organization,
-    require_internal_view_permission,
-    require_org_admin_permission,
+from .forms import DefectEditForm
+from .image_utils import (
+    delete_selected_defect_images,
+    handle_defect_image_uploads,
+    sync_defect_image_visibility,
 )
+from .permissions import get_active_profile_for_organization
 
 
 OPEN_DEFECT_STATUSES = [
@@ -56,20 +57,29 @@ DEFECT_STATUS_ACTIONS = {
 
 def get_defect_management_scope(user):
     if user.is_superuser:
-        return {"organization": None, "is_superadmin": True, "can_manage": True, "can_view_internal": True}
+        return {
+            "organization": None,
+            "is_superadmin": True,
+            "can_manage": True,
+            "can_manage_assignment": True,
+            "can_view_internal": True,
+        }
 
     profile = getattr(user, "profile", None)
-    if not profile:
-        return None
-
-    profile = get_active_profile_for_organization(user, profile.organization)
-    if not profile or not profile.may_view_internal or not profile.may_manage_organization:
-        return None
+    if not profile or not profile.is_active_for_organization:
+        return {
+            "organization": None,
+            "is_superadmin": False,
+            "can_manage": False,
+            "can_manage_assignment": False,
+            "can_view_internal": False,
+        }
 
     return {
         "organization": profile.organization,
         "is_superadmin": False,
-        "can_manage": profile.may_manage_organization,
+        "can_manage": profile.may_manage_organization or profile.may_inspect,
+        "can_manage_assignment": profile.may_manage_organization,
         "can_view_internal": profile.may_view_internal,
     }
 
@@ -98,8 +108,10 @@ def get_defect_queryset_for_scope(scope, selected_organization):
     if scope["is_superadmin"]:
         if selected_organization:
             defects = defects.filter(playground__organization=selected_organization)
-    else:
+    elif scope["organization"]:
         defects = defects.filter(playground__organization=scope["organization"])
+    else:
+        defects = defects.none()
     return defects
 
 
@@ -228,10 +240,39 @@ def get_playgrounds_for_filter(defects):
     return Playground.objects.filter(id__in=playground_ids).select_related("organization").order_by("name")
 
 
-def user_must_manage_defect(user, defect):
+def user_can_manage_defect(user, defect, *, include_assignment=False):
+    if not defect.playground:
+        return False
+
+    if user.is_superuser:
+        return True
+
+    profile = get_active_profile_for_organization(user, defect.playground.organization)
+    if not profile:
+        return False
+
+    if include_assignment:
+        return profile.may_manage_organization
+
+    return profile.may_manage_organization or profile.may_inspect
+
+
+def user_must_manage_defect(user, defect, *, include_assignment=False):
     if not defect.playground:
         raise PermissionDenied("Dieser Mangel ist keinem Spielplatz zugeordnet.")
-    require_org_admin_permission(user, defect.playground.organization)
+    if user_can_manage_defect(user, defect, include_assignment=include_assignment):
+        return True
+    if include_assignment:
+        raise PermissionDenied("Keine Berechtigung zum Ändern der Zuweisung.")
+    raise PermissionDenied("Keine Berechtigung zum Bearbeiten dieses Mangels.")
+
+
+def user_can_view_defect(user, defect):
+    if not defect.playground:
+        return False
+    if user.is_superuser:
+        return True
+    return bool(get_active_profile_for_organization(user, defect.playground.organization))
 
 
 def get_manageable_defect(defect_id):
@@ -241,14 +282,21 @@ def get_manageable_defect(defect_id):
     )
 
 
+def save_defect_images_or_add_error(request, defect):
+    try:
+        delete_selected_defect_images(defect, request.POST)
+        handle_defect_image_uploads(defect, request.FILES)
+        sync_defect_image_visibility(defect)
+    except ValidationError as error:
+        messages.error(request, error.messages[0] if error.messages else str(error))
+        return False
+
+    return True
+
+
 @login_required
 def defect_management(request):
     scope = get_defect_management_scope(request.user)
-    if not scope:
-        raise PermissionDenied("Keine Berechtigung für die operative Mängelverwaltung.")
-    if scope["organization"]:
-        require_internal_view_permission(request.user, scope["organization"])
-
     selected_organization = get_selected_organization(request, scope)
     defects = get_defect_queryset_for_scope(scope, selected_organization)
     filtered_defects, filters = apply_defect_filters(defects, request)
@@ -277,10 +325,88 @@ def defect_management(request):
 
 
 @login_required
+def edit_defect(request, defect_id):
+    defect = get_object_or_404(
+        Defect.objects.select_related(
+            "inspection",
+            "inspection_answer",
+            "inspection_answer__criterion",
+            "inspection_answer__scope",
+            "playground",
+            "playground__organization",
+            "equipment",
+            "surface",
+            "accessory",
+            "assignment",
+            "assignment__assigned_to",
+        ).prefetch_related("images", "images__image"),
+        id=defect_id,
+    )
+
+    playground = defect.playground
+
+    if not playground:
+        messages.error(request, "Dieser Mangel ist keinem Spielplatz zugeordnet.")
+        return redirect("public:index")
+
+    if not user_can_view_defect(request.user, defect):
+        raise PermissionDenied("Keine Berechtigung zum Anzeigen dieses Mangels.")
+
+    can_edit_defect = user_can_manage_defect(request.user, defect)
+    can_manage_assignment = user_can_manage_defect(request.user, defect, include_assignment=True)
+
+    if request.method == "POST":
+        user_must_manage_defect(request.user, defect)
+
+        form = DefectEditForm(
+            request.POST,
+            instance=defect,
+            playground=playground,
+        )
+
+        if form.is_valid():
+            defect = form.save(commit=False)
+            defect.playground = playground
+            defect.save()
+
+            if save_defect_images_or_add_error(request, defect):
+                messages.success(request, "Der Mangel wurde gespeichert.")
+                return redirect("internal:edit_defect", defect_id=defect.id)
+    else:
+        form = DefectEditForm(instance=defect, playground=playground)
+
+    if not can_edit_defect:
+        for field in form.fields.values():
+            field.disabled = True
+
+    current_assignment = getattr(defect, "assignment", None)
+    assignment_form = DefectAssignmentForm(
+        initial={"assigned_to": current_assignment.assigned_to if current_assignment else None},
+        organization=playground.organization,
+        current_user=request.user,
+    )
+
+    return render(
+        request,
+        "internal/edit_defect.html",
+        {
+            "defect": defect,
+            "form": form,
+            "assignment_form": assignment_form,
+            "current_assignment": current_assignment,
+            "playground": playground,
+            "defect_images": defect.images.select_related("image").all(),
+            "can_edit_defect": can_edit_defect,
+            "can_manage_assignment": can_manage_assignment,
+        },
+    )
+
+
+@login_required
 @require_POST
 def update_defect_assignment(request, defect_id):
     defect = get_manageable_defect(defect_id)
-    user_must_manage_defect(request.user, defect)
+    user_must_manage_defect(request.user, defect, include_assignment=True)
     form = DefectAssignmentForm(request.POST, organization=defect.playground.organization, current_user=request.user)
 
     if form.is_valid():
@@ -317,7 +443,7 @@ def update_defect_status(request, defect_id):
     defect.save(update_fields=["status", "updated_at"])
 
     if status == Defect.STATUS_DONE:
-        messages.success(request, "Die Erledigung wurde gemeldet.")
+        messages.success(request, "Der Mangelstatus wurde auf erledigt gesetzt.")
     elif status == Defect.STATUS_VERIFIED:
         messages.success(request, "Der Mangel wurde geprüft und abgeschlossen.")
     else:
