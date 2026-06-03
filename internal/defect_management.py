@@ -519,7 +519,6 @@ def update_defect_status(request, defect_id):
         return redirect(defect_management_redirect_url(request, defect.playground.organization_id))
 
     if status == Defect.STATUS_OPEN:
-        user_must_manage_defect(request.user, defect, include_assignment=True)
         clear_defect_planning(defect, request.user)
         defect = get_manageable_defect(defect_id)
         defect.planned_resolution_date = None
