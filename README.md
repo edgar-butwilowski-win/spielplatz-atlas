@@ -127,6 +127,8 @@ In Templates werden dafür `{% trans %}` und `{% blocktrans %}` verwendet. In Py
 
 Andere parallele Übersetzungskonzepte sind in diesem Projekt nicht erwünscht. Insbesondere sollen keine separaten Mapping-Tabellen, manuellen Sprachumschalter, dynamischen Template-Übersetzungen bereits berechneter Werte oder eigene Übersetzungs-Hilfsfunktionen neben Django i18n aufgebaut werden. Neue übersetzbare Texte sollen so eingeführt werden, dass sie mit `makemessages` gefunden und in den bestehenden `locale/*/LC_MESSAGES/django.po`-Katalogen gepflegt werden können.
 
+Bei Neuentwicklungen von UI-Elementen sowie bei Anpassungen bestehender UI-Elemente wird von Entwicklerinnen und Entwicklern erwartet, dass zeitgleich passende Übersetzungen für das betreffende UI-Element in allen fünf unterstützten Sprachen nachgeführt werden: English, Deutsch, Französisch, Italienisch und Rätoromanisch.
+
 ---
 
 ## Lokales Setup
