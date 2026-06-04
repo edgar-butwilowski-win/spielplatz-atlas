@@ -11,7 +11,6 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("playgrounds", "0001_initial"),
         ("media_assets", "0001_initial"),
-        ("tenants", "0002_organization_logo"),
     ]
 
     operations = [
