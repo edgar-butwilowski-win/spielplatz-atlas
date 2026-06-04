@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                 ("organization", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="inspection_tasks", to="tenants.organization", verbose_name="Organisation")),
                 ("playground", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="inspection_tasks", to="playgrounds.playground", verbose_name="Spielplatz")),
             ],
-            options={"ordering": ["due_date", "playground__name", "inspection_type"], "verbose_name": "Kontrollauftrag", "verbose_name_plural": "Kontrollaufträge", "indexes": [models.Index(fields=["organization", "due_date", "status"], name="inspection_organiz_9f4e2f_idx"), models.Index(fields=["playground", "inspection_type", "due_date"], name="inspection_playgro_f2f99f_idx")]},
+            options={"ordering": ["due_date", "playground__name", "inspection_type"], "verbose_name": "Kontrollauftrag", "verbose_name_plural": "Kontrollaufträge", "indexes": [models.Index(fields=["organization", "due_date", "status"], name="inspections_organiz_e94864_idx"), models.Index(fields=["playground", "inspection_type", "due_date"], name="inspections_playgro_9c2373_idx")]},
         ),
         migrations.CreateModel(
             name="InspectionScope",
@@ -146,7 +146,7 @@ class Migration(migrations.Migration):
                 ("updated_at", models.DateTimeField(auto_now=True, verbose_name="Aktualisiert am")),
                 ("accessory", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="defects", to="playgrounds.playgroundaccessory", verbose_name="Zusatzausstattung")),
                 ("equipment", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="defects", to="playgrounds.playequipment", verbose_name="Spielgerät")),
-                ("inspection", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="defects", to="inspections.inspection", verbose_name="Kontrolle")),
+                ("inspection", models.ForeignKey(blank=True, help_text="Optional. Ein Mangel kann aus einer Kontrolle stammen, muss aber nicht.", null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="defects", to="inspections.inspection", verbose_name="Kontrolle")),
                 ("inspection_answer", models.ForeignKey(blank=True, help_text="Optionale Prüfantwort, aus der dieser Mangel entstanden ist.", null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="defects", to="inspections.inspectionanswer", verbose_name="Prüfantwort")),
                 ("playground", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="defects", to="playgrounds.playground", verbose_name="Spielplatz")),
                 ("surface", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name="defects", to="playgrounds.playgroundsurface", verbose_name="Fallschutzfläche / Boden")),
