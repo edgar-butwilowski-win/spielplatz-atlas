@@ -5,7 +5,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
     dependencies = [
         ("media_assets", "0001_initial"),
-        ("tenants", "0002_organization_workday_planning"),
+        ("tenants", "0001_initial"),
     ]
 
     operations = [
