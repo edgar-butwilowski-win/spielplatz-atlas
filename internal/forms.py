@@ -76,43 +76,40 @@ def clean_urgency_by_safety_risk(cleaned_data):
     return cleaned_data
 
 
-class EquipmentRenovationForm(forms.ModelForm):
-    class Meta:
-        model = WorkOrder
-        fields = ("renovation_year", "renovation_type", "description")
+class EquipmentRenovationForm(forms.Form):
+    renovation_year = forms.IntegerField(required=False, min_value=1000, max_value=9999, widget=forms.NumberInput(attrs={"class": "form-control form-control-sm"}))
+    renovation_type = forms.ChoiceField(required=False, choices=[("", "---------")] + list(WorkOrder._meta.get_field("renovation_type").choices), widget=forms.Select(attrs={"class": "form-select form-select-sm"}))
+    description = forms.CharField(required=False, widget=forms.TextInput(attrs={"class": "form-control form-control-sm"}))
 
-    def __init__(self, *args, equipment=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.equipment = equipment
-        for field in self.fields.values():
-            field.required = False
-            field.widget.attrs.setdefault("class", "form-control form-control-sm")
-        self.fields["renovation_type"].widget.attrs["class"] = "form-select form-select-sm"
+    def __init__(self, *args, instance=None, equipment=None, **kwargs):
+        self.equipment = equipment or instance
+        self.work_order = None
+        if self.equipment:
+            self.work_order = self.equipment.get_active_renovation_work_order()
+        initial = kwargs.pop("initial", {})
+        if self.work_order:
+            initial = {**initial, "renovation_year": self.work_order.renovation_year, "renovation_type": self.work_order.renovation_type, "description": self.work_order.description}
+        super().__init__(*args, initial=initial, **kwargs)
 
-    def clean_renovation_year(self):
+    def save(self):
+        if not self.equipment:
+            return None
         year = self.cleaned_data.get("renovation_year")
-        if year is not None and (year < 1000 or year > 9999):
-            raise forms.ValidationError(_("Please enter a four-digit year."))
-        return year
-
-    def save(self, commit=True):
-        order = super().save(commit=False)
-        equipment = self.equipment or order.equipment
-        if equipment:
-            order.equipment = equipment
-            order.playground = equipment.playground
-            order.organization = equipment.playground.organization
-            order.title = "Sanierung %s" % equipment.name
+        renovation_type = self.cleaned_data.get("renovation_type") or ""
+        description = self.cleaned_data.get("description") or ""
+        order = self.work_order or WorkOrder(equipment=self.equipment, status=WorkOrder.STATUS_OPEN, priority=WorkOrder.PRIORITY_NORMAL)
+        order.organization = self.equipment.playground.organization
+        order.playground = self.equipment.playground
+        order.title = "Sanierung %s" % self.equipment.name
+        order.description = description
         order.order_type = WorkOrder.TYPE_RENOVATION
         order.source = WorkOrder.SOURCE_EQUIPMENT_RENOVATION
-        order.status = order.status or WorkOrder.STATUS_OPEN
-        order.priority = order.priority or WorkOrder.PRIORITY_NORMAL
-        if order.renovation_year and not order.due_date:
-            order.due_date = timezone.datetime(order.renovation_year, 12, 31).date()
-        if order.renovation_year and not order.credit_name:
-            order.credit_name = "Sammelkredit Sanierungen %s" % order.renovation_year
-        if commit:
-            order.save()
+        order.renovation_type = renovation_type
+        order.renovation_year = year
+        order.due_date = timezone.datetime(year, 12, 31).date() if year else None
+        if year and not order.credit_name:
+            order.credit_name = "Sammelkredit Sanierungen %s" % year
+        order.save()
         return order
 
 
