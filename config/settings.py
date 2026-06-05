@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     "public.apps.PublicConfig",
     "internal",
     "notifications.apps.NotificationsConfig",
+    "system_logging.apps.SystemLoggingConfig",
 ]
 
 MIDDLEWARE = [
@@ -118,7 +119,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
             ],
         },
-    },
+    }
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -160,6 +161,53 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "accounts.auth_backends.EmailAuthenticationBackend",
 ]
+
+
+# Logging
+# Before the database table exists, the custom handler writes to the console.
+# Once the table is available, it writes only to system_logging.LogEntry.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {
+            "format": "%(message)s",
+        },
+    },
+    "handlers": {
+        "database": {
+            "level": "INFO",
+            "class": "system_logging.handlers.DatabaseLogHandler",
+            "formatter": "plain",
+        },
+    },
+    "root": {
+        "handlers": ["database"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["database"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["database"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["database"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["database"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}
 
 
 # Internationalization
