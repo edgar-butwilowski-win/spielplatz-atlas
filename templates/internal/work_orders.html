@@ -12,21 +12,20 @@
         body { background:var(--atlas-bg); color:var(--atlas-text); }
         .content-card,.metric-card { background:white; border:1px solid #E2E8F0; border-radius:1.25rem; box-shadow:0 18px 45px rgba(15,23,42,.06); }
         .section-label { color:var(--atlas-primary); font-size:.82rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
-        .metric-value { font-size:1.45rem; font-weight:800; letter-spacing:-.04em; }
-        .metric-label { color:#64748B; font-size:.86rem; }
+        .metric-value { font-size:1.45rem; font-weight:800; }
+        .metric-label,.order-value-secondary { color:#64748B; font-size:.86rem; }
         .order-list { display:grid; gap:.85rem; }
         .order-card { background:white; border:1px solid #E2E8F0; border-radius:1rem; overflow:hidden; }
         .order-card-header { display:grid; grid-template-columns:7rem minmax(12rem,1.2fr) minmax(14rem,1.2fr) 8rem; gap:1rem; align-items:center; background:#F8FAFC; border-bottom:1px solid #E2E8F0; padding:.8rem .95rem; }
         .order-card-body { display:grid; grid-template-columns:minmax(24rem,1fr) 22rem; gap:1rem; padding:.95rem; }
         .order-label { color:#64748B; font-size:.68rem; font-weight:800; letter-spacing:.07em; line-height:1; margin-bottom:.25rem; text-transform:uppercase; }
         .order-value { font-weight:650; line-height:1.25; }
-        .order-value-secondary { color:#64748B; font-size:.86rem; line-height:1.35; }
         .order-status-pill { border:1px solid #CBD5E1; border-radius:999px; display:inline-flex; font-size:.78rem; font-weight:700; padding:.18rem .55rem; }
         .order-form { display:grid; gap:.5rem; }
         .order-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
         .credit-table th { color:#64748B; font-size:.75rem; letter-spacing:.06em; text-transform:uppercase; }
         .excel-hint { background:#ECFDF5; border:1px solid #A7F3D0; border-radius:1rem; color:#065F46; }
-        @media (max-width:1199.98px){ .order-card-header,.order-card-body{grid-template-columns:1fr;} .order-form-grid{grid-template-columns:1fr;} }
+        @media (max-width:1199.98px){ .order-card-header,.order-card-body,.order-form-grid{grid-template-columns:1fr;} }
         {% include "includes/main_navigation_styles.html" %}
     </style>
 </head>
@@ -38,162 +37,77 @@
         <h1 class="fw-bold mb-2">{% trans "Auftragsverwaltung" %}</h1>
         <p class="text-secondary fs-5 mb-0">
             {% if selected_organization %}
-                Sanierungsaufträge für {{ selected_organization.name }}. Die Liste wird aus den Sanierungsempfehlungen der Spielgeräte erzeugt und kann für Sammelkredite verdichtet werden.
+                {% blocktrans with organization=selected_organization.name %}Sanierungsaufträge für {{ organization }}. Die Liste wird aus den Sanierungsempfehlungen der Spielgeräte erzeugt und kann für Sammelkredite verdichtet werden.{% endblocktrans %}
             {% elif is_superadmin %}
-                Bitte wählen Sie eine Organisation aus, um deren Sanierungsaufträge und Sammelkredite zu bearbeiten.
+                {% trans "Bitte wählen Sie eine Organisation aus, um deren Sanierungsaufträge und Sammelkredite zu bearbeiten." %}
             {% endif %}
         </p>
     </div>
 
-    {% if messages %}
-        <div class="mb-4">
-            {% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}
-        </div>
-    {% endif %}
+    {% if messages %}<div class="mb-4">{% for message in messages %}<div class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</div>{% endfor %}</div>{% endif %}
 
     <section class="excel-hint p-3 p-lg-4 mb-4">
-        <h2 class="h5 fw-bold mb-2">Sanierungsplanung und Sammelkredite</h2>
-        <p class="mb-0">Diese Ansicht ersetzt die bisherige Excel-artige Sanierungsliste schrittweise: pro Spielgerät wird ein Sanierungsauftrag geführt, einem empfohlenen Sanierungsjahr zugeordnet und optional einem Sammelkredit inklusive Kostenschätzung zugewiesen.</p>
+        <h2 class="h5 fw-bold mb-2">{% trans "Sanierungsplanung und Sammelkredite" %}</h2>
+        <p class="mb-0">{% trans "Diese Ansicht ersetzt die bisherige Excel-artige Sanierungsliste schrittweise: pro Spielgerät wird ein Sanierungsauftrag geführt, einem empfohlenen Sanierungsjahr zugeordnet und optional einem Sammelkredit inklusive Kostenschätzung zugewiesen." %}</p>
     </section>
 
     <section class="content-card p-3 p-lg-4 mb-4">
         <form method="get" class="row g-3 align-items-end">
             {% if is_superadmin %}
-                <div class="col-md-4 col-xl-3">
-                    <label class="form-label" for="organization">{% trans "Organization" %}</label>
-                    <select class="form-select" id="organization" name="organization">
-                        <option value="">{% trans "Please select" %}</option>
-                        {% for organization in organizations %}
-                            <option value="{{ organization.id }}" {% if selected_organization and selected_organization.id == organization.id %}selected{% endif %}>{{ organization.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                <div class="col-md-4 col-xl-3"><label class="form-label" for="organization">{% trans "Organization" %}</label><select class="form-select" id="organization" name="organization"><option value="">{% trans "Please select" %}</option>{% for organization in organizations %}<option value="{{ organization.id }}" {% if selected_organization and selected_organization.id == organization.id %}selected{% endif %}>{{ organization.name }}</option>{% endfor %}</select></div>
             {% endif %}
-            <div class="col-md-4 col-xl-2">
-                <label class="form-label" for="status">{% trans "Status" %}</label>
-                <select class="form-select" id="status" name="status">
-                    {% for key, label in status_choices %}<option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4 col-xl-2">
-                <label class="form-label" for="year">Empfohlenes Jahr</label>
-                <select class="form-select" id="year" name="year">
-                    <option value="">Alle Jahre</option>
-                    {% for year in years %}<option value="{{ year }}" {% if year_filter|stringformat:'s' == year|stringformat:'s' %}selected{% endif %}>{{ year }}</option>{% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6 col-xl-3">
-                <label class="form-label" for="credit">Sammelkredit</label>
-                <select class="form-select" id="credit" name="credit">
-                    <option value="">Alle Sammelkredite</option>
-                    {% for credit in credits %}<option value="{{ credit }}" {% if credit_filter == credit %}selected{% endif %}>{{ credit }}</option>{% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6 col-xl-2 d-flex gap-2">
-                <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
-                <a href="{% url 'internal:work_orders' %}" class="btn btn-outline-secondary">{% trans "Reset" %}</a>
-            </div>
+            <div class="col-md-4 col-xl-2"><label class="form-label" for="status">{% trans "Status" %}</label><select class="form-select" id="status" name="status">{% for key, label in status_choices %}<option value="{{ key }}" {% if status_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div class="col-md-4 col-xl-2"><label class="form-label" for="year">{% trans "Empfohlenes Jahr" %}</label><select class="form-select" id="year" name="year"><option value="">{% trans "Alle Jahre" %}</option>{% for year in years %}<option value="{{ year }}" {% if year_filter|stringformat:'s' == year|stringformat:'s' %}selected{% endif %}>{{ year }}</option>{% endfor %}</select></div>
+            <div class="col-md-6 col-xl-3"><label class="form-label" for="credit">{% trans "Sammelkredit" %}</label><select class="form-select" id="credit" name="credit"><option value="">{% trans "Alle Sammelkredite" %}</option>{% for credit in credits %}<option value="{{ credit }}" {% if credit_filter == credit %}selected{% endif %}>{{ credit }}</option>{% endfor %}</select></div>
+            <div class="col-md-6 col-xl-2 d-flex gap-2"><button type="submit" class="btn btn-primary">{% trans "Filter" %}</button><a href="{% url 'internal:work_orders' %}" class="btn btn-outline-secondary">{% trans "Reset" %}</a></div>
         </form>
     </section>
 
     {% if selected_organization %}
         <section class="row g-3 mb-4">
-            <div class="col-md-6 col-xl-3"><div class="metric-card p-3 h-100"><div class="metric-value">{{ orders|length }}</div><div class="metric-label">angezeigte Sanierungsaufträge</div></div></div>
-            <div class="col-md-6 col-xl-3"><div class="metric-card p-3 h-100"><div class="metric-value">{{ credit_summary|length }}</div><div class="metric-label">Sammelkredit-Gruppen</div></div></div>
+            <div class="col-md-6 col-xl-3"><div class="metric-card p-3 h-100"><div class="metric-value">{{ orders|length }}</div><div class="metric-label">{% trans "angezeigte Sanierungsaufträge" %}</div></div></div>
+            <div class="col-md-6 col-xl-3"><div class="metric-card p-3 h-100"><div class="metric-value">{{ credit_summary|length }}</div><div class="metric-label">{% trans "Sammelkredit-Gruppen" %}</div></div></div>
         </section>
 
         <section class="content-card p-3 p-lg-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 fw-bold mb-0">Sammelkredite transparent verdichten</h2>
-                <span class="text-secondary small">Gruppiert nach Jahr und Sammelkredit</span>
-            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">{% trans "Sammelkredite transparent verdichten" %}</h2><span class="text-secondary small">{% trans "Gruppiert nach Jahr und Sammelkredit" %}</span></div>
             {% if credit_summary %}
-                <div class="table-responsive">
-                    <table class="table credit-table align-middle mb-0">
-                        <thead><tr><th>Jahr</th><th>Sammelkredit</th><th class="text-end">Aufträge</th><th class="text-end">Kostenschätzung</th></tr></thead>
-                        <tbody>
-                            {% for item in credit_summary %}
-                                <tr>
-                                    <td>{{ item.year }}</td>
-                                    <td>{{ item.credit_name }}</td>
-                                    <td class="text-end">{{ item.count }}</td>
-                                    <td class="text-end">{% if item.total_costs %}CHF {{ item.total_costs }}{% else %}<span class="text-secondary">offen</span>{% endif %}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <p class="text-secondary mb-0">Noch keine Sanierungsaufträge vorhanden.</p>
-            {% endif %}
+                <div class="table-responsive"><table class="table credit-table align-middle mb-0"><thead><tr><th>{% trans "Jahr" %}</th><th>{% trans "Sammelkredit" %}</th><th class="text-end">{% trans "Aufträge" %}</th><th class="text-end">{% trans "Kostenschätzung" %}</th></tr></thead><tbody>
+                    {% for item in credit_summary %}<tr><td>{{ item.year }}</td><td>{{ item.credit_name }}</td><td class="text-end">{{ item.count }}</td><td class="text-end">{% if item.total_costs %}CHF {{ item.total_costs }}{% else %}<span class="text-secondary">{% trans "offen" %}</span>{% endif %}</td></tr>{% endfor %}
+                </tbody></table></div>
+            {% else %}<p class="text-secondary mb-0">{% trans "Noch keine Sanierungsaufträge vorhanden." %}</p>{% endif %}
         </section>
 
         <section class="content-card p-3 p-lg-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 fw-bold mb-0">Sanierungsaufträge</h2>
-                <span class="text-secondary small">Maximum 200 Einträge</span>
-            </div>
-
+            <div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 fw-bold mb-0">{% trans "Sanierungsaufträge" %}</h2><span class="text-secondary small">{% trans "Maximum 200 Einträge" %}</span></div>
             {% if orders %}
                 <div class="order-list">
                     {% for order in orders %}
                         <article class="order-card">
                             <div class="order-card-header">
-                                <div>
-                                    <div class="order-label">Jahr</div>
-                                    <div class="order-value">{{ order.renovation_year|default:'offen' }}</div>
-                                </div>
-                                <div>
-                                    <div class="order-label">Spielplatz</div>
-                                    <div class="order-value">{{ order.playground.name }}</div>
-                                    <div class="order-value-secondary">{{ order.playground.organization.name }}</div>
-                                </div>
-                                <div>
-                                    <div class="order-label">Spielgerät</div>
-                                    <div class="order-value">{{ order.equipment.name|default:order.title }}</div>
-                                    <div class="order-value-secondary">{{ order.equipment.equipment_type.name }}{% if order.equipment.inventory_number %} · Inv.-Nr. {{ order.equipment.inventory_number }}{% endif %}</div>
-                                </div>
-                                <div>
-                                    <span class="order-status-pill">{{ order.get_status_display }}</span>
-                                </div>
+                                <div><div class="order-label">{% trans "Jahr" %}</div><div class="order-value">{% if order.renovation_year %}{{ order.renovation_year }}{% else %}{% trans "offen" %}{% endif %}</div></div>
+                                <div><div class="order-label">{% trans "Spielplatz" %}</div><div class="order-value">{{ order.playground.name }}</div><div class="order-value-secondary">{{ order.playground.organization.name }}</div></div>
+                                <div><div class="order-label">{% trans "Spielgerät" %}</div><div class="order-value">{{ order.equipment.name|default:order.title }}</div><div class="order-value-secondary">{{ order.equipment.equipment_type.name }}{% if order.equipment.inventory_number %} · {% trans "Inv.-Nr." %} {{ order.equipment.inventory_number }}{% endif %}</div></div>
+                                <div><span class="order-status-pill">{{ order.get_status_display }}</span></div>
                             </div>
                             <div class="order-card-body">
                                 <div>
-                                    <div class="row g-3">
-                                        <div class="col-md-4"><div class="order-label">Sanierungsart</div><div class="order-value">{{ order.get_renovation_type_display|default:'-' }}</div></div>
-                                        <div class="col-md-4"><div class="order-label">Fällig bis</div><div class="order-value">{{ order.due_date|date:'d.m.Y'|default:'-' }}</div></div>
-                                        <div class="col-md-4"><div class="order-label">Sammelkredit</div><div class="order-value">{{ order.credit_name|default:'noch nicht zugewiesen' }}</div></div>
-                                    </div>
-                                    <div class="mt-3">
-                                        <div class="order-label">Bemerkung empfohlene Sanierung</div>
-                                        <div class="order-value-secondary">{{ order.description|linebreaksbr }}</div>
-                                    </div>
-                                    {% if order.internal_note %}
-                                        <div class="mt-3">
-                                            <div class="order-label">Interne Notiz</div>
-                                            <div class="order-value-secondary">{{ order.internal_note|linebreaksbr }}</div>
-                                        </div>
-                                    {% endif %}
+                                    <div class="row g-3"><div class="col-md-4"><div class="order-label">{% trans "Sanierungsart" %}</div><div class="order-value">{{ order.get_renovation_type_display|default:'-' }}</div></div><div class="col-md-4"><div class="order-label">{% trans "Fällig bis" %}</div><div class="order-value">{{ order.due_date|date:'d.m.Y'|default:'-' }}</div></div><div class="col-md-4"><div class="order-label">{% trans "Sammelkredit" %}</div><div class="order-value">{% if order.credit_name %}{{ order.credit_name }}{% else %}{% trans "noch nicht zugewiesen" %}{% endif %}</div></div></div>
+                                    <div class="mt-3"><div class="order-label">{% trans "Bemerkung empfohlene Sanierung" %}</div><div class="order-value-secondary">{{ order.description|linebreaksbr }}</div></div>
+                                    {% if order.internal_note %}<div class="mt-3"><div class="order-label">{% trans "Interne Notiz" %}</div><div class="order-value-secondary">{{ order.internal_note|linebreaksbr }}</div></div>{% endif %}
                                 </div>
                                 <form method="post" action="{% url 'internal:update_work_order' order.id %}" class="order-form">
                                     {% csrf_token %}
-                                    <div class="order-form-grid">
-                                        <div><label class="form-label small mb-1">Status</label>{{ order.management_form.status }}</div>
-                                        <div><label class="form-label small mb-1">Geplant am</label>{{ order.management_form.planned_date }}</div>
-                                        <div><label class="form-label small mb-1">Zuständig</label>{{ order.management_form.assigned_to }}</div>
-                                        <div><label class="form-label small mb-1">Kostenschätzung</label>{{ order.management_form.estimated_costs }}</div>
-                                    </div>
-                                    <div><label class="form-label small mb-1">Sammelkredit</label>{{ order.management_form.credit_name }}</div>
-                                    <div><label class="form-label small mb-1">Interne Notiz</label>{{ order.management_form.internal_note }}</div>
-                                    <button type="submit" class="btn btn-sm btn-primary">Auftrag speichern</button>
+                                    <div class="order-form-grid"><div><label class="form-label small mb-1">{% trans "Status" %}</label>{{ order.management_form.status }}</div><div><label class="form-label small mb-1">{% trans "Geplant am" %}</label>{{ order.management_form.planned_date }}</div><div><label class="form-label small mb-1">{% trans "Zuständig" %}</label>{{ order.management_form.assigned_to }}</div><div><label class="form-label small mb-1">{% trans "Kostenschätzung" %}</label>{{ order.management_form.estimated_costs }}</div></div>
+                                    <div><label class="form-label small mb-1">{% trans "Sammelkredit" %}</label>{{ order.management_form.credit_name }}</div>
+                                    <div><label class="form-label small mb-1">{% trans "Interne Notiz" %}</label>{{ order.management_form.internal_note }}</div>
+                                    <button type="submit" class="btn btn-sm btn-primary">{% trans "Auftrag speichern" %}</button>
                                 </form>
                             </div>
                         </article>
                     {% endfor %}
                 </div>
-            {% else %}
-                <p class="text-secondary mb-0">Für die aktuelle Auswahl sind keine Sanierungsaufträge vorhanden. Sanierungsaufträge entstehen aus Spielgeräten mit empfohlenem Sanierungsjahr.</p>
-            {% endif %}
+            {% else %}<p class="text-secondary mb-0">{% trans "Für die aktuelle Auswahl sind keine Sanierungsaufträge vorhanden. Sanierungsaufträge entstehen aus Spielgeräten mit empfohlenem Sanierungsjahr." %}</p>{% endif %}
         </section>
     {% endif %}
 </main>
