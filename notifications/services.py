@@ -3,6 +3,7 @@
 # All rights reserved.
 
 import json
+import logging
 
 from django.conf import settings
 from django.utils import timezone
@@ -10,10 +11,17 @@ from django.utils import timezone
 from .models import DefectAssignment, PushSubscription, SystemNotification
 
 
+logger = logging.getLogger(__name__)
+
+
 def assign_defect(defect, assigned_to, assigned_by=None):
     playground = defect.playground
 
     if not playground:
+        logger.warning(
+            "Mangel %s kann keiner Person zugewiesen werden, weil kein Spielplatz verknüpft ist.",
+            defect.pk,
+        )
         return None, None
 
     assignment, _ = DefectAssignment.objects.update_or_create(
@@ -42,6 +50,10 @@ def create_defect_assignment_notification(defect, recipient, created_by=None):
     playground = defect.playground
 
     if not playground:
+        logger.warning(
+            "Für Mangel %s kann keine Zuweisungsbenachrichtigung erstellt werden, weil kein Spielplatz verknüpft ist.",
+            defect.pk,
+        )
         return None
 
     target = ""
@@ -78,6 +90,10 @@ def send_push_for_notification(notification):
     )
 
     if not subscriptions.exists():
+        logger.info(
+            "Keine aktive Push-Subscription für Benachrichtigung %s vorhanden.",
+            notification.pk,
+        )
         notification.delivery_status = SystemNotification.STATUS_NO_SUBSCRIPTION
         notification.delivery_error = "Für diese Person ist kein aktives Push-Gerät registriert."
         notification.save(update_fields=["delivery_status", "delivery_error", "updated_at"])
@@ -87,6 +103,10 @@ def send_push_for_notification(notification):
     vapid_email = getattr(settings, "WEBPUSH_VAPID_EMAIL", "")
 
     if not vapid_private_key or not vapid_email:
+        logger.error(
+            "Web-Push ist nicht konfiguriert; Benachrichtigung %s kann nicht zugestellt werden.",
+            notification.pk,
+        )
         notification.delivery_status = SystemNotification.STATUS_FAILED
         notification.delivery_error = "Web-Push ist nicht konfiguriert."
         notification.save(update_fields=["delivery_status", "delivery_error", "updated_at"])
@@ -95,6 +115,10 @@ def send_push_for_notification(notification):
     try:
         from pywebpush import WebPushException, webpush
     except ImportError:
+        logger.exception(
+            "pywebpush ist nicht installiert; Benachrichtigung %s kann nicht zugestellt werden.",
+            notification.pk,
+        )
         notification.delivery_status = SystemNotification.STATUS_FAILED
         notification.delivery_error = "pywebpush ist nicht installiert."
         notification.save(update_fields=["delivery_status", "delivery_error", "updated_at"])
@@ -131,13 +155,29 @@ def send_push_for_notification(notification):
             sent_any = True
         except WebPushException as error:
             errors.append(str(error))
+            logger.warning(
+                "Web-Push-Zustellung fehlgeschlagen für Benachrichtigung %s und Subscription %s: %s",
+                notification.pk,
+                subscription.pk,
+                error,
+            )
 
             response = getattr(error, "response", None)
             if response is not None and getattr(response, "status_code", None) in {404, 410}:
+                logger.info(
+                    "Inaktive Push-Subscription %s nach Statuscode %s deaktiviert.",
+                    subscription.pk,
+                    response.status_code,
+                )
                 subscription.is_active = False
                 subscription.save(update_fields=["is_active", "last_seen_at"])
         except Exception as error:  # bewusst breit: Push darf Fachprozess nicht abbrechen
             errors.append(str(error))
+            logger.exception(
+                "Unerwarteter Fehler beim Web-Push-Versand für Benachrichtigung %s und Subscription %s.",
+                notification.pk,
+                subscription.pk,
+            )
 
     if sent_any:
         notification.delivery_status = SystemNotification.STATUS_SENT
@@ -146,6 +186,10 @@ def send_push_for_notification(notification):
         notification.save(update_fields=["delivery_status", "sent_at", "delivery_error", "updated_at"])
         return True
 
+    logger.error(
+        "Benachrichtigung %s konnte an keine aktive Push-Subscription zugestellt werden.",
+        notification.pk,
+    )
     notification.delivery_status = SystemNotification.STATUS_FAILED
     notification.delivery_error = "\n".join(errors) or "Push konnte nicht zugestellt werden."
     notification.save(update_fields=["delivery_status", "delivery_error", "updated_at"])
