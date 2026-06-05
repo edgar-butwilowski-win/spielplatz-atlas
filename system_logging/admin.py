@@ -4,6 +4,7 @@
 
 from django.contrib import admin
 from django.core.paginator import Paginator
+from django.db.models import Subquery
 
 from .models import LogEntry
 
@@ -44,7 +45,9 @@ class LogEntryAdmin(admin.ModelAdmin):
         return f"{obj.message[:117]}..."
 
     def get_queryset(self, request):
-        return super().get_queryset(request).order_by("-created_at")[:100]
+        qs = super().get_queryset(request)
+        newest_ids = qs.order_by("-created_at").values("pk")[:100]
+        return qs.filter(pk__in=Subquery(newest_ids)).order_by("-created_at")
 
     def has_module_permission(self, request):
         return request.user.is_active and request.user.is_superuser
