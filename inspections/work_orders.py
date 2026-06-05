@@ -179,9 +179,9 @@ class WorkOrder(models.Model):
         verbose_name = "Auftrag"
         verbose_name_plural = "Aufträge"
         indexes = [
-            models.Index(fields=["organization", "order_type", "status"]),
-            models.Index(fields=["organization", "renovation_year", "credit_name"]),
-            models.Index(fields=["equipment", "order_type", "status"]),
+            models.Index(fields=["organization", "order_type", "status"], name="inspections_organiz_e0d7d5_idx"),
+            models.Index(fields=["organization", "renovation_year", "credit_name"], name="inspections_organiz_74e71c_idx"),
+            models.Index(fields=["equipment", "order_type", "status"], name="inspections_equipme_c8aeca_idx"),
         ]
 
     def __str__(self):
