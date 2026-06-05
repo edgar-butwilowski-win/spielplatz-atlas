@@ -1,4 +1,3 @@
-from collections import defaultdict
 from datetime import date
 from decimal import Decimal
 
@@ -7,10 +6,9 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Q, Sum
+from django.db.models import Count, Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from accounts.models import UserProfile
@@ -182,14 +180,19 @@ def build_credit_summary(queryset):
     rows = (
         queryset
         .values("renovation_year", "credit_name")
-        .annotate(total_costs=Sum("estimated_costs"))
+        .annotate(total_costs=Sum("estimated_costs"), order_count=Count("id"))
         .order_by("renovation_year", "credit_name")
     )
     summary = []
     for row in rows:
         year = row["renovation_year"] or "ohne Jahr"
         credit_name = row["credit_name"] or "Noch keinem Sammelkredit zugewiesen"
-        summary.append({"year": year, "credit_name": credit_name, "total_costs": row["total_costs"], "count": queryset.filter(renovation_year=row["renovation_year"], credit_name=row["credit_name"]).count()})
+        summary.append({
+            "year": year,
+            "credit_name": credit_name,
+            "total_costs": row["total_costs"],
+            "count": row["order_count"],
+        })
     return summary
 
 
