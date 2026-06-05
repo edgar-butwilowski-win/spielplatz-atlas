@@ -3,6 +3,7 @@
 # All rights reserved.
 
 import logging
+import sys
 from datetime import timedelta
 
 from django.apps import apps
@@ -28,7 +29,8 @@ class DatabaseLogHandler(logging.Handler):
             else:
                 self.emit_to_console(record)
         except Exception:
-            self.handleError(record)
+            if self.__class__.table_available is not True:
+                self.emit_to_console(record)
         finally:
             self.__class__.is_emitting = False
 
@@ -79,4 +81,6 @@ class DatabaseLogHandler(logging.Handler):
         self.__class__.last_cleanup_at = now
 
     def emit_to_console(self, record):
-        print(f"{record.levelname} {record.name}: {self.format(record)}")
+        stream = sys.stderr
+        stream.write(f"{record.levelname} {record.name}: {self.format(record)}\n")
+        stream.flush()
