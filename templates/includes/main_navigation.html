@@ -108,6 +108,7 @@
                         <a href="{% url 'internal:my_inspections' %}">{% trans "My inspections" %}</a>
                     {% endif %}
                     {% if request.user.is_superuser or request.user.profile.may_manage_organization %}
+                        <a href="{% url 'internal:work_orders' %}">{% trans "Orders" %}</a>
                         <a href="{% url 'internal:inspection_planning' %}">{% trans "Deployment planning" %}</a>
                     {% endif %}
                     {% if request.user.is_superuser or request.user.profile.may_manage_organization %}
