@@ -2143,50 +2143,14 @@ msgstr "Gestion interne des ordres"
 msgid "Auftragsverwaltung"
 msgstr "Gestion des ordres"
 
-msgid "Organization"
-msgstr "Organisation"
-
 msgid "Please select"
 msgstr "Veuillez sélectionner"
-
-msgid "Status"
-msgstr "Statut"
-
-msgid "Filter"
-msgstr "Filtrer"
-
-msgid "Reset"
-msgstr "Réinitialiser"
-
-msgid "Inspection"
-msgstr "Contrôle"
 
 msgid "Defect repair"
 msgstr "Correction de défaut"
 
 msgid "Renovation"
 msgstr "Assainissement"
-
-msgid "Other"
-msgstr "Autre"
-
-msgid "Open"
-msgstr "Ouvert"
-
-msgid "Planned"
-msgstr "Planifié"
-
-msgid "In progress"
-msgstr "En cours"
-
-msgid "Completed"
-msgstr "Terminé"
-
-msgid "Cancelled"
-msgstr "Annulé"
-
-msgid "Suspended"
-msgstr "Suspendu"
 
 msgid "Low"
 msgstr "Faible"
@@ -2200,14 +2164,5 @@ msgstr "Élevé"
 msgid "Urgent"
 msgstr "Urgent"
 
-msgid "Manual"
-msgstr "Manuel"
-
-msgid "Automatic"
-msgstr "Automatique"
-
 msgid "Equipment renovation"
 msgstr "Assainissement d’équipement"
-
-msgid "Defect"
-msgstr "Défaut"

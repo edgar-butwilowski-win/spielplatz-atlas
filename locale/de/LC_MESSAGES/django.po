@@ -2142,50 +2142,14 @@ msgstr "Interne Auftragsverwaltung"
 msgid "Auftragsverwaltung"
 msgstr "Auftragsverwaltung"
 
-msgid "Organization"
-msgstr "Organisation"
-
 msgid "Please select"
 msgstr "Bitte auswählen"
-
-msgid "Status"
-msgstr "Status"
-
-msgid "Filter"
-msgstr "Filtern"
-
-msgid "Reset"
-msgstr "Zurücksetzen"
-
-msgid "Inspection"
-msgstr "Kontrolle"
 
 msgid "Defect repair"
 msgstr "Mängelbehebung"
 
 msgid "Renovation"
 msgstr "Sanierung"
-
-msgid "Other"
-msgstr "Sonstiges"
-
-msgid "Open"
-msgstr "Offen"
-
-msgid "Planned"
-msgstr "Geplant"
-
-msgid "In progress"
-msgstr "In Bearbeitung"
-
-msgid "Completed"
-msgstr "Abgeschlossen"
-
-msgid "Cancelled"
-msgstr "Abgebrochen"
-
-msgid "Suspended"
-msgstr "Sistiert"
 
 msgid "Low"
 msgstr "Niedrig"
@@ -2199,14 +2163,5 @@ msgstr "Hoch"
 msgid "Urgent"
 msgstr "Dringend"
 
-msgid "Manual"
-msgstr "Manuell"
-
-msgid "Automatic"
-msgstr "Automatisch"
-
 msgid "Equipment renovation"
 msgstr "Spielgeräte-Sanierung"
-
-msgid "Defect"
-msgstr "Mangel"
