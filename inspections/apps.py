@@ -14,5 +14,9 @@ class InspectionsConfig(AppConfig):
     name = "inspections"
     verbose_name = "Kontrollen"
 
+    def import_models(self):
+        super().import_models()
+        import inspections.work_orders  # noqa: F401
+
     def ready(self):
         import inspections.signals  # noqa: F401
