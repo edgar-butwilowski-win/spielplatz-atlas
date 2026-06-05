@@ -1,4 +1,3 @@
-from datetime import date
 from decimal import Decimal
 
 from django import forms
@@ -13,34 +12,24 @@ from django.views.decorators.http import require_POST
 
 from accounts.models import UserProfile
 from inspections.work_orders import WorkOrder
-from playgrounds.models import PlayEquipment
 from tenants.models import Organization
 
 from .permissions import get_active_profile_for_organization, require_org_admin_permission
 
 HTML_DATE_FORMAT = "%Y-%m-%d"
-RENOVATION_ACTIVE_STATUSES = [
-    WorkOrder.STATUS_OPEN,
-    WorkOrder.STATUS_PLANNED,
-    WorkOrder.STATUS_IN_PROGRESS,
-    WorkOrder.STATUS_SUSPENDED,
-]
+RENOVATION_ACTIVE_STATUSES = [WorkOrder.STATUS_OPEN, WorkOrder.STATUS_PLANNED, WorkOrder.STATUS_IN_PROGRESS, WorkOrder.STATUS_SUSPENDED]
 
 
 class WorkOrderUserChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, user):
         full_name = user.get_full_name().strip()
         if full_name and user.email:
-            return f"{full_name} ({user.email})"
+            return "%s (%s)" % (full_name, user.email)
         return full_name or user.email or "Benutzer ohne E-Mail"
 
 
 class RenovationWorkOrderForm(forms.ModelForm):
-    assigned_to = WorkOrderUserChoiceField(
-        queryset=get_user_model().objects.none(),
-        required=False,
-        widget=forms.Select(attrs={"class": "form-select form-select-sm"}),
-    )
+    assigned_to = WorkOrderUserChoiceField(queryset=get_user_model().objects.none(), required=False, widget=forms.Select(attrs={"class": "form-select form-select-sm"}))
 
     class Meta:
         model = WorkOrder
@@ -49,7 +38,7 @@ class RenovationWorkOrderForm(forms.ModelForm):
             "status": forms.Select(attrs={"class": "form-select form-select-sm"}),
             "planned_date": forms.DateInput(format=HTML_DATE_FORMAT, attrs={"type": "date", "class": "form-control form-control-sm"}),
             "estimated_costs": forms.NumberInput(attrs={"class": "form-control form-control-sm", "min": "0", "step": "0.05", "placeholder": "CHF"}),
-            "credit_name": forms.TextInput(attrs={"class": "form-control form-control-sm", "placeholder": "z. B. Sammelkredit Sanierungen 2027"}),
+            "credit_name": forms.TextInput(attrs={"class": "form-control form-control-sm"}),
             "internal_note": forms.Textarea(attrs={"class": "form-control form-control-sm", "rows": 2}),
         }
 
@@ -60,26 +49,18 @@ class RenovationWorkOrderForm(forms.ModelForm):
         self.fields["planned_date"].input_formats = [HTML_DATE_FORMAT]
         self.fields["planned_date"].widget.format = HTML_DATE_FORMAT
         self.fields["assigned_to"].queryset = self.get_assignable_users()
-        self.fields["estimated_costs"].required = False
-        self.fields["credit_name"].required = False
-        self.fields["internal_note"].required = False
+        for name in ["estimated_costs", "credit_name", "internal_note"]:
+            self.fields[name].required = False
 
     def get_assignable_users(self):
         if not self.organization:
             return get_user_model().objects.none()
-        return get_user_model().objects.filter(is_active=True).filter(
-            Q(is_superuser=True)
-            | (
-                Q(profile__organization=self.organization)
-                & Q(profile__is_active_for_organization=True)
-                & Q(profile__role=UserProfile.ROLE_ORG_ADMIN)
-            )
-        ).distinct().order_by("last_name", "first_name", "email")
+        return get_user_model().objects.filter(is_active=True).filter(Q(is_superuser=True) | (Q(profile__organization=self.organization) & Q(profile__is_active_for_organization=True) & Q(profile__role=UserProfile.ROLE_ORG_ADMIN))).distinct().order_by("last_name", "first_name", "email")
 
     def clean_estimated_costs(self):
         value = self.cleaned_data.get("estimated_costs")
         if value is not None and value < Decimal("0"):
-            raise forms.ValidationError("Die Kostenschätzung darf nicht negativ sein.")
+            raise forms.ValidationError("Die Kostenschaetzung darf nicht negativ sein.")
         return value
 
 
@@ -106,94 +87,12 @@ def get_selected_organization(request, scope):
 
 def work_order_redirect_url(organization_id=None):
     url = reverse("internal:work_orders")
-    return f"{url}?organization={organization_id}" if organization_id else url
-
-
-def suggested_credit_name(year):
-    return f"Sammelkredit Sanierungen {year}" if year else "Sammelkredit Sanierungen"
-
-
-def renovation_due_date(year):
-    if not year:
-        return None
-    return date(year, 12, 31)
-
-
-def sync_renovation_work_orders(organization):
-    if organization is None:
-        return {"created": 0, "updated": 0}
-
-    equipment_queryset = (
-        PlayEquipment.objects
-        .select_related("playground", "playground__organization", "equipment_type")
-        .filter(playground__organization=organization, is_active=True, recommended_renovation_year__isnull=False)
-    )
-    created = 0
-    updated = 0
-
-    for equipment in equipment_queryset:
-        work_order = (
-            WorkOrder.objects
-            .filter(equipment=equipment, order_type=WorkOrder.TYPE_RENOVATION)
-            .exclude(status=WorkOrder.STATUS_CANCELLED)
-            .order_by("created_at")
-            .first()
-        )
-        title = f"Sanierung {equipment.name}"
-        description = equipment.renovation_comment or "Sanierung gemäss Spielgeräteplanung."
-        defaults = {
-            "organization": equipment.playground.organization,
-            "playground": equipment.playground,
-            "title": title,
-            "description": description,
-            "order_type": WorkOrder.TYPE_RENOVATION,
-            "source": WorkOrder.SOURCE_EQUIPMENT_RENOVATION,
-            "renovation_type": equipment.renovation_type,
-            "renovation_year": equipment.recommended_renovation_year,
-            "due_date": renovation_due_date(equipment.recommended_renovation_year),
-        }
-
-        if work_order is None:
-            WorkOrder.objects.create(
-                equipment=equipment,
-                status=WorkOrder.STATUS_OPEN,
-                priority=WorkOrder.PRIORITY_NORMAL,
-                credit_name=suggested_credit_name(equipment.recommended_renovation_year),
-                **defaults,
-            )
-            created += 1
-            continue
-
-        changed = False
-        for field_name, value in defaults.items():
-            if getattr(work_order, field_name) != value:
-                setattr(work_order, field_name, value)
-                changed = True
-        if changed:
-            work_order.save()
-            updated += 1
-
-    return {"created": created, "updated": updated}
+    return "%s?organization=%s" % (url, organization_id) if organization_id else url
 
 
 def build_credit_summary(queryset):
-    rows = (
-        queryset
-        .values("renovation_year", "credit_name")
-        .annotate(total_costs=Sum("estimated_costs"), order_count=Count("id"))
-        .order_by("renovation_year", "credit_name")
-    )
-    summary = []
-    for row in rows:
-        year = row["renovation_year"] or "ohne Jahr"
-        credit_name = row["credit_name"] or "Noch keinem Sammelkredit zugewiesen"
-        summary.append({
-            "year": year,
-            "credit_name": credit_name,
-            "total_costs": row["total_costs"],
-            "count": row["order_count"],
-        })
-    return summary
+    rows = queryset.values("renovation_year", "credit_name").annotate(total_costs=Sum("estimated_costs"), order_count=Count("id")).order_by("renovation_year", "credit_name")
+    return [{"year": row["renovation_year"] or "ohne Jahr", "credit_name": row["credit_name"] or "Noch keinem Sammelkredit zugewiesen", "total_costs": row["total_costs"], "count": row["order_count"]} for row in rows]
 
 
 def add_order_forms(work_orders):
@@ -207,59 +106,32 @@ def add_order_forms(work_orders):
 def work_orders(request):
     scope = get_order_scope(request.user)
     if not scope:
-        raise PermissionDenied("Keine Berechtigung für die Auftragsverwaltung.")
-
+        raise PermissionDenied("Keine Berechtigung fuer die Auftragsverwaltung.")
     selected_organization = get_selected_organization(request, scope)
     if selected_organization:
         require_org_admin_permission(request.user, selected_organization)
-        result = sync_renovation_work_orders(selected_organization)
-        if request.GET.get("synced") == "1":
-            messages.success(request, f"Sanierungsaufträge synchronisiert. Erstellt: {result['created']}, aktualisiert: {result['updated']}.")
-
     organizations = Organization.objects.filter(is_active=True).order_by("name") if scope["is_superadmin"] else []
     orders = WorkOrder.objects.select_related("organization", "playground", "equipment", "equipment__equipment_type", "assigned_to").filter(order_type=WorkOrder.TYPE_RENOVATION)
-
     if selected_organization:
         orders = orders.filter(organization=selected_organization)
     elif not scope["is_superadmin"]:
         orders = orders.none()
-
     status_filter = request.GET.get("status") or "active"
     year_filter = request.GET.get("year") or ""
     credit_filter = request.GET.get("credit") or ""
-
     if status_filter == "active":
         filtered_orders = orders.filter(status__in=RENOVATION_ACTIVE_STATUSES)
     elif status_filter:
         filtered_orders = orders.filter(status=status_filter)
     else:
         filtered_orders = orders
-
     if year_filter:
         filtered_orders = filtered_orders.filter(renovation_year=year_filter)
     if credit_filter:
         filtered_orders = filtered_orders.filter(credit_name=credit_filter)
-
     years = orders.exclude(renovation_year__isnull=True).values_list("renovation_year", flat=True).distinct().order_by("renovation_year")
     credits = orders.exclude(credit_name="").values_list("credit_name", flat=True).distinct().order_by("credit_name")
-
-    return render(
-        request,
-        "internal/work_orders.html",
-        {
-            **scope,
-            "selected_organization": selected_organization,
-            "organizations": organizations,
-            "orders": add_order_forms(filtered_orders.order_by("renovation_year", "playground__name", "equipment__name")),
-            "status_filter": status_filter,
-            "year_filter": year_filter,
-            "credit_filter": credit_filter,
-            "status_choices": [("active", "Aktive Aufträge")] + list(WorkOrder.STATUS_CHOICES),
-            "years": years,
-            "credits": credits,
-            "credit_summary": build_credit_summary(orders.filter(order_type=WorkOrder.TYPE_RENOVATION)),
-        },
-    )
+    return render(request, "internal/work_orders.html", {**scope, "selected_organization": selected_organization, "organizations": organizations, "orders": add_order_forms(filtered_orders.order_by("renovation_year", "playground__name", "equipment__name")), "status_filter": status_filter, "year_filter": year_filter, "credit_filter": credit_filter, "status_choices": [("active", "Aktive Auftraege")] + list(WorkOrder.STATUS_CHOICES), "years": years, "credits": credits, "credit_summary": build_credit_summary(orders.filter(order_type=WorkOrder.TYPE_RENOVATION))})
 
 
 @login_required
