@@ -2136,3 +2136,81 @@ msgstr "Enavos al plazzal da gieu"
 
 #~ msgid "Open message"
 #~ msgstr "Avrir"
+
+msgid "Orders"
+msgstr "Incumbensas"
+
+msgid "Internal order management"
+msgstr "Administraziun interna da las incumbensas"
+
+msgid "Auftragsverwaltung"
+msgstr "Administraziun da las incumbensas"
+
+msgid "Organization"
+msgstr "Organisaziun"
+
+msgid "Please select"
+msgstr "Tscherner per plaschair"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Filter"
+msgstr "Filtrar"
+
+msgid "Reset"
+msgstr "Restabilir"
+
+msgid "Inspection"
+msgstr "Controlla"
+
+msgid "Defect repair"
+msgstr "Reparatura d’in defect"
+
+msgid "Renovation"
+msgstr "Sanaziun"
+
+msgid "Other"
+msgstr "Auter"
+
+msgid "Open"
+msgstr "Avert"
+
+msgid "Planned"
+msgstr "Planisà"
+
+msgid "In progress"
+msgstr "En lavur"
+
+msgid "Completed"
+msgstr "Terminà"
+
+msgid "Cancelled"
+msgstr "Annullà"
+
+msgid "Suspended"
+msgstr "Suspendì"
+
+msgid "Low"
+msgstr "Bassa"
+
+msgid "Normal"
+msgstr "Normal"
+
+msgid "High"
+msgstr "Auta"
+
+msgid "Urgent"
+msgstr "Urgent"
+
+msgid "Manual"
+msgstr "Manual"
+
+msgid "Automatic"
+msgstr "Automatic"
+
+msgid "Equipment renovation"
+msgstr "Sanaziun d’apparat da gieu"
+
+msgid "Defect"
+msgstr "Defect"

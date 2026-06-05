@@ -2137,3 +2137,81 @@ msgstr "Torna al parco giochi"
 
 #~ msgid "Open message"
 #~ msgstr "Aprire"
+
+msgid "Orders"
+msgstr "Ordini"
+
+msgid "Internal order management"
+msgstr "Gestione interna degli ordini"
+
+msgid "Auftragsverwaltung"
+msgstr "Gestione degli ordini"
+
+msgid "Organization"
+msgstr "Organizzazione"
+
+msgid "Please select"
+msgstr "Selezionare"
+
+msgid "Status"
+msgstr "Stato"
+
+msgid "Filter"
+msgstr "Filtra"
+
+msgid "Reset"
+msgstr "Reimposta"
+
+msgid "Inspection"
+msgstr "Controllo"
+
+msgid "Defect repair"
+msgstr "Riparazione difetto"
+
+msgid "Renovation"
+msgstr "Risanamento"
+
+msgid "Other"
+msgstr "Altro"
+
+msgid "Open"
+msgstr "Aperto"
+
+msgid "Planned"
+msgstr "Pianificato"
+
+msgid "In progress"
+msgstr "In corso"
+
+msgid "Completed"
+msgstr "Completato"
+
+msgid "Cancelled"
+msgstr "Annullato"
+
+msgid "Suspended"
+msgstr "Sospeso"
+
+msgid "Low"
+msgstr "Bassa"
+
+msgid "Normal"
+msgstr "Normale"
+
+msgid "High"
+msgstr "Alta"
+
+msgid "Urgent"
+msgstr "Urgente"
+
+msgid "Manual"
+msgstr "Manuale"
+
+msgid "Automatic"
+msgstr "Automatico"
+
+msgid "Equipment renovation"
+msgstr "Risanamento attrezzatura"
+
+msgid "Defect"
+msgstr "Difetto"
