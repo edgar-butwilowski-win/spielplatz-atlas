@@ -8,7 +8,7 @@
 
 from django.urls import path
 
-from . import control_status, dashboard, defect_management, export_views, planning_views, views
+from . import control_status, dashboard, defect_management, export_views, planning_views, views, work_order_views
 
 app_name = "internal"
 
@@ -19,6 +19,8 @@ urlpatterns = [
     path("defects/<int:defect_id>/assign/", defect_management.update_defect_assignment, name="update_defect_assignment"),
     path("defects/<int:defect_id>/planning/", defect_management.update_defect_planning, name="update_defect_planning"),
     path("defects/<int:defect_id>/status/", defect_management.update_defect_status, name="update_defect_status"),
+    path("work-orders/", work_order_views.work_orders, name="work_orders"),
+    path("work-orders/<int:order_id>/save/", work_order_views.update_work_order, name="update_work_order"),
     path("my-inspections/", planning_views.my_inspections, name="my_inspections"),
     path("inspection-planning/", planning_views.inspection_planning, name="inspection_planning"),
     path("inspection-planning/rebuild/", planning_views.rebuild_inspection_planning, name="rebuild_inspection_planning"),
