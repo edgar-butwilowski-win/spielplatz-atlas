@@ -3,42 +3,25 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from inspections.models import Defect
+from inspections.work_orders import WorkOrder
 from playgrounds.models import PlayEquipment, PlaygroundAccessory, PlaygroundSurface
 
 TARGET_TYPE_NONE = "none"
 TARGET_TYPE_EQUIPMENT = "equipment"
 TARGET_TYPE_SURFACE = "surface"
 TARGET_TYPE_ACCESSORY = "accessory"
-
 HTML_DATE_FORMAT = "%Y-%m-%d"
 HTML_DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
-
-TARGET_TYPE_CHOICES = [
-    (TARGET_TYPE_NONE, _("General playground defect")),
-    (TARGET_TYPE_EQUIPMENT, _("Play equipment")),
-    (TARGET_TYPE_SURFACE, _("Impact protection surface / ground")),
-    (TARGET_TYPE_ACCESSORY, _("Additional equipment")),
-]
-
-CREATE_STATUS_CHOICES = [
-    (Defect.STATUS_OPEN, _("Open")),
-]
-
-MANUAL_STATUS_CHOICES = [
-    (Defect.STATUS_OPEN, _("Open")),
-    (Defect.STATUS_DONE, _("Resolved")),
-    (Defect.STATUS_VERIFIED, _("Checked / completed")),
-]
+TARGET_TYPE_CHOICES = [(TARGET_TYPE_NONE, _("General playground defect")), (TARGET_TYPE_EQUIPMENT, _("Play equipment")), (TARGET_TYPE_SURFACE, _("Impact protection surface / ground")), (TARGET_TYPE_ACCESSORY, _("Additional equipment"))]
+CREATE_STATUS_CHOICES = [(Defect.STATUS_OPEN, _("Open"))]
+MANUAL_STATUS_CHOICES = [(Defect.STATUS_OPEN, _("Open")), (Defect.STATUS_DONE, _("Resolved")), (Defect.STATUS_VERIFIED, _("Checked / completed"))]
 
 
 def apply_bootstrap_classes(form):
     for field in form.fields.values():
-        existing_classes = field.widget.attrs.get("class", "")
-        if isinstance(field.widget, forms.CheckboxInput):
+        if isinstance(field.widget, forms.CheckboxInput) or isinstance(field.widget, forms.RadioSelect):
             field.widget.attrs["class"] = "form-check-input"
-        elif isinstance(field.widget, forms.RadioSelect):
-            field.widget.attrs["class"] = "form-check-input"
-        elif "form-control" not in existing_classes and "form-select" not in existing_classes:
+        elif "class" not in field.widget.attrs:
             field.widget.attrs["class"] = "form-select" if isinstance(field.widget, forms.Select) else "form-control"
 
 
@@ -48,49 +31,41 @@ def use_html_datetime_input(field):
 
 
 def restrict_target_fields_to_playground(form, playground):
-    if not playground:
-        return
-    form.fields["equipment"].queryset = PlayEquipment.objects.filter(playground=playground, is_active=True).order_by("name")
-    form.fields["surface"].queryset = PlaygroundSurface.objects.filter(playground=playground, is_active=True).order_by("name")
-    form.fields["accessory"].queryset = PlaygroundAccessory.objects.filter(playground=playground, is_active=True).order_by("name")
-
-
-def clean_single_target(cleaned_data):
-    selected_targets = [value for value in [cleaned_data.get("equipment"), cleaned_data.get("surface"), cleaned_data.get("accessory")] if value is not None]
-    if len(selected_targets) > 1:
-        raise forms.ValidationError(_("Please select at most one affected object: play equipment, impact protection surface or additional equipment."))
-    return cleaned_data
+    if playground:
+        form.fields["equipment"].queryset = PlayEquipment.objects.filter(playground=playground, is_active=True).order_by("name")
+        form.fields["surface"].queryset = PlaygroundSurface.objects.filter(playground=playground, is_active=True).order_by("name")
+        form.fields["accessory"].queryset = PlaygroundAccessory.objects.filter(playground=playground, is_active=True).order_by("name")
 
 
 def clean_target_by_type(cleaned_data):
     target_type = cleaned_data.get("target_type") or TARGET_TYPE_NONE
-    equipment = cleaned_data.get("equipment")
-    surface = cleaned_data.get("surface")
-    accessory = cleaned_data.get("accessory")
     if target_type == TARGET_TYPE_NONE:
         cleaned_data["equipment"] = None
         cleaned_data["surface"] = None
         cleaned_data["accessory"] = None
-        return cleaned_data
-    if target_type == TARGET_TYPE_EQUIPMENT:
+    elif target_type == TARGET_TYPE_EQUIPMENT:
         cleaned_data["surface"] = None
         cleaned_data["accessory"] = None
-        if not equipment:
+        if not cleaned_data.get("equipment"):
             raise forms.ValidationError(_("Please select the affected play equipment."))
-        return cleaned_data
-    if target_type == TARGET_TYPE_SURFACE:
+    elif target_type == TARGET_TYPE_SURFACE:
         cleaned_data["equipment"] = None
         cleaned_data["accessory"] = None
-        if not surface:
+        if not cleaned_data.get("surface"):
             raise forms.ValidationError(_("Please select the affected impact protection surface or ground."))
-        return cleaned_data
-    if target_type == TARGET_TYPE_ACCESSORY:
+    elif target_type == TARGET_TYPE_ACCESSORY:
         cleaned_data["equipment"] = None
         cleaned_data["surface"] = None
-        if not accessory:
+        if not cleaned_data.get("accessory"):
             raise forms.ValidationError(_("Please select the affected additional equipment."))
-        return cleaned_data
-    raise forms.ValidationError(_("Please select a valid object type."))
+    return cleaned_data
+
+
+def clean_single_target(cleaned_data):
+    targets = [cleaned_data.get("equipment"), cleaned_data.get("surface"), cleaned_data.get("accessory")]
+    if len([target for target in targets if target is not None]) > 1:
+        raise forms.ValidationError(_("Please select at most one affected object: play equipment, impact protection surface or additional equipment."))
+    return cleaned_data
 
 
 def clean_urgency_by_safety_risk(cleaned_data):
@@ -103,45 +78,52 @@ def clean_urgency_by_safety_risk(cleaned_data):
 
 class EquipmentRenovationForm(forms.ModelForm):
     class Meta:
-        model = PlayEquipment
-        fields = ("recommended_renovation_year", "renovation_type", "renovation_comment")
-        widgets = {
-            "recommended_renovation_year": forms.NumberInput(attrs={"class": "form-control form-control-sm", "placeholder": _("e.g. 2028"), "min": 1000, "max": 9999}),
-            "renovation_type": forms.Select(attrs={"class": "form-select form-select-sm"}),
-            "renovation_comment": forms.TextInput(attrs={"class": "form-control form-control-sm", "placeholder": _("Optional comment")}),
-        }
+        model = WorkOrder
+        fields = ("renovation_year", "renovation_type", "description")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, equipment=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["recommended_renovation_year"].required = False
-        self.fields["renovation_type"].required = False
-        self.fields["renovation_comment"].required = False
+        self.equipment = equipment
+        for field in self.fields.values():
+            field.required = False
+            field.widget.attrs.setdefault("class", "form-control form-control-sm")
+        self.fields["renovation_type"].widget.attrs["class"] = "form-select form-select-sm"
 
-    def clean_recommended_renovation_year(self):
-        year = self.cleaned_data.get("recommended_renovation_year")
-        if year is None:
-            return year
-        if year < 1000 or year > 9999:
+    def clean_renovation_year(self):
+        year = self.cleaned_data.get("renovation_year")
+        if year is not None and (year < 1000 or year > 9999):
             raise forms.ValidationError(_("Please enter a four-digit year."))
         return year
 
+    def save(self, commit=True):
+        order = super().save(commit=False)
+        equipment = self.equipment or order.equipment
+        if equipment:
+            order.equipment = equipment
+            order.playground = equipment.playground
+            order.organization = equipment.playground.organization
+            order.title = "Sanierung %s" % equipment.name
+        order.order_type = WorkOrder.TYPE_RENOVATION
+        order.source = WorkOrder.SOURCE_EQUIPMENT_RENOVATION
+        order.status = order.status or WorkOrder.STATUS_OPEN
+        order.priority = order.priority or WorkOrder.PRIORITY_NORMAL
+        if order.renovation_year and not order.due_date:
+            order.due_date = timezone.datetime(order.renovation_year, 12, 31).date()
+        if order.renovation_year and not order.credit_name:
+            order.credit_name = "Sammelkredit Sanierungen %s" % order.renovation_year
+        if commit:
+            order.save()
+        return order
+
 
 class DefectCreateForm(forms.ModelForm):
-    target_type = forms.ChoiceField(label=_("Affected object"), choices=TARGET_TYPE_CHOICES, widget=forms.RadioSelect, required=True, help_text=_("First select the object type. The matching selection field will then become active."))
-
+    target_type = forms.ChoiceField(label=_("Affected object"), choices=TARGET_TYPE_CHOICES, widget=forms.RadioSelect, required=True)
     class Meta:
         model = Defect
         fields = ("target_type", "equipment", "surface", "accessory", "source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "public_visible", "public_note")
-        widgets = {
-            "reported_at": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "form-control"}, format=HTML_DATETIME_FORMAT),
-            "internal_description": forms.Textarea(attrs={"rows": 4, "class": "form-control"}),
-            "internal_note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-            "public_note": forms.Textarea(attrs={"rows": 3, "class": "form-control"}),
-        }
-
+        widgets = {"reported_at": forms.DateTimeInput(attrs={"type": "datetime-local"}, format=HTML_DATETIME_FORMAT), "internal_description": forms.Textarea(attrs={"rows": 4}), "internal_note": forms.Textarea(attrs={"rows": 3}), "public_note": forms.Textarea(attrs={"rows": 3})}
     def __init__(self, *args, playground=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.playground = playground
         restrict_target_fields_to_playground(self, playground)
         apply_bootstrap_classes(self)
         use_html_datetime_input(self.fields["reported_at"])
@@ -149,23 +131,13 @@ class DefectCreateForm(forms.ModelForm):
         self.fields["status"].initial = Defect.STATUS_OPEN
         self.fields["status"].disabled = True
         if not self.is_bound:
-            if self.initial.get("equipment"):
-                self.initial["target_type"] = TARGET_TYPE_EQUIPMENT
-            elif self.initial.get("surface"):
-                self.initial["target_type"] = TARGET_TYPE_SURFACE
-            elif self.initial.get("accessory"):
-                self.initial["target_type"] = TARGET_TYPE_ACCESSORY
-            else:
-                self.initial["target_type"] = TARGET_TYPE_NONE
+            self.initial["target_type"] = TARGET_TYPE_EQUIPMENT if self.initial.get("equipment") else TARGET_TYPE_SURFACE if self.initial.get("surface") else TARGET_TYPE_ACCESSORY if self.initial.get("accessory") else TARGET_TYPE_NONE
         for name in ["equipment", "surface", "accessory", "reported_by_text", "internal_note", "public_note"]:
             self.fields[name].required = False
-
     def clean(self):
         cleaned_data = super().clean()
         cleaned_data["status"] = Defect.STATUS_OPEN
-        cleaned_data = clean_target_by_type(cleaned_data)
-        cleaned_data = clean_single_target(cleaned_data)
-        return clean_urgency_by_safety_risk(cleaned_data)
+        return clean_urgency_by_safety_risk(clean_single_target(clean_target_by_type(cleaned_data)))
 
 
 class DefectFromInspectionAnswerForm(forms.ModelForm):
@@ -173,23 +145,17 @@ class DefectFromInspectionAnswerForm(forms.ModelForm):
         model = Defect
         fields = ("reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "public_visible", "public_note")
         widgets = DefectCreateForm.Meta.widgets
-
     def __init__(self, *args, inspection_answer=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.inspection_answer = inspection_answer
         use_html_datetime_input(self.fields["reported_at"])
         self.fields["status"].choices = CREATE_STATUS_CHOICES
         self.fields["status"].initial = Defect.STATUS_OPEN
         self.fields["status"].disabled = True
-        if not self.is_bound:
-            self.initial.setdefault("reported_at", timezone.localtime().strftime(HTML_DATETIME_FORMAT))
-            self.initial.setdefault("source_type", Defect.SOURCE_INSPECTION)
-            if inspection_answer and inspection_answer.comment:
-                self.initial.setdefault("internal_description", inspection_answer.comment)
         apply_bootstrap_classes(self)
         for name in ["reported_by_text", "internal_note", "public_note"]:
             self.fields[name].required = False
-
+        if not self.is_bound and inspection_answer and inspection_answer.comment:
+            self.initial.setdefault("internal_description", inspection_answer.comment)
     def clean(self):
         cleaned_data = super().clean()
         cleaned_data["status"] = Defect.STATUS_OPEN
@@ -201,15 +167,12 @@ class DefectEditForm(forms.ModelForm):
         model = Defect
         fields = ("source_type", "reported_at", "reported_by_text", "internal_description", "internal_note", "has_safety_risk", "urgency", "status", "public_visible", "public_note")
         widgets = DefectCreateForm.Meta.widgets
-
     def __init__(self, *args, playground=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.playground = playground
         use_html_datetime_input(self.fields["reported_at"])
         self.fields["status"].choices = MANUAL_STATUS_CHOICES
         apply_bootstrap_classes(self)
         for name in ["reported_by_text", "internal_note", "public_note"]:
             self.fields[name].required = False
-
     def clean(self):
         return clean_urgency_by_safety_risk(super().clean())
