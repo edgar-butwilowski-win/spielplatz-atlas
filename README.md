@@ -131,6 +131,39 @@ Bei Neuentwicklungen von UI-Elementen sowie bei Anpassungen bestehender UI-Eleme
 
 ---
 
+## Zentrales Logging
+
+SpielplatzAtlas verwendet für technische Logmeldungen das zentrale Django-Logging über `system_logging`. Sobald die Datenbanktabelle `system_logging.LogEntry` erreichbar ist, werden Logmeldungen in dieser Tabelle gespeichert und im Django-Admin im Bereich **Logging** angezeigt. Während des frühen Aufstartens, wenn die Datenbanktabelle noch nicht erreichbar ist, fällt das Logging auf die Konsole zurück.
+
+Neue technische Logmeldungen werden immer über das Standardmodul `logging` von Python erzeugt. Beispiel:
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def import_quartiere(organization):
+    logger.info(
+        "Quartierimport für Organisation %s gestartet.",
+        organization.pk,
+    )
+
+    try:
+        # Fachlogik ausführen
+        pass
+    except Exception:
+        logger.exception(
+            "Quartierimport für Organisation %s fehlgeschlagen.",
+            organization.pk,
+        )
+        raise
+```
+
+Bei der Weiterentwicklung ist zwingend darauf zu achten, dass für technisches Logging ausschliesslich dieses bestehende Logging-System verwendet wird. Parallele Logging-Modelle, eigene Logtabellen, direkte technische `print`-Ausgaben oder andere eigenständige Logging-Strukturen sind nicht zulässig. Fachliche Statusfelder, zum Beispiel Zustellstatus von Benachrichtigungen, dürfen bestehen bleiben; technische Fehler und Diagnoseinformationen müssen aber zusätzlich über `logging` protokolliert werden.
+
+---
+
 ## Lokales Setup
 
 ### 1. Repository klonen
