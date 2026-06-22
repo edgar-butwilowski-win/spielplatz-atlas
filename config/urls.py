@@ -6,13 +6,14 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
 from internal import admin_csv_views
 
 admin.site.site_header = "playsafeswiss"
-admin.site.site_title = "playsafeswiss"
+admin.site.site_title = f"playsafeswiss{settings.ENVIRONMENT_TITLE_SUFFIX}"
 admin.site.index_title = "Verwaltung und Stammdaten"
 
 urlpatterns = [

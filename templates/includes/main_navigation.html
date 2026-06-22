@@ -13,6 +13,16 @@
         height: 100%;
         display: block;
     }
+    .environment-badge {
+        border: 1px solid #F59E0B;
+        border-radius: 999px;
+        color: #92400E;
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        line-height: 1;
+        padding: .18rem .42rem;
+    }
     .atlas-menu {
         position: relative;
     }
@@ -50,6 +60,9 @@
                 {% include "includes/playsafeswiss_logo_mark.svg" %}
             </span>
             <span class="fw-bold">playsafeswiss</span>
+            {% if environment_badge_label %}
+                <span class="environment-badge" title="{% trans 'Environment' %}">{{ environment_badge_label }}</span>
+            {% endif %}
         </a>
 
         <div class="d-flex align-items-center gap-2 atlas-menu">

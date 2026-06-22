@@ -59,6 +59,41 @@ def env_list(name, default=None):
 
 DEBUG = env_bool("DJANGO_DEBUG", default=True)
 
+def env_str(name, default=None):
+    value = os.environ.get(name)
+
+    if value is None:
+        return default
+
+    return value.strip()
+
+
+def first_env_value(*names, default=None):
+    for name in names:
+        value = env_str(name)
+        if value:
+            return value
+
+    return default
+
+
+ENVIRONMENT = first_env_value(
+    "DJANGO_ENVIRONMENT",
+    "ENVIRONMENT",
+    "APP_ENV",
+    "DJANGO_ENV",
+    default="DEV" if DEBUG else "PROD",
+).upper()
+
+if ENVIRONMENT not in {"DEV", "TEST", "PROD"}:
+    raise ImproperlyConfigured(
+        "Die Umgebung muss DEV, TEST oder PROD sein. "
+        "Setze dazu DJANGO_ENVIRONMENT in der .env-Datei."
+    )
+
+ENVIRONMENT_TITLE_SUFFIX = "" if ENVIRONMENT == "PROD" else f" [{ENVIRONMENT}]"
+ENVIRONMENT_BADGE_LABEL = "" if ENVIRONMENT == "PROD" else ENVIRONMENT
+
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 if not SECRET_KEY:
@@ -117,6 +152,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'config.context_processors.environment_title_suffix',
             ],
         },
     }

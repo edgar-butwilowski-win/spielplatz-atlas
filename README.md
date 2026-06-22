@@ -189,6 +189,18 @@ export SPATIALITE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/mod_spatialite.so
 
 Auf anderen Systemen muss `SPATIALITE_LIBRARY_PATH` entsprechend auf die installierte SpatiaLite-Bibliothek zeigen.
 
+### Umgebung im WebApp-Titel
+
+Die Umgebung wird aus der `.env`-Datei im Projekt-Root gelesen. Verwende dafür bevorzugt `DJANGO_ENVIRONMENT`. Zulässige Werte sind `DEV`, `TEST` und `PROD`. In `DEV` und `TEST` ergänzt die WebApp den Browser-Titel automatisch mit `[DEV]` beziehungsweise `[TEST]` und zeigt zusätzlich ein sichtbares Badge `DEV` beziehungsweise `TEST` neben dem WebApp-Namen an. In `PROD` bleibt der Titel unverändert und es wird kein Badge angezeigt.
+
+Beispiel für `.env`:
+
+```env
+DJANGO_ENVIRONMENT=DEV
+```
+
+Falls bestehende Deployments bereits `ENVIRONMENT`, `APP_ENV` oder `DJANGO_ENV` verwenden, werden diese Variablen ebenfalls akzeptiert. Ohne explizite Angabe gilt bei `DJANGO_DEBUG=True` automatisch `DEV`, sonst `PROD`.
+
 ### 3. Virtuelle Umgebung erstellen
 
 ```bash
