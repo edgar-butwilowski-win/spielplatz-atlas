@@ -9,6 +9,8 @@ from accounts.models import UserProfile
 from accounts.utils import display_user
 from media_assets.models import ImageAsset
 
+from .lifecycle import abort_play_equipment
+
 from .models import (
     EquipmentSupplier,
     EquipmentType,
@@ -97,12 +99,12 @@ class PlayEquipmentAdminForm(forms.ModelForm):
         widgets = {
             "year_built": forms.DateInput(attrs={"type": "date"}),
             "build_date": forms.DateInput(attrs={"type": "date"}),
-            "demolition_date": forms.DateInput(attrs={"type": "date"}),
         }
 
 
 class OrganizationScopedAdminMixin(OrganizationAdminPermissionMixin):
     organization_field = "organization"
+
 
     def get_object_organization(self, obj):
         return getattr(obj, self.organization_field, None) if obj is not None else None
@@ -192,16 +194,32 @@ class PlayEquipmentAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
     fieldsets = (
         ("Grunddaten", {"fields": ("playground", "equipment_type", "name", "sequence_number", "inventory_number")}),
         ("Lieferung und Norm", {"fields": ("supplier", "norm", "year_built", "build_date")}),
-        ("Rückbau", {"fields": ("demolition_date",)}),
+        ("Rückbau", {"fields": ("demolition_date", "is_active")}),
         ("Administrative Prüfausnahme", {"fields": ("not_to_inspect", "not_to_inspect_reason")}),
         ("Prüfbarkeit während der Kontrolle", {"fields": ("not_inspectable", "not_inspectable_reason")}),
         ("Foto", {"fields": ("photo", "photo_upload")}),
-        ("Koordinaten und Sichtbarkeit", {"fields": ("latitude", "longitude", "public_visible", "is_active")}),
+        ("Koordinaten und Sichtbarkeit", {"fields": ("latitude", "longitude", "public_visible")}),
     )
     list_display = ("name", "playground", "equipment_type", "supplier", "sequence_number", "inventory_number", "not_to_inspect", "not_inspectable", "demolition_date", "public_visible", "is_active")
     list_filter = ("playground__organization", "equipment_type", "supplier", "not_to_inspect", "not_inspectable", "public_visible", "is_active")
     search_fields = ("name", "inventory_number", "supplier__name", "norm", "playground__name")
     autocomplete_fields = ("playground", "equipment_type", "supplier", "photo")
+    readonly_fields = ("demolition_date", "is_active")
+    actions = ("abort_selected_equipment",)
+
+
+
+    @admin.action(description="Ausgewählte Spielgeräte abbrechen")
+    def abort_selected_equipment(self, request, queryset):
+        aborted_count = 0
+        for equipment in queryset.select_related("playground", "playground__organization").filter(is_active=True):
+            if not request.user.is_superuser:
+                organization = get_user_organization(request.user)
+                if not organization or equipment.playground.organization_id != organization.id:
+                    continue
+            abort_play_equipment(equipment)
+            aborted_count += 1
+        self.message_user(request, f"{aborted_count} Spielgerät(e) wurden abgebrochen.")
 
     def get_object_organization(self, obj):
         return obj.playground.organization if obj and obj.playground_id else None

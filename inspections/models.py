@@ -252,7 +252,8 @@ class Defect(models.Model):
     STATUS_PLANNED = "planned"
     STATUS_DONE = "done"
     STATUS_VERIFIED = "verified"
-    STATUS_CHOICES = [(STATUS_OPEN, _("Open")), (STATUS_PLANNED, _("Planned")), (STATUS_DONE, _("Resolved")), (STATUS_VERIFIED, _("Checked / completed"))]
+    STATUS_CANCELED = "canceled"
+    STATUS_CHOICES = [(STATUS_OPEN, _("Open")), (STATUS_PLANNED, _("Planned")), (STATUS_DONE, _("Resolved")), (STATUS_VERIFIED, _("Checked / completed")), (STATUS_CANCELED, _("Canceled"))]
     SOURCE_INSPECTION = "inspection"
     SOURCE_CITIZEN_REPORT = "citizen_report"
     SOURCE_INTERNAL_REPORT = "internal_report"

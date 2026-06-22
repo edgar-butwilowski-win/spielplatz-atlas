@@ -16,6 +16,7 @@ from inspections.models import (
 )
 from inspections.planning import update_planning_after_completed_inspection
 from notifications.forms import DefectAssignmentForm
+from playgrounds.lifecycle import abort_play_equipment
 from playgrounds.models import (
     PlayEquipment,
     Playground,
@@ -38,6 +39,7 @@ from .permissions import (
     require_inspection_permission,
     require_internal_view_permission,
     require_maintenance_permission,
+    require_org_admin_permission,
 )
 
 
@@ -122,6 +124,36 @@ def update_equipment_renovation(request, equipment_id):
         for errors in form.errors.values():
             for error in errors:
                 messages.error(request, error)
+
+    return redirect(
+        "public:playground_detail",
+        organization_slug=playground.organization.slug,
+        playground_slug=playground.slug,
+    )
+
+
+@login_required
+@require_POST
+def abort_equipment(request, equipment_id):
+    equipment = get_object_or_404(
+        PlayEquipment.objects.select_related("playground", "playground__organization"),
+        id=equipment_id,
+        is_active=True,
+    )
+    playground = equipment.playground
+
+    require_org_admin_permission(request.user, playground.organization)
+
+    result = abort_play_equipment(equipment)
+    messages.success(
+        request,
+        (
+            "Das Spielgerät wurde per heutigem Datum abgebrochen. "
+            f"Abgebrochen wurden zudem {result['defects']} Mängel, "
+            f"{result['maintenance_actions']} Instandhaltungsmassnahmen und "
+            f"{result['work_orders']} Sanierungs-/Reparaturaufträge."
+        ),
+    )
 
     return redirect(
         "public:playground_detail",

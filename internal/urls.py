@@ -30,6 +30,7 @@ urlpatterns = [
     path("inspection-tasks/<int:task_id>/accept/", planning_views.accept_inspection_task, name="accept_inspection_task"),
     path("inspection-tasks/<int:task_id>/start/", planning_views.start_inspection_from_task, name="start_inspection_from_task"),
     path("equipment/<int:equipment_id>/renovation/save/", views.update_equipment_renovation, name="update_equipment_renovation"),
+    path("equipment/<int:equipment_id>/abort/", views.abort_equipment, name="abort_equipment"),
     path("playgrounds/<slug:organization_slug>/<slug:playground_slug>/inspections/new/", views.create_inspection, name="create_inspection"),
     path("playgrounds/<slug:organization_slug>/<slug:playground_slug>/defects/new/", views.create_defect, name="create_defect"),
     path("defects/<int:defect_id>/edit/", defect_management.edit_defect, name="edit_defect"),

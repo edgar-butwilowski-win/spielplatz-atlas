@@ -342,8 +342,30 @@ class PlayEquipment(models.Model):
             self.location = None
 
     def save(self, *args, **kwargs):
+        skip_abort_cleanup = kwargs.pop("skip_abort_cleanup", False)
+        was_active = None
+        if self.pk:
+            was_active = (
+                type(self).objects
+                .filter(pk=self.pk)
+                .values_list("is_active", flat=True)
+                .first()
+            )
+
         self.sync_location_from_lv95()
+
+        if was_active is True and not self.is_active and self.demolition_date is None:
+            self.demolition_date = timezone.localdate()
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None and "demolition_date" not in update_fields:
+                kwargs["update_fields"] = [*update_fields, "demolition_date"]
+
         super().save(*args, **kwargs)
+
+        if was_active is True and not self.is_active and not skip_abort_cleanup:
+            from .lifecycle import cancel_related_items_for_aborted_equipment
+
+            cancel_related_items_for_aborted_equipment(self)
 
     def get_active_renovation_work_order(self):
         if hasattr(self, "active_renovation_work_order"):

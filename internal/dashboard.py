@@ -25,6 +25,7 @@ ACTIVE_MAINTENANCE_STATUSES = [MaintenanceAction.STATUS_PLANNED, MaintenanceActi
 EXCLUDED_DASHBOARD_DEFECT_STATUSES = [
     Defect.STATUS_IN_PROGRESS,
     Defect.STATUS_VERIFIED,
+    Defect.STATUS_CANCELED,
 ]
 DASHBOARD_INSPECTION_TASK_STATUS_CHOICES = [
     (InspectionTask.STATUS_OPEN, "Open"),
@@ -241,7 +242,7 @@ def build_dashboard_context(scope):
         inspection_tasks = inspection_tasks.filter(organization=organization)
         equipment = equipment.filter(playground__organization=organization)
 
-    open_defects = defects.exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED])
+    open_defects = defects.exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED, Defect.STATUS_CANCELED])
     safety_risk_defects = open_defects.filter(has_safety_risk=True)
     planned_maintenance_actions = maintenance_actions.exclude(status__in=[MaintenanceAction.STATUS_DONE, MaintenanceAction.STATUS_CANCELLED])
     completed_inspections = inspections.filter(status=Inspection.STATUS_COMPLETED)

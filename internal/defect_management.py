@@ -40,6 +40,7 @@ OPEN_DEFECT_STATUSES = [
 LOCKED_PLANNING_STATUSES = [
     Defect.STATUS_DONE,
     Defect.STATUS_VERIFIED,
+    Defect.STATUS_CANCELED,
 ]
 ACTIVE_MAINTENANCE_STATUSES = [
     MaintenanceAction.STATUS_PLANNED,
@@ -54,18 +55,21 @@ DEFECT_STATUS_FILTER_CHOICES = [
     (DEFECT_STATUS_OVERDUE, "Überfällig"),
     (Defect.STATUS_DONE, "Behoben"),
     (Defect.STATUS_VERIFIED, "Geprüft / abgeschlossen"),
+    (Defect.STATUS_CANCELED, "Abgebrochen"),
 ]
 
 DEFECT_MANUAL_STATUS_CHOICES = [
     (Defect.STATUS_OPEN, "Offen"),
     (Defect.STATUS_DONE, "Behoben"),
     (Defect.STATUS_VERIFIED, "Geprüft / abgeschlossen"),
+    (Defect.STATUS_CANCELED, "Abgebrochen"),
 ]
 
 DEFECT_STATUS_ACTIONS = {
     Defect.STATUS_OPEN,
     Defect.STATUS_DONE,
     Defect.STATUS_VERIFIED,
+    Defect.STATUS_CANCELED,
 }
 
 AUTO_PLANNED_SOURCE_STATUSES = {
@@ -280,6 +284,7 @@ def build_status_counts(defects):
         "overdue": defects.filter(status__in=OPEN_DEFECT_STATUSES, maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES, maintenance_actions__planned_date__lt=today).distinct().count(),
         "done": defects.filter(status=Defect.STATUS_DONE).distinct().count(),
         "verified": defects.filter(status=Defect.STATUS_VERIFIED).distinct().count(),
+        "canceled": defects.filter(status=Defect.STATUS_CANCELED).distinct().count(),
     }
 
 
@@ -611,6 +616,9 @@ def update_defect_status(request, defect_id):
             active_action.status = MaintenanceAction.STATUS_DONE
             active_action.completed_date = active_action.completed_date or timezone.localdate()
             active_action.save(update_fields=["status", "completed_date", "updated_at"])
+    elif status == Defect.STATUS_CANCELED:
+        cancel_active_maintenance_actions(defect)
+        defect = get_manageable_defect(defect_id)
 
     defect.status = status
     defect.save(update_fields=["status", "updated_at"])
@@ -621,4 +629,6 @@ def update_defect_status(request, defect_id):
         messages.success(request, "Der Mangelstatus wurde auf behoben gesetzt.")
     elif status == Defect.STATUS_VERIFIED:
         messages.success(request, "Der Mangel wurde geprüft und abgeschlossen.")
+    elif status == Defect.STATUS_CANCELED:
+        messages.success(request, "Der Mangel wurde abgebrochen.")
     return redirect(defect_management_redirect_url(request, defect.playground.organization_id))

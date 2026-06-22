@@ -14,7 +14,7 @@ HTML_DATE_FORMAT = "%Y-%m-%d"
 HTML_DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 TARGET_TYPE_CHOICES = [(TARGET_TYPE_NONE, _("General playground defect")), (TARGET_TYPE_EQUIPMENT, _("Play equipment")), (TARGET_TYPE_SURFACE, _("Impact protection surface / ground")), (TARGET_TYPE_ACCESSORY, _("Additional equipment"))]
 CREATE_STATUS_CHOICES = [(Defect.STATUS_OPEN, _("Open"))]
-MANUAL_STATUS_CHOICES = [(Defect.STATUS_OPEN, _("Open")), (Defect.STATUS_DONE, _("Resolved")), (Defect.STATUS_VERIFIED, _("Checked / completed"))]
+MANUAL_STATUS_CHOICES = [(Defect.STATUS_OPEN, _("Open")), (Defect.STATUS_DONE, _("Resolved")), (Defect.STATUS_VERIFIED, _("Checked / completed")), (Defect.STATUS_CANCELED, _("Canceled"))]
 
 
 def apply_bootstrap_classes(form):

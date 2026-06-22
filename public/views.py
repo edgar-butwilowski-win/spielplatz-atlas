@@ -21,6 +21,7 @@ from accounts.permissions import (
     get_active_profile,
     user_may_inspect,
     user_may_maintain,
+    user_may_manage_organization,
     user_may_view_internal,
 )
 from inspections.models import Defect, Inspection, MaintenanceAction
@@ -147,6 +148,7 @@ def get_playground_detail_permissions(user, playground):
         "can_open_defect": False,
         "can_view_equipment_renovation": False,
         "can_edit_equipment_renovation": False,
+        "can_abort_equipment": False,
     }
     if not user.is_authenticated:
         return permissions
@@ -161,6 +163,7 @@ def get_playground_detail_permissions(user, playground):
     permissions["can_open_defect"] = can_view_internal
     permissions["can_view_equipment_renovation"] = can_view_internal
     permissions["can_edit_equipment_renovation"] = can_maintain
+    permissions["can_abort_equipment"] = user_may_manage_organization(user, organization)
     return permissions
 
 
@@ -272,6 +275,7 @@ def playground_detail(request, organization_slug, playground_slug):
     can_open_defect = permissions["can_open_defect"]
     can_view_equipment_renovation = permissions["can_view_equipment_renovation"]
     can_edit_equipment_renovation = permissions["can_edit_equipment_renovation"]
+    can_abort_equipment = permissions["can_abort_equipment"]
     can_manage_photos = can_create_inspection
     can_view_playground_documents = user_may_view_playground_documents(request.user, playground)
     playground_documents = []
@@ -288,7 +292,7 @@ def playground_detail(request, organization_slug, playground_slug):
         Defect.objects
         .select_related("equipment", "surface", "accessory", "inspection")
         .filter(playground=playground)
-        .exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED])
+        .exclude(status__in=[Defect.STATUS_DONE, Defect.STATUS_VERIFIED, Defect.STATUS_CANCELED])
         .annotate(next_planned_date=Min("maintenance_actions__planned_date", filter=Q(maintenance_actions__status__in=ACTIVE_MAINTENANCE_STATUSES)))
     )
     if not can_open_defect:
@@ -318,6 +322,7 @@ def playground_detail(request, organization_slug, playground_slug):
         "can_open_defect": can_open_defect,
         "can_view_equipment_renovation": can_view_equipment_renovation,
         "can_edit_equipment_renovation": can_edit_equipment_renovation,
+        "can_abort_equipment": can_abort_equipment,
         "can_manage_photos": can_manage_photos,
         "can_view_playground_documents": can_view_playground_documents,
         "certificate_documents": certificate_documents,
