@@ -193,8 +193,8 @@ def inspections_csv_response(organization, date_from, date_to):
     for inspection in queryset.iterator(chunk_size=1000):
         writer.writerow([
             inspection.id,
-            inspection.playground.organization.name,
-            inspection.playground.name,
+            inspection.archived_organization_name,
+            inspection.archived_playground_name,
             inspection.get_inspection_type_display(),
             date_value(inspection.inspected_at),
             user_display_name(inspection.inspector),
@@ -269,8 +269,8 @@ def defects_csv_response(organization, date_from, date_to):
             date_value(defect.planned_resolution_date),
             "Ja" if defect.public_visible else "Nein",
             defect.inspection_id or "",
-            defect.inspection_answer.scope.label if defect.inspection_answer and defect.inspection_answer.scope else "",
-            defect.inspection_answer.criterion.title if defect.inspection_answer and defect.inspection_answer.criterion else "",
+            defect.inspection_answer.scope.archived_label if defect.inspection_answer and defect.inspection_answer.scope else "",
+            defect.inspection_answer.archived_criterion_title if defect.inspection_answer and defect.inspection_answer.criterion else "",
             defect.internal_description,
             defect.internal_note,
             defect.public_note,

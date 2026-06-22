@@ -25,9 +25,9 @@
         <div class="context-label mb-2">{% trans "Record defect from inspection item" %}</div>
         <h1 class="fw-bold h3 mb-3">{{ playground.name }}</h1>
         <div class="row g-3">
-            <div class="col-lg-6"><div class="small text-secondary mb-1">{% trans "Inspection area" %}</div><div class="fw-semibold">{% if answer.scope %}{{ answer.scope.label }}{% else %}{% trans "Without inspection area" %}{% endif %}</div></div>
-            <div class="col-lg-6"><div class="small text-secondary mb-1">{% trans "Inspection criterion" %}</div><div class="fw-semibold">{{ answer.criterion.title }}</div></div>
-            {% if answer.criterion.inspection_text %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Inspection note" %}</div><div>{{ answer.criterion.inspection_text }}</div></div>{% endif %}
+            <div class="col-lg-6"><div class="small text-secondary mb-1">{% trans "Inspection area" %}</div><div class="fw-semibold">{% if answer.scope %}{{ answer.scope.archived_label }}{% else %}{% trans "Without inspection area" %}{% endif %}</div></div>
+            <div class="col-lg-6"><div class="small text-secondary mb-1">{% trans "Inspection criterion" %}</div><div class="fw-semibold">{{ answer.archived_criterion_title }}</div></div>
+            {% if answer.archived_criterion_inspection_text %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Inspection note" %}</div><div>{{ answer.archived_criterion_inspection_text }}</div></div>{% endif %}
             {% if answer.comment %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Comment from inspection" %}</div><div class="p-3 rounded-3 bg-light">{{ answer.comment }}</div></div>{% endif %}
         </div>
     </div>

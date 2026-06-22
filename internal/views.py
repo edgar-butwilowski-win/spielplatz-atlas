@@ -407,7 +407,7 @@ def inspection_detail(request, inspection_id):
             "scope__accessory",
         )
         .prefetch_related("defects")
-        .order_by("scope__sort_order", "criterion__area", "criterion__title")
+        .order_by("scope__sort_order", "criterion_area_snapshot", "criterion_title_snapshot")
     )
 
     scopes = (
@@ -420,7 +420,7 @@ def inspection_detail(request, inspection_id):
             "accessory",
         )
         .prefetch_related("answers", "answers__criterion", "answers__defects")
-        .order_by("sort_order", "label")
+        .order_by("sort_order", "label_snapshot", "label")
     )
 
     pending_answers_count = answers.filter(
@@ -512,6 +512,43 @@ def save_inspection_answers(request, inspection_id):
     return redirect("internal:inspection_detail", inspection_id=inspection.id)
 
 
+def refresh_inspection_archive_snapshots(inspection):
+    inspection.refresh_archive_snapshot()
+    inspection.save(update_fields=["playground_name_snapshot", "organization_name_snapshot"])
+
+    for scope in inspection.scopes.select_related(
+        "equipment",
+        "equipment__equipment_type",
+        "surface",
+        "accessory",
+    ):
+        scope.refresh_archive_snapshot()
+        scope.save(
+            update_fields=[
+                "label_snapshot",
+                "equipment_name_snapshot",
+                "equipment_inventory_number_snapshot",
+                "equipment_type_snapshot",
+                "surface_name_snapshot",
+                "accessory_name_snapshot",
+            ]
+        )
+
+    for answer in inspection.answers.select_related("criterion").prefetch_related("defects"):
+        answer.refresh_archive_snapshot()
+        answer.refresh_defect_summary_snapshot()
+        answer.save(
+            update_fields=[
+                "criterion_area_snapshot",
+                "criterion_title_snapshot",
+                "criterion_inspection_text_snapshot",
+                "criterion_maintenance_text_snapshot",
+                "criterion_norm_reference_snapshot",
+                "defect_summary_snapshot",
+            ]
+        )
+
+
 @login_required
 @require_POST
 def complete_inspection(request, inspection_id):
@@ -547,6 +584,8 @@ def complete_inspection(request, inspection_id):
     has_defects = inspection.answers.filter(
         answer=InspectionAnswer.ANSWER_DEFECT
     ).exists()
+
+    refresh_inspection_archive_snapshots(inspection)
 
     inspection.status = Inspection.STATUS_COMPLETED
     inspection.completed_at = timezone.now()

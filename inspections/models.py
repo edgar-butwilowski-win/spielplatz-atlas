@@ -77,6 +77,8 @@ class Inspection(models.Model):
     STATUS_COMPLETED = "completed"
     STATUS_CHOICES = [(STATUS_DRAFT, _("In progress")), (STATUS_COMPLETED, _("Completed"))]
     playground = models.ForeignKey("playgrounds.Playground", on_delete=models.CASCADE, related_name="inspections", verbose_name="Spielplatz")
+    playground_name_snapshot = models.CharField("Archiv: Spielplatz", max_length=255, blank=True)
+    organization_name_snapshot = models.CharField("Archiv: Organisation", max_length=255, blank=True)
     inspection_type = models.CharField("Kontrollart", max_length=30, choices=TYPE_CHOICES, default=TYPE_VISUAL)
     inspected_at = models.DateField("Kontrolldatum", default=timezone.localdate)
     inspector = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="inspections", verbose_name="Kontrollperson")
@@ -95,6 +97,28 @@ class Inspection(models.Model):
 
     def __str__(self):
         return f"{self.playground} – {self.get_inspection_type_display()} – {self.inspected_at}"
+
+    @property
+    def archived_playground_name(self):
+        return self.playground_name_snapshot or (self.playground.name if self.playground_id else "")
+
+    @property
+    def archived_organization_name(self):
+        if self.organization_name_snapshot:
+            return self.organization_name_snapshot
+        if self.playground_id and self.playground.organization_id:
+            return self.playground.organization.name
+        return ""
+
+    def refresh_archive_snapshot(self):
+        if self.playground_id:
+            self.playground_name_snapshot = self.playground.name
+            self.organization_name_snapshot = self.playground.organization.name
+
+    def save(self, *args, **kwargs):
+        if self.playground_id and (not self.playground_name_snapshot or not self.organization_name_snapshot):
+            self.refresh_archive_snapshot()
+        super().save(*args, **kwargs)
 
 
 class InspectionRule(models.Model):
@@ -210,6 +234,12 @@ class InspectionScope(models.Model):
     surface = models.ForeignKey("playgrounds.PlaygroundSurface", on_delete=models.CASCADE, related_name="inspection_scopes", null=True, blank=True, verbose_name="Fallschutzfläche / Boden")
     accessory = models.ForeignKey("playgrounds.PlaygroundAccessory", on_delete=models.CASCADE, related_name="inspection_scopes", null=True, blank=True, verbose_name="Zusatzausstattung")
     label = models.CharField("Bezeichnung", max_length=255)
+    label_snapshot = models.CharField("Archiv: Bezeichnung", max_length=255, blank=True)
+    equipment_name_snapshot = models.CharField("Archiv: Spielgerät", max_length=255, blank=True)
+    equipment_inventory_number_snapshot = models.CharField("Archiv: Inventarnummer", max_length=100, blank=True)
+    equipment_type_snapshot = models.CharField("Archiv: Spielgerätetyp", max_length=255, blank=True)
+    surface_name_snapshot = models.CharField("Archiv: Fallschutzfläche / Boden", max_length=255, blank=True)
+    accessory_name_snapshot = models.CharField("Archiv: Zusatzausstattung", max_length=255, blank=True)
     sort_order = models.PositiveIntegerField("Sortierung", default=0)
 
     class Meta:
@@ -218,7 +248,51 @@ class InspectionScope(models.Model):
         verbose_name_plural = "Prüfbereiche"
 
     def __str__(self):
-        return f"{self.inspection} – {self.label}"
+        return f"{self.inspection} – {self.archived_label}"
+
+    @property
+    def archived_label(self):
+        return self.label_snapshot or self.label
+
+    @property
+    def archived_equipment_name(self):
+        return self.equipment_name_snapshot or (self.equipment.name if self.equipment_id else "")
+
+    @property
+    def archived_equipment_inventory_number(self):
+        return self.equipment_inventory_number_snapshot or (self.equipment.inventory_number if self.equipment_id else "")
+
+    @property
+    def archived_equipment_type(self):
+        if self.equipment_type_snapshot:
+            return self.equipment_type_snapshot
+        if self.equipment_id and self.equipment.equipment_type_id:
+            return self.equipment.equipment_type.name
+        return ""
+
+    @property
+    def archived_surface_name(self):
+        return self.surface_name_snapshot or (self.surface.name if self.surface_id else "")
+
+    @property
+    def archived_accessory_name(self):
+        return self.accessory_name_snapshot or (self.accessory.name if self.accessory_id else "")
+
+    def refresh_archive_snapshot(self):
+        self.label_snapshot = self.label
+        if self.equipment_id:
+            self.equipment_name_snapshot = self.equipment.name
+            self.equipment_inventory_number_snapshot = self.equipment.inventory_number or ""
+            self.equipment_type_snapshot = self.equipment.equipment_type.name if self.equipment.equipment_type_id else ""
+        if self.surface_id:
+            self.surface_name_snapshot = self.surface.name
+        if self.accessory_id:
+            self.accessory_name_snapshot = self.accessory.name
+
+    def save(self, *args, **kwargs):
+        if not self.label_snapshot:
+            self.refresh_archive_snapshot()
+        super().save(*args, **kwargs)
 
 
 class InspectionAnswer(models.Model):
@@ -230,20 +304,68 @@ class InspectionAnswer(models.Model):
     inspection = models.ForeignKey(Inspection, on_delete=models.CASCADE, related_name="answers", verbose_name="Kontrolle")
     scope = models.ForeignKey(InspectionScope, on_delete=models.CASCADE, related_name="answers", null=True, blank=True, verbose_name="Prüfbereich")
     criterion = models.ForeignKey(InspectionCriterion, on_delete=models.PROTECT, related_name="answers", verbose_name="Prüfkriterium")
+    criterion_area_snapshot = models.CharField("Archiv: Bereich", max_length=255, blank=True)
+    criterion_title_snapshot = models.CharField("Archiv: Prüfkriterium", max_length=255, blank=True)
+    criterion_inspection_text_snapshot = models.TextField("Archiv: Prüfhinweis", blank=True)
+    criterion_maintenance_text_snapshot = models.TextField("Archiv: Wartungshinweis", blank=True)
+    criterion_norm_reference_snapshot = models.CharField("Archiv: Norm-/Quellenhinweis", max_length=255, blank=True)
     equipment = models.ForeignKey("playgrounds.PlayEquipment", on_delete=models.SET_NULL, related_name="inspection_answers", null=True, blank=True, verbose_name="Spielgerät")
     answer = models.CharField("Antwort", max_length=30, choices=ANSWER_CHOICES, default=ANSWER_PENDING)
     comment = models.TextField("Kommentar", blank=True)
+    defect_summary_snapshot = models.TextField("Archiv: Mängel zum Abschlusszeitpunkt", blank=True)
     created_at = models.DateTimeField("Erstellt am", auto_now_add=True)
     updated_at = models.DateTimeField("Aktualisiert am", auto_now=True)
 
     class Meta:
-        ordering = ["scope__sort_order", "criterion__area", "criterion__title"]
+        ordering = ["scope__sort_order", "criterion_area_snapshot", "criterion_title_snapshot"]
         unique_together = [("inspection", "scope", "criterion")]
         verbose_name = "Prüfantwort"
         verbose_name_plural = "Prüfantworten"
 
     def __str__(self):
-        return f"{self.inspection} – {self.criterion} – {self.get_answer_display()}"
+        return f"{self.inspection} – {self.archived_criterion_title} – {self.get_answer_display()}"
+
+    @property
+    def archived_criterion_area(self):
+        return self.criterion_area_snapshot or self.criterion.area
+
+    @property
+    def archived_criterion_title(self):
+        return self.criterion_title_snapshot or self.criterion.title
+
+    @property
+    def archived_criterion_inspection_text(self):
+        return self.criterion_inspection_text_snapshot or self.criterion.inspection_text
+
+    @property
+    def archived_criterion_maintenance_text(self):
+        return self.criterion_maintenance_text_snapshot or self.criterion.maintenance_text
+
+    @property
+    def archived_criterion_norm_reference(self):
+        return self.criterion_norm_reference_snapshot or self.criterion.norm_reference
+
+    def refresh_archive_snapshot(self):
+        self.criterion_area_snapshot = self.criterion.area
+        self.criterion_title_snapshot = self.criterion.title
+        self.criterion_inspection_text_snapshot = self.criterion.inspection_text
+        self.criterion_maintenance_text_snapshot = self.criterion.maintenance_text
+        self.criterion_norm_reference_snapshot = self.criterion.norm_reference
+
+    def refresh_defect_summary_snapshot(self):
+        if not self.pk:
+            self.defect_summary_snapshot = ""
+            return
+
+        defects = self.defects.order_by("id")
+        self.defect_summary_snapshot = ", ".join(
+            f"#{defect.id} {defect.get_status_display()}" for defect in defects
+        )
+
+    def save(self, *args, **kwargs):
+        if self.criterion_id and not self.criterion_title_snapshot:
+            self.refresh_archive_snapshot()
+        super().save(*args, **kwargs)
 
 
 class Defect(models.Model):

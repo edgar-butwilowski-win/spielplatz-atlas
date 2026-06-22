@@ -37,7 +37,7 @@
             <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Reported on" %}</div><div class="fw-semibold">{{ defect.reported_at|date:"d.m.Y H:i" }}</div></div>
             <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Affected object" %}</div><div class="fw-semibold">{% if defect.equipment %}{{ defect.equipment.name }}{% elif defect.surface %}{{ defect.surface.name }}{% elif defect.accessory %}{{ defect.accessory.name }}{% else %}{% trans "General playground defect" %}{% endif %}</div></div>
             <div class="col-lg-4"><div class="small text-secondary mb-1">{% trans "Responsible person" %}</div><div class="fw-semibold">{% if current_assignment and current_assignment.assigned_to %}{{ current_assignment.assigned_to.get_full_name|default:current_assignment.assigned_to.username }}{% else %}{% trans "Not assigned yet" %}{% endif %}</div></div>
-            {% if defect.inspection_answer %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Created from inspection item" %}</div><div class="p-3 rounded-3 bg-light">{% if defect.inspection_answer.scope %}<strong>{{ defect.inspection_answer.scope.label }}</strong><br>{% endif %}{{ defect.inspection_answer.criterion.title }}</div></div>{% endif %}
+            {% if defect.inspection_answer %}<div class="col-12"><div class="small text-secondary mb-1">{% trans "Created from inspection item" %}</div><div class="p-3 rounded-3 bg-light">{% if defect.inspection_answer.scope %}<strong>{{ defect.inspection_answer.scope.archived_label }}</strong><br>{% endif %}{{ defect.inspection_answer.archived_criterion_title }}</div></div>{% endif %}
         </div>
     </div>
     {% if can_manage_assignment %}

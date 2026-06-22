@@ -249,18 +249,18 @@ def inspection_pdf(request, inspection_id):
         .filter(inspection=inspection)
         .select_related("scope", "criterion")
         .prefetch_related("defects")
-        .order_by("scope__sort_order", "criterion__area", "criterion__title")
+        .order_by("scope__sort_order", "criterion_area_snapshot", "criterion_title_snapshot")
     )
 
     title = f"Prüfprotokoll Kontrolle #{inspection.id}"
-    subtitle = f"{inspection.playground.name} · {inspection.playground.organization.name}"
+    subtitle = f"{inspection.archived_playground_name} · {inspection.archived_organization_name}"
 
     def build_story(story, styles):
         add_key_value_table(
             story,
             [
-                ("Spielplatz", inspection.playground.name),
-                ("Organisation", inspection.playground.organization.name),
+                ("Spielplatz", inspection.archived_playground_name),
+                ("Organisation", inspection.archived_organization_name),
                 ("Kontrollart", inspection.get_inspection_type_display()),
                 ("Kontrolldatum", date_value(inspection.inspected_at)),
                 ("Kontrollperson", user_display_name(inspection.inspector)),
@@ -284,11 +284,11 @@ def inspection_pdf(request, inspection_id):
         ]]
 
         for answer in answers:
-            defects = ", ".join(f"#{defect.id} {defect.get_status_display()}" for defect in answer.defects.all())
+            defects = answer.defect_summary_snapshot if inspection.status == Inspection.STATUS_COMPLETED else ", ".join(f"#{defect.id} {defect.get_status_display()}" for defect in answer.defects.all())
             table_data.append([
-                paragraph(answer.criterion.area, styles["AtlasCell"]),
-                paragraph(answer.scope.label if answer.scope else "", styles["AtlasCell"]),
-                paragraph(answer.criterion.title, styles["AtlasCell"]),
+                paragraph(answer.archived_criterion_area, styles["AtlasCell"]),
+                paragraph(answer.scope.archived_label if answer.scope else "", styles["AtlasCell"]),
+                paragraph(answer.archived_criterion_title, styles["AtlasCell"]),
                 paragraph(answer.get_answer_display(), styles["AtlasCell"]),
                 paragraph(answer.comment, styles["AtlasCell"]),
                 paragraph(defects, styles["AtlasCell"]),
@@ -315,7 +315,7 @@ def inspection_pdf(request, inspection_id):
         story.append(table)
 
     buffer = build_pdf(title, subtitle, build_story, pagesize=landscape(A4))
-    filename = filename_slug("pruefprotokoll", inspection.playground.name, inspection.id) + ".pdf"
+    filename = filename_slug("pruefprotokoll", inspection.archived_playground_name, inspection.id) + ".pdf"
     return pdf_response(buffer, filename)
 
 
@@ -370,10 +370,10 @@ def defect_pdf(request, defect_id):
             story.append(paragraph("Bezug zur Kontrolle", styles["AtlasSection"]))
             criterion = ""
             if defect.inspection_answer and defect.inspection_answer.criterion:
-                criterion = defect.inspection_answer.criterion.title
+                criterion = defect.inspection_answer.archived_criterion_title
             scope = ""
             if defect.inspection_answer and defect.inspection_answer.scope:
-                scope = defect.inspection_answer.scope.label
+                scope = defect.inspection_answer.scope.archived_label
             add_key_value_table(
                 story,
                 [
@@ -427,8 +427,8 @@ def inspections_csv(request):
     for inspection in queryset:
         writer.writerow([
             inspection.id,
-            inspection.playground.organization.name,
-            inspection.playground.name,
+            inspection.archived_organization_name,
+            inspection.archived_playground_name,
             inspection.get_inspection_type_display(),
             date_value(inspection.inspected_at),
             user_display_name(inspection.inspector),
@@ -511,8 +511,8 @@ def defects_csv(request):
             date_value(defect.planned_resolution_date),
             "Ja" if defect.public_visible else "Nein",
             defect.inspection_id or "",
-            defect.inspection_answer.scope.label if defect.inspection_answer and defect.inspection_answer.scope else "",
-            defect.inspection_answer.criterion.title if defect.inspection_answer and defect.inspection_answer.criterion else "",
+            defect.inspection_answer.scope.archived_label if defect.inspection_answer and defect.inspection_answer.scope else "",
+            defect.inspection_answer.archived_criterion_title if defect.inspection_answer and defect.inspection_answer.criterion else "",
             defect.internal_description,
             defect.internal_note,
             defect.public_note,

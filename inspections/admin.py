@@ -6,7 +6,7 @@
 # Unauthorized copying, modification, distribution, or use is prohibited
 # unless expressly permitted in writing.
 
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from accounts.admin_utils import OrganizationAdminPermissionMixin, get_user_organization
 from playgrounds.models import PlayEquipment, Playground, PlaygroundAccessory, PlaygroundSurface
@@ -59,24 +59,50 @@ def object_organization_from_defect_object(obj):
     return defect.playground.organization if defect and defect.playground_id else None
 
 
-class InspectionAnswerInline(admin.TabularInline):
+def inspection_is_completed(obj):
+    if obj is None:
+        return False
+    inspection = obj if isinstance(obj, Inspection) else getattr(obj, "inspection", None)
+    return bool(inspection and inspection.status == Inspection.STATUS_COMPLETED)
+
+
+class CompletedInspectionReadOnlyInlineMixin:
+    def has_add_permission(self, request, obj=None):
+        if inspection_is_completed(obj):
+            return False
+        return super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        if inspection_is_completed(obj):
+            return False
+        return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if inspection_is_completed(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+
+
+class InspectionAnswerInline(CompletedInspectionReadOnlyInlineMixin, admin.TabularInline):
     model = InspectionAnswer
     extra = 0
     autocomplete_fields = ("scope", "criterion", "equipment")
-    fields = ("scope", "criterion", "equipment", "answer", "comment")
+    fields = ("scope", "criterion", "criterion_title_snapshot", "criterion_area_snapshot", "equipment", "answer", "comment", "defect_summary_snapshot")
+    readonly_fields = ("criterion_title_snapshot", "criterion_area_snapshot", "defect_summary_snapshot")
 
 
-class DefectInline(admin.StackedInline):
+class DefectInline(CompletedInspectionReadOnlyInlineMixin, admin.StackedInline):
     model = Defect
     extra = 0
     autocomplete_fields = ("equipment",)
 
 
-class InspectionScopeInline(admin.TabularInline):
+class InspectionScopeInline(CompletedInspectionReadOnlyInlineMixin, admin.TabularInline):
     model = InspectionScope
     extra = 0
     autocomplete_fields = ("equipment", "surface", "accessory")
-    fields = ("scope_type", "equipment", "surface", "accessory", "label", "sort_order")
+    fields = ("scope_type", "equipment", "surface", "accessory", "label", "label_snapshot", "sort_order")
+    readonly_fields = ("label_snapshot",)
 
 
 class InspectionCriterionApplicabilityInline(admin.StackedInline):
@@ -173,6 +199,22 @@ class InspectionScopeAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    def get_readonly_fields(self, request, obj=None):
+        if inspection_is_completed(obj):
+            return [field.name for field in self.model._meta.fields]
+        return super().get_readonly_fields(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if inspection_is_completed(obj):
+            return False
+        return super().has_delete_permission(request, obj)
+
+    def save_model(self, request, obj, form, change):
+        if inspection_is_completed(obj):
+            messages.error(request, "Abgeschlossene Kontrollen sind archiviert und dürfen nicht verändert werden.")
+            return
+        super().save_model(request, obj, form, change)
+
 
 def get_allowed_minimum_inspection_types(inspection_type):
     if inspection_type == Inspection.TYPE_VISUAL:
@@ -189,8 +231,8 @@ def get_allowed_minimum_inspection_types(inspection_type):
 
 @admin.register(Inspection)
 class InspectionAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
-    list_display = ("playground", "inspection_type", "inspected_at", "inspector", "result", "created_at")
-    list_filter = ("inspection_type", "result", "playground__organization", "inspected_at")
+    list_display = ("playground", "inspection_type", "inspected_at", "inspector", "result", "status", "completed_at", "created_at")
+    list_filter = ("inspection_type", "result", "status", "playground__organization", "inspected_at")
     search_fields = ("playground__name", "inspector__email", "notes")
     autocomplete_fields = ("playground", "inspector")
     inlines = (InspectionScopeInline, InspectionAnswerInline, DefectInline)
@@ -212,7 +254,25 @@ class InspectionAdmin(OrganizationAdminPermissionMixin, admin.ModelAdmin):
 
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
+    def get_readonly_fields(self, request, obj=None):
+        snapshot_fields = ("playground_name_snapshot", "organization_name_snapshot", "completed_at", "completed_by")
+        if obj and obj.status == Inspection.STATUS_COMPLETED:
+            return [field.name for field in self.model._meta.fields]
+        return tuple(super().get_readonly_fields(request, obj)) + snapshot_fields
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and obj.status == Inspection.STATUS_COMPLETED:
+            return False
+        return super().has_delete_permission(request, obj)
+
     def save_model(self, request, obj, form, change):
+        if change and obj.pk:
+            previous = Inspection.objects.filter(pk=obj.pk).only("status").first()
+            if previous and previous.status == Inspection.STATUS_COMPLETED:
+                messages.error(request, "Abgeschlossene Kontrollen sind archiviert und dürfen nicht verändert werden.")
+                return
+
         is_new = obj.pk is None
 
         if not change and not request.user.is_superuser:
